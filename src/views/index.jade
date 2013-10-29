@@ -1,0 +1,16 @@
+extends layout
+
+block content
+    h1= title
+    p Welcome to #{title}
+    if authFailed
+        p Auth failed
+    if !authSuccess
+        a(href='/auth') Login with twitter
+    if authSuccess
+        p #{userInfo.name}
+        img(src= userInfo.profile_image_url)
+        div.view
+            p(data-bind='text: testTitle')
+            div.gmap(data-bind='gmap: true, center: gmapCenter, zoom: gmapZoom, bound: gmapBound')
+            p(data-bind='text: gmapCenter')
