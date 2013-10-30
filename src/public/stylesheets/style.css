@@ -1,14 +1,107 @@
 body {
-  padding: 50px;
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+    padding: 5px;
+    font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 
+/*
 a {
-  color: #00B7FF;
+    color: #00B7FF;
+}
+*/
+
+a.no-decoration{
+    text-decoration: none;
 }
 
-.gmap{
-    width: 640px;
+p {
+    margin-bottom: 5px;
+    margin-top: 0;
+}
+
+ul{
+    padding-left: 0;
+    list-style: none;
+}
+
+.view {
+    text-align: center;
+}
+
+.pane-left {
+    display: inline-block;
+    width: 60%;
+    text-align: left;
+    vertical-align: top;
+    margin: 5px;
+}
+
+.pane-right {
+    display: inline-block;
+    width: 30%;
+    text-align: left;
+    vertical-align: top;
+    margin: 5px;
+}
+
+.gmap {
+    width: 100%;
     height: 480px;
     border: solid 1px;
 }
+
+.geo-autocomplete {
+    width: 100%;
+    padding-right: 0;
+    margin-bottom: 5px;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.avatar {
+    border-radius: 4px;
+    border: solid 1px;
+    width: 48px;
+    height: 48px;
+    margin-right: 5px;
+    vertical-align: top;
+}
+
+.account-info {
+    display: inline-block;
+    vertical-align: top;
+}
+
+.screen-name:before {
+    content: '@';
+}
+
+li.li-tweet{
+    /*display: inline-block;*/
+    border-top: 1px solid #A9A9A9;
+    padding: 5px;
+}
+
+li.li-tweet .tweet-right{
+    display: inline-block;
+}
+
+.full-name{
+    font-weight: bold;
+    margin-right: 5px;
+    color: black;
+}
+
+.screen-name{
+    font-size: 12px;
+    color: darkgray;
+}
+
+.tweet-date{
+    font-size:12px;
+    color: darkgray;
+    margin-left: 5px;
+    float: right;
+}
+

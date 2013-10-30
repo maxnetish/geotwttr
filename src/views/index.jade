@@ -1,16 +1,35 @@
 extends layout
 
 block content
-    h1= title
-    p Welcome to #{title}
+    h1.text-center= title
     if authFailed
         p Auth failed
     if !authSuccess
-        a(href='/auth') Login with twitter
+        p.text-center
+            a(href='/auth') Login with twitter
     if authSuccess
-        p #{userInfo.name}
-        img(src= userInfo.profile_image_url)
         div.view
-            p(data-bind='text: testTitle')
-            div.gmap(data-bind='gmap: true, center: gmapCenter, zoom: gmapZoom, bound: gmapBound')
-            p(data-bind='text: gmapCenter')
+            h2.text-center(data-bind='text: title')
+            div.pane-left
+                input.geo-autocomplete(data-bind="geoAutocomplete: '.gmap'", type="text")
+                div.gmap(data-bind='gmap: gmapState')
+                p(data-bind='text: gmapState().center')
+            div.pane-right
+                div.account-card
+                    p Signed in as
+                    a.no-decoration(href= "https://twitter.com/"+userInfo.screen_name, target="_blank")
+                        img.avatar(src= userInfo.profile_image_url)
+                        div.account-info
+                            span.full-name #{userInfo.name}
+                            br
+                            span.screen-name #{userInfo.screen_name}
+                    a(href="/logout") Sign-out
+                ul#tweet-list(data-bind='foreach: {data: searchResult, afterRender: setTweetContentWidth}')
+                    li.li-tweet
+                        img.avatar(data-bind="attr: {src: user.profile_image_url}"))
+                        div.tweet-right
+                            p.tweet-usernames
+                                span.full-name(data-bind="text: user.name")
+                                span.screen-name(data-bind="text: user.screen_name")
+                                span.tweet-date(data-bind='text: $parent.formatTweetDate($data)')
+                            p.tweet-text(data-bind='text: text')

@@ -5,6 +5,7 @@
 var store = require('./store').store;
 var OAuth = require('oauth').OAuth;
 var tokens = require('../config/tokens');
+var url = require('url');
 
 var oAuthConsumer = function () {
     return  new OAuth("https://api.twitter.com/oauth/request_token",
@@ -44,8 +45,30 @@ var verifyCredentials = function (accessToken, callback) {
     });
 };
 
+var searchTweets = function (accessToken, searchOptions, callback) {
+    store.getSecret(accessToken, function (error, secret) {
+        if (error) {
+            callback(error);
+            return;
+        }
+        var oa = oAuthConsumer();
+        var searchUrl = url.parse("https://api.twitter.com/1.1/search/tweets.json");
+        searchUrl.query = searchOptions;
+        var actualUnwrapped = url.format(searchUrl);
+        oa.get(actualUnwrapped, accessToken, secret, function (error, result) {
+            if (error) {
+                callback(error);
+                return;
+            }
+            var resultParsed = JSON.parse(result);
+            callback(null, resultParsed);
+        });
+    });
+};
+
 exports.twitter = {
     isAccessTokenValid: verifyCredentials,
     getAccessToken: getAccessToken,
-    getRequestToken: getRequestToken
+    getRequestToken: getRequestToken,
+    searchTweets: searchTweets
 };
