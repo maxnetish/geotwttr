@@ -9,8 +9,14 @@ var models = {
 
         var _center = ko.observable(center);
         var _zoom = ko.observable(zoom);
+        var _circleVisible = ko.observable(false);
+        var _circleRadius = ko.observable(3);
+        var _circleCenter = ko.observable(center);
 
         this.center = _center;
         this.zoom = _zoom;
+        this.circleVisible = _circleVisible;
+        this.circleRadius = _circleRadius;
+        this.circleCenter = _circleCenter;
     }
 };

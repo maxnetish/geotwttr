@@ -9,7 +9,7 @@ a {
 }
 */
 
-a.no-decoration{
+a.no-decoration {
     text-decoration: none;
 }
 
@@ -18,7 +18,7 @@ p {
     margin-top: 0;
 }
 
-ul{
+ul {
     padding-left: 0;
     list-style: none;
 }
@@ -77,31 +77,47 @@ ul{
     content: '@';
 }
 
-li.li-tweet{
+li.li-tweet {
     /*display: inline-block;*/
     border-top: 1px solid #A9A9A9;
     padding: 5px;
 }
 
-li.li-tweet .tweet-right{
+li.li-tweet .tweet-right {
     display: inline-block;
 }
 
-.full-name{
+.full-name {
     font-weight: bold;
     margin-right: 5px;
     color: black;
 }
 
-.screen-name{
+.screen-name {
     font-size: 12px;
     color: darkgray;
 }
 
-.tweet-date{
-    font-size:12px;
+.tweet-date {
+    font-size: 12px;
     color: darkgray;
     margin-left: 5px;
     float: right;
+}
+
+.geo-radius-input {
+    width: 20%;
+}
+
+.geo-radius-value:after {
+    content: ' km';
+}
+
+.search-button {
+    float: right;
+}
+
+.search-type {
+    margin-left: 15px;
 }
 

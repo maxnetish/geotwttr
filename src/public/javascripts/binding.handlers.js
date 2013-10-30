@@ -33,6 +33,9 @@
             var gmapState = gmapStateObservable();
             var centerObservable = gmapState.center;
             var zoomObservable = gmapState.zoom;
+            var circleVisibleObservable = gmapState.circleVisible;
+            var circleRadiusObservable = gmapState.circleRadius;
+            var circleCenterObservable = gmapState.circleCenter;
             var centerObsevableWillBeChanged = false;
             var zoomObservableWillBeChanged = false;
             var throttleDelay = 3000;
@@ -43,7 +46,21 @@
                 mapTypeId: google.maps.MapTypeId.ROADMAP
             };
             var map = new google.maps.Map(element, mapOptions);
+            var circle = new google.maps.Circle({
+                center: circleCenterObservable(),
+                clickable: false,
+                draggable: false,
+                editable: false,
+                fillColor: "#26AAE1",
+                fillOpacity: 0.1,
+                map: map,
+                radius: circleRadiusObservable() * 1000,
+                visible: circleVisibleObservable(),
+                strokeOpacity: 0.2,
+                strokeWeight: 1
+            });
             $(element).data("gmap", map);
+            $(element).data("circle", circle);
             console.log("[MAPS] map ready");
 
             google.maps.event.addListener(map, 'center_changed', function () {
@@ -71,6 +88,18 @@
             gmapStateObservable.subscribe(function () {
                 map.setZoom(zoomObservable());
                 map.panTo(centerObservable());
+            });
+
+            circleCenterObservable.subscribe(function (data) {
+                circle.setCenter(data);
+            });
+
+            circleRadiusObservable.subscribe(function (data) {
+                circle.setRadius(data * 1000);
+            });
+
+            circleVisibleObservable.subscribe(function (data) {
+                circle.setVisible(data);
             });
         }
         /*

@@ -11,7 +11,16 @@ block content
         div.view
             h2.text-center(data-bind='text: title')
             div.pane-left
-                input.geo-autocomplete(data-bind="geoAutocomplete: '.gmap'", type="text")
+                input.geo-radius-input(type="range", max="10", min="1", step="1", data-bind="value: searchRadius")
+                span.geo-radius-value(data-bind="text: searchRadius")
+                input.search-type(type="radio", name="searchTypeGroup", value="mixed", data-bind="checked: searchType")
+                span.search-value mixed
+                input.search-type(type="radio", name="searchTypeGroup", value="popular", data-bind="checked: searchType")
+                span.search-value popular
+                input.search-type(type="radio", name="searchTypeGroup", value="recent", data-bind="checked: searchType")
+                span.search-value recent
+                button.search-button(type="button", data-bind="click: searchButtonClick") Search
+                input.geo-autocomplete(data-bind="geoAutocomplete: '.gmap'", type="search")
                 div.gmap(data-bind='gmap: gmapState')
                 p(data-bind='text: gmapState().center')
             div.pane-right
