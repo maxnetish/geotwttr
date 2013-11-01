@@ -6,7 +6,7 @@ var tokens=require('../config/tokens');
 
 exports.indexVm = function () {
     var self = this;
-    var title = "geoTwttr";
+    var title = "Geo statuses";
     var googleAPiToken=tokens.google.apiToken;
 
 

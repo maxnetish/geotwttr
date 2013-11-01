@@ -13,6 +13,13 @@ a.no-decoration {
     text-decoration: none;
 }
 
+.preloader{
+    background: url(preloader.gif) no-repeat 50% 50%;
+    height: 24px;
+    width: 100%;
+    visibility: hidden;
+}
+
 p {
     margin-bottom: 5px;
     margin-top: 0;
@@ -110,7 +117,7 @@ li.li-tweet .tweet-right {
 }
 
 .geo-radius-value:after {
-    content: ' km';
+    content: ' m';
 }
 
 .search-button {

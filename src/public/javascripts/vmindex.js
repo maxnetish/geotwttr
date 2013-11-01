@@ -6,13 +6,11 @@ var vmIndex = function () {
     var self = this;
 
     var updateSearchResult = function () {
-        var center = self.gmapState().center();
-
-        self.gmapState().circleCenter(center);
-        self.gmapState().circleVisible(true);
+        var center = self.selectedLocation().center();
+        var radius = self.selectedLocation().radius() / 1000;
 
         var searchOptions = {
-            geocode: center.lat() + ',' + center.lng() + ',' + self.gmapState().circleRadius() + 'km',
+            geocode: center.lat() + ',' + center.lng() + ',' + radius + 'km',
             result_type: self.searchType() //'mixed', 'popular' or 'recent'
         };
 
@@ -33,11 +31,22 @@ var vmIndex = function () {
         });
     };
 
-    this.title = ko.observable("i'm vmIndex");
-    this.gmapState = ko.observable(new models.gmapState());
+    this.selectedLocation = ko.observable(new models.selectedLocation());
     this.searchResult = ko.observableArray();
-    this.searchRadius = this.gmapState().circleRadius;
-    this.searchType = ko.observable("mixed");
+    this.searchRadius = this.selectedLocation().radius;
+    this.searchType = ko.observable("recent");
+
+    this.title = ko.computed({
+        read: function () {
+            var geoName = self.selectedLocation().geoName();
+            if (geoName.length) {
+                return "Tweets near: " + geoName;
+            } else {
+                return "Tweets near...";
+            }
+        }
+    });
+
     this.setTweetContentWidth = function (element, tweet) {
         var $element = $(element);
         var $tweetright = $element.find(".tweet-right");
@@ -55,4 +64,7 @@ var vmIndex = function () {
     this.searchButtonClick = function () {
         updateSearchResult();
     }
+    this.selectedLocation.subscribe(function (data) {
+        updateSearchResult();
+    });
 };

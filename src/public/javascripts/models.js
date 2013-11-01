@@ -18,5 +18,17 @@ var models = {
         this.circleVisible = _circleVisible;
         this.circleRadius = _circleRadius;
         this.circleCenter = _circleCenter;
+    },
+    selectedLocation: function (center, radius) {
+        center = center || new google.maps.LatLng(0, 0);
+        radius = radius || 1000;
+
+        var _center = ko.observable(center),
+            _radius = ko.observable(radius),
+            _geoName = ko.observable("");
+
+        this.center = _center;
+        this.radius = _radius;
+        this.geoName = _geoName;
     }
 };

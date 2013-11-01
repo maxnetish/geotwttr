@@ -16,7 +16,7 @@ var getAccessTokenSecret = function (accessToken, callback) {
 
     client.get(accessToken, function (err, reply) {
         // reply is null when the key is missing
-        console.log(reply);
+        //console.log(reply);
         if (err) {
             callback(err, null);
             return;

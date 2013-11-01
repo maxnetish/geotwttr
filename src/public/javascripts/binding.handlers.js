@@ -27,79 +27,92 @@
         }, resizeThrottleDelay);
     });
 
+    $(document).ajaxStart(function () {
+        $(".preloader").css({visibility: 'visible'});
+    });
+
+    $(document).ajaxComplete(function (event, xhr, settings) {
+        $('.preloader').css({visibility: 'hidden'});
+    });
+
     ko.bindingHandlers.gmap = {
         init: function (element, valueAccessor) {
-            var gmapStateObservable = valueAccessor();
-            var gmapState = gmapStateObservable();
-            var centerObservable = gmapState.center;
-            var zoomObservable = gmapState.zoom;
-            var circleVisibleObservable = gmapState.circleVisible;
-            var circleRadiusObservable = gmapState.circleRadius;
-            var circleCenterObservable = gmapState.circleCenter;
+            var selectedLocationObservable = valueAccessor();
+            var selectedLocation = selectedLocationObservable();
+            var selectedCenterObservable = selectedLocation.center;
+            //var zoomObservable = selectedLocation.zoom;
+            //var circleVisibleObservable = selectedLocation.circleVisible;
+            var selectedRadiusObservable = selectedLocation.radius;
             var centerObsevableWillBeChanged = false;
-            var zoomObservableWillBeChanged = false;
             var throttleDelay = 3000;
 
             var mapOptions = {
-                center: centerObservable(),
-                zoom: zoomObservable(),
-                mapTypeId: google.maps.MapTypeId.ROADMAP
+                center: selectedCenterObservable(),
+                zoom: 6,
+                mapTypeId: google.maps.MapTypeId.ROADMAP,
+                streetViewControl: false,
+                rotateControl: false
             };
+
             var map = new google.maps.Map(element, mapOptions);
+
             var circle = new google.maps.Circle({
-                center: circleCenterObservable(),
+                center: selectedCenterObservable(),
                 clickable: false,
                 draggable: false,
-                editable: false,
+                editable: true,
                 fillColor: "#26AAE1",
                 fillOpacity: 0.1,
                 map: map,
-                radius: circleRadiusObservable() * 1000,
-                visible: circleVisibleObservable(),
+                radius: selectedRadiusObservable(),
+                visible: true,
                 strokeOpacity: 0.2,
                 strokeWeight: 1
             });
+            var geocoder = new google.maps.Geocoder();
+
             $(element).data("gmap", map);
             $(element).data("circle", circle);
             console.log("[MAPS] map ready");
 
+            var updateGeoName = function () {
+                geocoder.geocode({
+                    location: selectedCenterObservable()
+                }, function (result, status) {
+                    if (result.length && result[0].formatted_address) {
+                        selectedLocation.geoName(result[0].formatted_address);
+                    } else {
+                        selectedLocation.geoName("");
+                    }
+                });
+            };
+
+            google.maps.event.addListener(map, 'click', function (mouseEvent) {
+                var clickedPosition = mouseEvent.latLng;
+                circle.setCenter(clickedPosition);
+            });
+
+            google.maps.event.addListener(circle, 'center_changed', function () {
+                selectedCenterObservable(circle.getCenter());
+                selectedLocationObservable.valueHasMutated();
+                updateGeoName();
+            });
+
+            google.maps.event.addListener(circle, 'radius_changed', function () {
+                selectedRadiusObservable(Math.round(circle.getRadius()));
+                selectedLocationObservable.valueHasMutated();
+            });
+
             google.maps.event.addListener(map, 'center_changed', function () {
-                if (centerObsevableWillBeChanged) {
-                    return;
-                }
-                centerObsevableWillBeChanged = true;
-                setTimeout(function () {
-                    centerObservable(map.getCenter());
-                    centerObsevableWillBeChanged = false;
-                }, throttleDelay);
+
             });
 
             google.maps.event.addListener(map, 'zoom_changed', function () {
-                if (zoomObservableWillBeChanged) {
-                    return;
-                }
-                zoomObservableWillBeChanged = true;
-                setTimeout(function () {
-                    zoomObservable(map.getZoom());
-                    zoomObservableWillBeChanged = false;
-                }, throttleDelay)
+
             });
 
-            gmapStateObservable.subscribe(function () {
-                map.setZoom(zoomObservable());
-                map.panTo(centerObservable());
-            });
+            selectedLocationObservable.subscribe(function () {
 
-            circleCenterObservable.subscribe(function (data) {
-                circle.setCenter(data);
-            });
-
-            circleRadiusObservable.subscribe(function (data) {
-                circle.setRadius(data * 1000);
-            });
-
-            circleVisibleObservable.subscribe(function (data) {
-                circle.setVisible(data);
             });
         }
         /*
