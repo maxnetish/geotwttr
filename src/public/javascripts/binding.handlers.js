@@ -7,8 +7,8 @@
         var $ulContainer = $("#tweet-list");
         var tweetContents = $ulContainer.find(".tweet-right");
         var width = $ulContainer.width() - 72;
-        if (width < 100) {
-            width = 100;
+        if (width < 150) {
+            width = 150;
         }
         tweetContents.width(width);
         console.log("[WIDTH] set tweet content width after resize, " + width);
@@ -22,7 +22,7 @@
         }
         resizeWillBeProcess = true;
         setTimeout(function () {
-            setWidthOfTweetContent();
+            //setWidthOfTweetContent();
             resizeWillBeProcess = false;
         }, resizeThrottleDelay);
     });
@@ -133,6 +133,62 @@
          }
          */
 
+    };
+    ko.bindingHandlers.renderTweetTextContent = {
+        init: function (element, valueAccessor) {
+            var unionEntities = function (tweet, props) {
+                var result = [];
+                for (var i = 0; i < props.length; i++) {
+                    $.merge(result, $.map(tweet.entities[props[i]], function (entity) {
+                        entity.type_of_entity = props[i];
+                        return entity;
+                    }));
+                }
+                return result;
+            };
+            var renderEntity = function (entity) {
+                var result;
+                if (entity.type_of_entity == "urls") {
+                    return "<a target='_blank' class='entity url' href='" + entity.expanded_url + "'>" + entity.display_url + "</a>";
+                } else if (entity.type_of_entity == "user_mentions") {
+                    return "<a target='_blank' class='entity user-mention' href='https://twitter.com/" + entity.screen_name + "'>" + entity.screen_name + "</a>";
+                } else if (entity.type_of_entity == "hashtags") {
+                    return "<span class='entity hashtag'>" + entity.text + "</span>";
+                } else if (entity.type_of_entity == "symbols") {
+                    return "<span class='entity symbol'>" + entity.text + "</span>";
+                } else {
+                    return "<span class='entity'>" + entity.text + "</span>";
+                }
+            };
+
+            var $element = $(element);
+            var tweet = valueAccessor();
+
+            var isRetweet = tweet.isRetweet;
+            var initialText = isRetweet ? tweet.retweeted_status.text : tweet.text;
+            var initialLen = initialText.length;
+            //var tweetEntities=isRetweet?tweet.retweeted_status.entities:tweet.entities;
+            var resultArray = [];
+            var splitIndices = [];
+            var remainText = initialText;
+
+            var allEntities = unionEntities(isRetweet ? tweet.retweeted_status : tweet, ["urls", "user_mentions", "hashtags", "symbols"]);
+            allEntities.sort(function (a, b) {
+                return a.indices[0] - b.indices[0];
+            });
+
+            var origStart;
+            var origEnd;
+            $.each(allEntities, function (ind, entity) {
+                origStart = entity.indices[0];
+                origEnd = entity.indices[1];
+                resultArray.push(remainText.substr(0, origStart - (initialLen - remainText.length)));
+                resultArray.push(renderEntity(entity));
+                remainText = remainText.substr(origEnd - (initialLen - remainText.length));
+            });
+            resultArray.push(remainText);
+            $element.html(resultArray.join(""));
+        }
     };
     ko.bindingHandlers.geoAutocomplete = {
         init: function (element, valueAccessor) {

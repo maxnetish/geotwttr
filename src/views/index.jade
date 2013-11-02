@@ -23,16 +23,24 @@ block content
             div.gmap(data-bind='gmap: selectedLocation')
             span(data-bind='text: selectedLocation().center')
             span.geo-radius-value(data-bind="text: searchRadius")
-        div.pane-right
-            ul#tweet-list(data-bind='foreach: {data: searchResult, afterRender: setTweetContentWidth}')
+        div.pane-right.scroll
+            ul#tweet-list(data-bind='foreach: {data: searchResult}')
                 li.li-tweet
-                    img.avatar(data-bind="attr: {src: user.profile_image_url}"))
+                    div.tweet-left
+                        img.avatar(data-bind="attr: {src: isRetweet? retweeted_status.user.profile_image_url:user.profile_image_url}"))
                     div.tweet-right
-                         p.tweet-usernames
-                             span.full-name(data-bind="text: user.name")
-                             span.screen-name(data-bind="text: user.screen_name")
-                             span.tweet-date(data-bind='text: $parent.formatTweetDate($data)')
-                         p.tweet-text(data-bind='text: text')
+                        p.tweet-usernames
+                            a.no-decoration(data-bind="attr: {href: $parent.getUserHref($data)}", target="_blank")
+                                span.full-name(data-bind="text: isRetweet? retweeted_status.user.name : user.name")
+                                span.screen-name(data-bind="text: isRetweet? retweeted_status.user.screen_name : user.screen_name")
+                        p.tweet-text(data-bind='renderTweetTextContent: $data')
+                        p.tweet-meta
+                            span.tweet-date(data-bind='text: $parent.formatTweetDate($data)')
+                            span.retweet-from(data-bind="visible: isRetweet") RT from
+                            a.no-decoration(data-bind="attr: {href: $parent.getUserHref($data, true)}", target="_blank")
+                                span.screen-name(data-bind="visible: isRetweet, text: user.screen_name")
+                            a.entity(data-bind="click: $parent.showTweetOnMap", href="javascript:void(0)")
+                                span.show-on-map Show on map
     script(src='http://ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js')
     script(src='http://ajax.aspnetcdn.com/ajax/knockout/knockout-2.2.1.js')
     script(src='http://cdnjs.cloudflare.com/ajax/libs/moment.js/2.4.0/moment.min.js')

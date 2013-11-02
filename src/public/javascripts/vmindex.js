@@ -24,7 +24,12 @@ var vmIndex = function () {
                 alert(error);
             },
             'success': function (data, status, xhr) {
-                self.searchResult(data.statuses);
+
+                self.searchResult($.map(data.statuses, function (status) {
+                    status.isRetweet = !!status.retweeted_status;
+                    return status;
+                }));
+                //this.setTweetContentWidth();
             },
             type: 'GET',
             url: '/searchtweets'
@@ -47,23 +52,32 @@ var vmIndex = function () {
         }
     });
 
-    this.setTweetContentWidth = function (element, tweet) {
-        var $element = $(element);
-        var $tweetright = $element.find(".tweet-right");
-        var $parentUl = $element.parent();
+    this.setTweetContentWidth = function () {
+        var $parentUl = $("#tweet-list");
+        var $tweetright = $parentUl.find(".tweet-right");
+
         var myWidth = $parentUl.width() - 72;
-        if (myWidth < 100) {
-            myWidth = 100;
+        if (myWidth < 150) {
+            myWidth = 150;
         }
         $tweetright.width(myWidth);
     };
     this.formatTweetDate = function (tweet) {
-        var result = moment(tweet.created_at).fromNow();
+        var created_at = tweet.isRetweet ? tweet.retweeted_status.created_at : tweet.created_at;
+        var result = moment(created_at).fromNow();
         return result;
-    }
+    };
+    this.getUserHref = function (tweet, forceSender) {
+        forceSender = forceSender || false;
+        var result = "https://twitter.com/" + (!forceSender && tweet.isRetweet ? tweet.retweeted_status.user.screen_name : tweet.user.screen_name);
+        return result;
+    };
+    this.showTweetOnMap = function (tweet) {
+        console.dir(tweet);
+    };
     this.searchButtonClick = function () {
         updateSearchResult();
-    }
+    };
     this.selectedLocation.subscribe(function (data) {
         updateSearchResult();
     });

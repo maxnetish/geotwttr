@@ -106,10 +106,16 @@ li.li-tweet {
     /*display: inline-block;*/
     border-top: 1px solid #A9A9A9;
     padding: 5px;
+    min-height: 50px;
 }
 
 li.li-tweet .tweet-right {
-    display: inline-block;
+    margin-left: 58px;
+    overflow: hidden;
+}
+
+li.li-tweet .tweet-left{
+    float: left;
 }
 
 .full-name {
@@ -126,8 +132,13 @@ li.li-tweet .tweet-right {
 .tweet-date {
     font-size: 12px;
     color: darkgray;
-    margin-left: 5px;
-    float: right;
+    margin-right: 10px;
+}
+
+.retweet-from{
+    font-size: 12px;
+    color: darkgray;
+    margin-right: 5px;
 }
 
 .geo-radius-input {
@@ -146,3 +157,32 @@ li.li-tweet .tweet-right {
     margin-left: 15px;
 }
 
+.scroll{
+    overflow-x: auto;
+}
+
+.scroll.pane-right{
+    height: 530px;
+}
+
+.entity{
+    color: #0099B9;
+    text-decoration: none;
+}
+
+.user-mention:before{
+    content: '@';
+}
+
+.hashtag:before{
+    content: '#';
+}
+
+.tweet-meta{
+    font-size: 12px;
+    color: darkgray;
+}
+
+.show-on-map{
+    margin-left: 10px;
+}

@@ -1,7 +1,3 @@
-/**
- * Created by max on 01.11.13.
- */
-
 var actualTokens = require('./tokens.dev');
 
 var twitterConsumerKey = actualTokens.twitterConsumerKey;
