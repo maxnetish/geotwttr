@@ -13,7 +13,7 @@ a.no-decoration {
     text-decoration: none;
 }
 
-.preloader{
+.preloader {
     background: url(preloader.gif) no-repeat 50% 50%;
     height: 24px;
     width: 100%;
@@ -28,6 +28,12 @@ p {
 ul {
     padding-left: 0;
     list-style: none;
+    margin:0;
+}
+
+h1, h2 {
+    margin-top: 5px;
+    margin-bottom: 5px;
 }
 
 .view {
@@ -78,6 +84,18 @@ ul {
 .account-info {
     display: inline-block;
     vertical-align: top;
+}
+
+.account-card {
+    text-align: center;
+}
+
+.account-card span {
+    margin-right: 5px;
+}
+
+.account-card .logout {
+    margin-left: 10px;
 }
 
 .screen-name:before {

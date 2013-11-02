@@ -1,0 +1,11 @@
+//
+   Created by max on 02.11.13.
+extends layout
+block content
+    div.preloader
+    h1.text-center= title
+    if authFailed
+        p.text-center Auth failed
+    if !authSuccess
+        p.text-center
+            a(href='/auth') Login with twitter

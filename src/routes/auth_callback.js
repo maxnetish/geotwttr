@@ -9,7 +9,7 @@ var twitterHelper=require('../helpers/twitter').twitter;
 var onAuthFailed = function (req, res) {
     indexVm = new vm.indexVm();
     indexVm.authFailed = true;
-    res.render('index', indexVm);
+    res.render('login', indexVm);
 };
 
 exports.redirectFromAuth = function (req, res) {
@@ -26,7 +26,7 @@ exports.redirectFromAuth = function (req, res) {
                     onAuthFailed(req, res);
                     return;
                 }
-                res.cookie('at', authToken, { expires: new Date(Date.now() + 90000000), httpOnly: true, signed: true });
+                res.cookie('at', authToken, { expires: new Date(Date.now() + 900000000), httpOnly: true, signed: true });
                 store.setSecret(authToken, authTokenSecret);
                 res.redirect('/');
             });

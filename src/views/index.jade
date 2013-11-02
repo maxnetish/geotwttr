@@ -1,45 +1,47 @@
 extends layout
 
 block content
+    div.account-card
+        span Signed in as
+        a.no-decoration(href= "https://twitter.com/"+userInfo.screen_name, target="_blank")
+            span.screen-name #{userInfo.screen_name}
+        a.logout(href="/logout") Sign-out
     div.preloader
     h1.text-center= title
-    if authFailed
-        p Auth failed
-    if !authSuccess
-        p.text-center
-            a(href='/auth') Login with twitter
-    if authSuccess
-        div.view
-            h2.text-center(data-bind='text: title')
-            div.pane-left
-                //input.geo-radius-input(type="range", max="10", min="1", step="1", data-bind="value: searchRadius")
-                input.search-type(type="radio", name="searchTypeGroup", value="mixed", data-bind="checked: searchType")
-                span.search-value mixed
-                input.search-type(type="radio", name="searchTypeGroup", value="popular", data-bind="checked: searchType")
-                span.search-value popular
-                input.search-type(type="radio", name="searchTypeGroup", value="recent", data-bind="checked: searchType")
-                span.search-value recent
-                button.search-button(type="button", data-bind="click: searchButtonClick") Update
-                input.geo-autocomplete(data-bind="geoAutocomplete: '.gmap'", type="search")
-                div.gmap(data-bind='gmap: selectedLocation')
-                span(data-bind='text: selectedLocation().center')
-                span.geo-radius-value(data-bind="text: searchRadius")
-            div.pane-right
-                div.account-card
-                    p Signed in as
-                    a.no-decoration(href= "https://twitter.com/"+userInfo.screen_name, target="_blank")
-                        img.avatar(src= userInfo.profile_image_url)
-                        div.account-info
-                            span.full-name #{userInfo.name}
-                            br
-                            span.screen-name #{userInfo.screen_name}
-                    a(href="/logout") Sign-out
-                ul#tweet-list(data-bind='foreach: {data: searchResult, afterRender: setTweetContentWidth}')
-                    li.li-tweet
-                        img.avatar(data-bind="attr: {src: user.profile_image_url}"))
-                        div.tweet-right
-                            p.tweet-usernames
-                                span.full-name(data-bind="text: user.name")
-                                span.screen-name(data-bind="text: user.screen_name")
-                                span.tweet-date(data-bind='text: $parent.formatTweetDate($data)')
-                            p.tweet-text(data-bind='text: text')
+    div.view
+        h2.text-center(data-bind='text: title')
+        div.pane-left
+            //input.geo-radius-input(type="range", max="10", min="1", step="1", data-bind="value: searchRadius")
+            input.search-type(type="radio", name="searchTypeGroup", value="mixed", data-bind="checked: searchType")
+            span.search-value mixed
+            input.search-type(type="radio", name="searchTypeGroup", value="popular", data-bind="checked: searchType")
+            span.search-value popular
+            input.search-type(type="radio", name="searchTypeGroup", value="recent", data-bind="checked: searchType")
+            span.search-value recent
+            button.search-button(type="button", data-bind="click: searchButtonClick") Update
+            input.geo-autocomplete(data-bind="geoAutocomplete: '.gmap'", type="search")
+            div.gmap(data-bind='gmap: selectedLocation')
+            span(data-bind='text: selectedLocation().center')
+            span.geo-radius-value(data-bind="text: searchRadius")
+        div.pane-right
+            ul#tweet-list(data-bind='foreach: {data: searchResult, afterRender: setTweetContentWidth}')
+                li.li-tweet
+                    img.avatar(data-bind="attr: {src: user.profile_image_url}"))
+                    div.tweet-right
+                         p.tweet-usernames
+                             span.full-name(data-bind="text: user.name")
+                             span.screen-name(data-bind="text: user.screen_name")
+                             span.tweet-date(data-bind='text: $parent.formatTweetDate($data)')
+                         p.tweet-text(data-bind='text: text')
+    script(src='http://ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js')
+    script(src='http://ajax.aspnetcdn.com/ajax/knockout/knockout-2.2.1.js')
+    script(src='http://cdnjs.cloudflare.com/ajax/libs/moment.js/2.4.0/moment.min.js')
+    script(src="http://maps.googleapis.com/maps/api/js?key="+googleAPiToken+"&sensor=true&libraries=places")
+    script(src='/javascripts/vmindex.js')
+    script(src='/javascripts/models.js')
+    script(src='/javascripts/binding.handlers.js')
+    script
+        $(document).ready(function(){
+            var myVm=new vmIndex();
+            ko.applyBindings(myVm);
+        })
