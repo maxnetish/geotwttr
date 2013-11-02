@@ -27,8 +27,10 @@ var vmIndex = function () {
 
                 self.searchResult($.map(data.statuses, function (status) {
                     status.isRetweet = !!status.retweeted_status;
+                    status.canShowOnMap=!!status.coordinates || !!status.place
                     return status;
                 }));
+                self.statusesOnMap.removeAll();
                 //this.setTweetContentWidth();
             },
             type: 'GET',
@@ -36,6 +38,7 @@ var vmIndex = function () {
         });
     };
 
+    this.statusesOnMap=ko.observableArray();
     this.selectedLocation = ko.observable(new models.selectedLocation());
     this.searchResult = ko.observableArray();
     this.searchRadius = this.selectedLocation().radius;
@@ -73,7 +76,7 @@ var vmIndex = function () {
         return result;
     };
     this.showTweetOnMap = function (tweet) {
-        console.dir(tweet);
+        self.statusesOnMap.push(tweet);
     };
     this.searchButtonClick = function () {
         updateSearchResult();

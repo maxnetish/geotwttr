@@ -36,7 +36,7 @@
     });
 
     ko.bindingHandlers.gmap = {
-        init: function (element, valueAccessor) {
+        init: function (element, valueAccessor, allBindings) {
             var selectedLocationObservable = valueAccessor();
             var selectedLocation = selectedLocationObservable();
             var selectedCenterObservable = selectedLocation.center;
@@ -45,6 +45,7 @@
             var selectedRadiusObservable = selectedLocation.radius;
             var centerObsevableWillBeChanged = false;
             var throttleDelay = 3000;
+            var statusesOnMap=allBindings.statusesOnMap;
 
             var mapOptions = {
                 center: selectedCenterObservable(),
@@ -103,6 +104,10 @@
                 selectedLocationObservable.valueHasMutated();
             });
 
+            statusesOnMap.subscribe(function(){
+
+            });
+
             google.maps.event.addListener(map, 'center_changed', function () {
 
             });
@@ -112,7 +117,7 @@
             });
 
             selectedLocationObservable.subscribe(function () {
-
+                //TODO: ...
             });
         }
         /*
