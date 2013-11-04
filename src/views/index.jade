@@ -11,16 +11,9 @@ block content
     div.view
         h2.text-center(data-bind='text: title')
         div.pane-left
-            //input.geo-radius-input(type="range", max="10", min="1", step="1", data-bind="value: searchRadius")
-            input.search-type(type="radio", name="searchTypeGroup", value="mixed", data-bind="checked: searchType")
-            span.search-value mixed
-            input.search-type(type="radio", name="searchTypeGroup", value="popular", data-bind="checked: searchType")
-            span.search-value popular
-            input.search-type(type="radio", name="searchTypeGroup", value="recent", data-bind="checked: searchType")
-            span.search-value recent
             button.search-button(type="button", data-bind="click: searchButtonClick") Update
             input.geo-autocomplete(data-bind="geoAutocomplete: '.gmap'", type="search")
-            div.gmap(data-bind='gmap: selectedLocation, statusesOnMap: statusesOnMap')
+            div.gmap(data-bind='gmap: selectedLocation, statusOnMap: statusOnMap')
             span(data-bind='text: selectedLocation().center')
             span.geo-radius-value(data-bind="text: searchRadius")
         div.pane-right.scroll
@@ -35,7 +28,8 @@ block content
                                 span.screen-name(data-bind="text: isRetweet? retweeted_status.user.screen_name : user.screen_name")
                         p.tweet-text(data-bind='renderTweetTextContent: $data')
                         p.tweet-meta
-                            span.tweet-date(data-bind='text: $parent.formatTweetDate($data)')
+                            a.no-decoration(data-bind="attr: {href: $parent.getStatusHref($data)}", target="_blank")
+                                span.tweet-date(data-bind='text: $parent.formatTweetDate($data)')
                             span.retweet-from(data-bind="visible: isRetweet") RT from
                             a.no-decoration(data-bind="visible: isRetweet, attr: {href: $parent.getUserHref($data, true)}", target="_blank")
                                 span.screen-name(data-bind="text: user.screen_name")
@@ -46,11 +40,5 @@ block content
     script(src='http://ajax.aspnetcdn.com/ajax/knockout/knockout-2.2.1.js')
     script(src='http://cdnjs.cloudflare.com/ajax/libs/moment.js/2.4.0/moment.min.js')
     script(src="http://maps.googleapis.com/maps/api/js?key="+googleAPiToken+"&sensor=true&libraries=places")
-    script(src='/javascripts/vmindex.js')
-    script(src='/javascripts/models.js')
+    script(src='/javascripts/app.js')
     script(src='/javascripts/binding.handlers.js')
-    script
-        $(document).ready(function(){
-            var myVm=new vmIndex();
-            ko.applyBindings(myVm);
-        })

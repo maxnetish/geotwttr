@@ -2,39 +2,6 @@
  * Created by max on 30.10.13.
  */
 (function () {
-
-    var setWidthOfTweetContent = function () {
-        var $ulContainer = $("#tweet-list");
-        var tweetContents = $ulContainer.find(".tweet-right");
-        var width = $ulContainer.width() - 72;
-        if (width < 150) {
-            width = 150;
-        }
-        tweetContents.width(width);
-        console.log("[WIDTH] set tweet content width after resize, " + width);
-    };
-
-    var resizeWillBeProcess = false;
-    var resizeThrottleDelay = 500;
-    $(window).on("resize", function () {
-        if (resizeWillBeProcess) {
-            return;
-        }
-        resizeWillBeProcess = true;
-        setTimeout(function () {
-            //setWidthOfTweetContent();
-            resizeWillBeProcess = false;
-        }, resizeThrottleDelay);
-    });
-
-    $(document).ajaxStart(function () {
-        $(".preloader").css({visibility: 'visible'});
-    });
-
-    $(document).ajaxComplete(function (event, xhr, settings) {
-        $('.preloader').css({visibility: 'hidden'});
-    });
-
     ko.bindingHandlers.gmap = {
         init: function (element, valueAccessor, allBindings) {
             var selectedLocationObservable = valueAccessor();
@@ -45,11 +12,12 @@
             var selectedRadiusObservable = selectedLocation.radius;
             var centerObsevableWillBeChanged = false;
             var throttleDelay = 3000;
-            var statusesOnMap=allBindings().statusesOnMap;
+            var statusOnMap = allBindings().statusOnMap;
+
 
             var mapOptions = {
                 center: selectedCenterObservable(),
-                zoom: 6,
+                zoom: 12,
                 mapTypeId: google.maps.MapTypeId.ROADMAP,
                 streetViewControl: false,
                 rotateControl: false
@@ -70,6 +38,15 @@
                 strokeOpacity: 0.2,
                 strokeWeight: 1
             });
+
+            var statusMarker = new google.maps.Marker({
+                animation: google.maps.Animation.DROP,  //DROP BOUNCE
+                clickable: true,
+                map: map,
+                position: selectedCenterObservable(),
+                visible: false
+            });
+
             var geocoder = new google.maps.Geocoder();
 
             $(element).data("gmap", map);
@@ -94,60 +71,65 @@
             });
 
             google.maps.event.addListener(circle, 'center_changed', function () {
-                selectedCenterObservable(circle.getCenter());
+                var currentCenter = selectedCenterObservable();
+                var newCenter = circle.getCenter();
+                if (currentCenter.lat() == newCenter.lat() && currentCenter.lng() == newCenter.lng()) {
+                    return;
+                }
+                selectedCenterObservable(newCenter);
                 selectedLocationObservable.valueHasMutated();
                 updateGeoName();
             });
 
             google.maps.event.addListener(circle, 'radius_changed', function () {
-                selectedRadiusObservable(Math.round(circle.getRadius()));
+                var currentRadius = selectedRadiusObservable();
+                var newRadius = Math.round(circle.getRadius());
+                if (currentRadius == newRadius) {
+                    return;
+                }
+                selectedRadiusObservable(newRadius);
                 selectedLocationObservable.valueHasMutated();
             });
 
-            statusesOnMap.subscribe(function(){
-
+            selectedLocationObservable.subscribe(function (data) {
+                var newCenter = data.center();
+                var newRadius = data.radius();
+                map.setCenter(newCenter);
+                circle.setCenter(newCenter);
+                circle.setRadius(newRadius);
+                updateGeoName();
             });
 
-            google.maps.event.addListener(map, 'center_changed', function () {
-
-            });
-
-            google.maps.event.addListener(map, 'zoom_changed', function () {
-
-            });
-
-            selectedLocationObservable.subscribe(function () {
-                //TODO: ...
+            statusOnMap.subscribe(function (data) {
+                if (data && data.coordinates) {
+                    var newPosition = new google.maps.LatLng(data.coordinates.coordinates[1], data.coordinates.coordinates[0]);
+                    statusMarker.setPosition(newPosition);
+                    if (data.place && data.place.name) {
+                        statusMarker.setTitle(data.place.name);
+                    } else {
+                        statusMarker.setTitle(null);
+                    }
+                    statusMarker.setVisible(true);
+                    map.panTo(newPosition);
+                } else {
+                    statusMarker.setVisible(false);
+                }
             });
         }
-        /*
-         update: function (element, valueAccessor, allBindings) {
-         var valueAccessorUnwrapped = valueAccessor();
-         var allBindingsUnwrapped=allBindings();
-         var centerBinding = allBindingsUnwrapped.center;
-         var centerBindingUnwrapped = centerBinding();
-         var boundBinding=allBindingsUnwrapped.bound;
-         var boundBindingUnwrapped=boundBinding();
-         var zoomBinding=allBindingsUnwrapped.zoom;
-         var zoomBindingUnwrapped=zoomBinding();
-         var map= $(element).data("gmap");
-
-         map.setCenter(centerBindingUnwrapped);
-         //map.setZoom(zoomBindingUnwrapped);
-         //map.setBounds(boundBindingUnwrapped);
-         }
-         */
-
     };
     ko.bindingHandlers.renderTweetTextContent = {
         init: function (element, valueAccessor) {
             var unionEntities = function (tweet, props) {
                 var result = [];
+                var currentEntityTypeArray;
                 for (var i = 0; i < props.length; i++) {
-                    $.merge(result, $.map(tweet.entities[props[i]], function (entity) {
-                        entity.type_of_entity = props[i];
-                        return entity;
-                    }));
+                    currentEntityTypeArray = tweet.entities[props[i]];
+                    if (currentEntityTypeArray && currentEntityTypeArray.length) {
+                        $.merge(result, $.map(currentEntityTypeArray, function (entity) {
+                            entity.type_of_entity = props[i];
+                            return entity;
+                        }));
+                    }
                 }
                 return result;
             };
@@ -161,7 +143,10 @@
                     return "<span class='entity hashtag'>" + entity.text + "</span>";
                 } else if (entity.type_of_entity == "symbols") {
                     return "<span class='entity symbol'>" + entity.text + "</span>";
-                } else {
+                } else if (entity.type_of_entity == "media") {
+                    return "<a target='_blank' class='entity media' href='" + entity.expanded_url + "'>" + entity.display_url + "</a>";
+                }
+                else {
                     return "<span class='entity'>" + entity.text + "</span>";
                 }
             };
@@ -174,10 +159,9 @@
             var initialLen = initialText.length;
             //var tweetEntities=isRetweet?tweet.retweeted_status.entities:tweet.entities;
             var resultArray = [];
-            var splitIndices = [];
             var remainText = initialText;
 
-            var allEntities = unionEntities(isRetweet ? tweet.retweeted_status : tweet, ["urls", "user_mentions", "hashtags", "symbols"]);
+            var allEntities = unionEntities(isRetweet ? tweet.retweeted_status : tweet, ["media", "urls", "user_mentions", "hashtags", "symbols"]);
             allEntities.sort(function (a, b) {
                 return a.indices[0] - b.indices[0];
             });
@@ -220,9 +204,9 @@
                     var location = geometry.location || null;
                     var viewport = geometry.viewport || null;
                     if (viewport) {
-                        map.fitBounds(viewport);
+                        map.panToBounds(viewport);
                     } else if (location) {
-                        map.setCenter(location);
+                        map.panTo(location);
                     }
                 });
             };
@@ -230,5 +214,4 @@
             initAutocomplete();
         }
     };
-
 })();
