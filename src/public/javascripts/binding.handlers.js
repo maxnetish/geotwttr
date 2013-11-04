@@ -45,7 +45,7 @@
             var selectedRadiusObservable = selectedLocation.radius;
             var centerObsevableWillBeChanged = false;
             var throttleDelay = 3000;
-            var statusesOnMap=allBindings.statusesOnMap;
+            var statusesOnMap=allBindings().statusesOnMap;
 
             var mapOptions = {
                 center: selectedCenterObservable(),
