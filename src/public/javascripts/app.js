@@ -136,7 +136,7 @@
             }
         });
 
-        return{
+        return {
             statusOnMap: statusOnMap,
             selectedLocation: selectedLocation,
             searchResult: searchResult,

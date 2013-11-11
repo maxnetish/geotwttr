@@ -7,5 +7,5 @@ exports.indexVm = function () {
     var title = "Geo statuses";
     return{
         title: title
-    }
+    };
 };

@@ -4,16 +4,11 @@
 (function () {
     ko.bindingHandlers.gmap = {
         init: function (element, valueAccessor, allBindings) {
-            var selectedLocationObservable = valueAccessor();
-            var selectedLocation = selectedLocationObservable();
-            var selectedCenterObservable = selectedLocation.center;
-            //var zoomObservable = selectedLocation.zoom;
-            //var circleVisibleObservable = selectedLocation.circleVisible;
-            var selectedRadiusObservable = selectedLocation.radius;
-            var centerObsevableWillBeChanged = false;
-            var throttleDelay = 3000;
-            var statusOnMap = allBindings().statusOnMap;
-
+            var selectedLocationObservable = valueAccessor(),
+                selectedLocation = selectedLocationObservable(),
+                selectedCenterObservable = selectedLocation.center,
+                selectedRadiusObservable = selectedLocation.radius,
+                statusOnMap = allBindings().statusOnMap;
 
             var mapOptions = {
                 center: selectedCenterObservable(),
