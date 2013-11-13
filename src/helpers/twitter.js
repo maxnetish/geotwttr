@@ -6,6 +6,7 @@ var store = require('./store').store;
 var OAuth = require('oauth').OAuth;
 var tokens = require('../config/tokens');
 var url = require('url');
+var _ = require('underscrore');
 
 var oAuthConsumer = function () {
     return  new OAuth("https://api.twitter.com/oauth/request_token",
@@ -66,57 +67,79 @@ var searchTweets = function (accessToken, searchOptions, callback) {
     });
 };
 
-var performStatusesFilterStream = function (accessToken, filterOptions, callback) {
-    var buffer = "";
-    var nextTweetLength;
-    var onError = function (error, data) {
-        if (callback) callback(error, data);
+var performStatusesFilterStream = function (opts) {
+    var self = this;
+
+    opts = opts || {};
+    var _accessToken = opts.accessToken || null;
+    var _filterOptions = opts.filterOptions || null;
+
+    var _buffer = "";
+    var _onError = function (error, data) {
+
     };
-    var onChunkReceived=function(chunk){
-        buffer+=chunk.toString();
-        var rnPosition=buffer.indexOf("\r\n");
-        var holeTweet;
-        while(rnPosition!=-1){
-            holeTweet=buffer.substring(0,rnPosition);
-            buffer=buffer.substring(rnPosition);
-            if(holeTweet.length){
-                onTweetReceived(holeTweet);
+
+    var _eventHandlers={
+        tweetReceived: [],
+        closeConnection: []
+    };
+
+    var _eventHandlersExecutor={
+        onTweetTeceived: function(oneTweet){
+
+            for(var i=0;i<_eventHandlers.length;i++){
+                _eventHandlers.tweetReceived[i](oneTweet);
             }
-            rnPosition=buffer.indexOf("\r\n");
         }
     };
-    var onTweetReceived=function(oneTweet){
-        if(callback){
-            callback(null, oneTweet);
+
+    var _onChunkReceived = function (chunk) {
+        _buffer += chunk.toString();
+        var rnPosition = _buffer.indexOf("\r\n");
+        var holeTweet;
+        while (rnPosition !== -1) {
+            holeTweet = _buffer.substring(0, rnPosition);
+            _buffer = _buffer.substring(rnPosition);
+            if (holeTweet.length) {
+                _onTweetReceived(holeTweet);
+            }
+            rnPosition = _buffer.indexOf("\r\n");
         }
     };
-    var onClose=function(response){
-        if(callback){
-            callback(null,null);
-        }
+    var _onTweetReceived = function (oneTweet) {
+
     };
-    store.getSecret(accessToken, function (error, secret) {
-        if (error) {
-            onError(error);
-            return;
-        }
+    var _onCloseConnection = function (response) {
+
+    };
+    var _startRequest = function (secret) {
         var oa = oAuthConsumer();
         var filterStreamUrl = "https://stream.twitter.com/1.1/statuses/filter.json";
-        var streamRequest = oa.post(filterStreamUrl, accessToken, secret, filterOptions);
+        var streamRequest = oa.post(filterStreamUrl, _accessToken, secret, _filterOptions);
 
         streamRequest.on('response', function (response) {
             response.setEncoding('utf8');
             response.on('data', function (chunk) {
-                onChunkReceived(chunk);
+                _onChunkReceived(chunk);
             });
             response.on('close', function () {
-                onClose(response);
+                _onCloseConnection(response);
             });
         });
         streamRequest.on("error", function (err) {
-            onError(err);
+            _onError(err);
         });
         streamRequest.end();
+    };
+    var _addHandler=function(eventName, callback){
+
+    };
+    store.getSecret(_accessToken, function (error, secret) {
+        if (error) {
+            _onError(error);
+            return;
+        }
+        _startRequest(secret);
     });
 };
 
@@ -124,5 +147,6 @@ exports.twitter = {
     isAccessTokenValid: verifyCredentials,
     getAccessToken: getAccessToken,
     getRequestToken: getRequestToken,
-    searchTweets: searchTweets
+    searchTweets: searchTweets,
+    statusesFilterStream: performStatusesFilterStream
 };

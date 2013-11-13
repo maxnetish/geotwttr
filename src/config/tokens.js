@@ -12,4 +12,4 @@ exports.twitter = {
 };
 exports.google = {
     apiToken: googleApiToken
-}
+};
