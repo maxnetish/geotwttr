@@ -8,6 +8,8 @@
                 selectedLocation = selectedLocationObservable(),
                 selectedCenterObservable = selectedLocation.center,
                 selectedRadiusObservable = selectedLocation.radius,
+                selectedBoundsObservable = selectedLocation.bounds,
+
                 statusOnMap = allBindings().statusOnMap;
 
             var mapOptions = {
@@ -72,6 +74,7 @@
                     return;
                 }
                 selectedCenterObservable(newCenter);
+                selectedBoundsObservable(circle.getBounds());
                 selectedLocationObservable.valueHasMutated();
                 updateGeoName();
             });
@@ -82,6 +85,7 @@
                 if (currentRadius == newRadius) {
                     return;
                 }
+                selectedBoundsObservable(circle.getBounds());
                 selectedRadiusObservable(newRadius);
                 selectedLocationObservable.valueHasMutated();
             });

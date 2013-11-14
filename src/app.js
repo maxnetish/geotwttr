@@ -11,6 +11,7 @@ var twttrProxy = require('./routes/twttr_proxy');
 var logout = require('./routes/logout');
 var http = require('http');
 var path = require('path');
+var WebSocket = require('ws');
 
 var app = express();
 
@@ -38,6 +39,12 @@ app.get('/auth', auth.auth);
 app.get('/searchtweets', twttrProxy.searchTweets);
 app.get('/logout', logout.logout);
 
-http.createServer(app).listen(app.get('port'), '127.0.0.1', function () {
+var httpServer = http.createServer(app);
+httpServer.listen(app.get('port'), '127.0.0.1', function () {
     console.log('Express server listening on port ' + app.get('port'));
+});
+
+var wsServer = new WebSocket.Server({server: httpServer});
+wsServer.on('connection', function (ws) {
+    require('./routes/twttr_ws').webSocketServer(ws);
 });

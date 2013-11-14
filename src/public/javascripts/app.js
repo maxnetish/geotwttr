@@ -37,11 +37,13 @@
 
             var _center = ko.observable(center),
                 _radius = ko.observable(radius),
-                _geoName = ko.observable("");
+                _geoName = ko.observable(""),
+                _bounds = ko.observable();
 
             this.center = _center;
             this.radius = _radius;
             this.geoName = _geoName;
+            this.bounds = _bounds;
         };
 
         /*  private methods */
@@ -65,7 +67,7 @@
                 'success': function (data, status, xhr) {
                     searchResult($.map(data.statuses, function (status) {
                         status.isRetweet = !!status.retweeted_status;
-                        status.canShowOnMap = !!status.coordinates || !!status.place
+                        status.canShowOnMap = !!status.coordinates || !!status.place;
                         return status;
                     }));
                     statusOnMap(null);
@@ -115,9 +117,56 @@
         var showTweetOnMap = function (tweet) {
             statusOnMap(tweet);
         };
+
         var searchButtonClick = function () {
-            updateSearchResult();
+            //updateSearchResult();
+
+            var testWebsocket = function () {
+                searchResult.removeAll();
+                // создать подключение
+                var socket = new WebSocket("ws://127.0.0.1:3000");
+                console.dir(socket);
+                socket.onopen = function (event) {
+                    console.log("Websocket open");
+                    console.dir(event);
+
+                    var center = selectedLocation().center();
+                    var radius = selectedLocation().radius() / 1000;
+                    var bounds=selectedLocation().bounds();
+                    var SWlatlng=bounds.getSouthWest();
+                    var NElanlng=bounds.getNorthEast();
+                    var searchOptions = {
+                        locations: SWlatlng.lng() + "," + SWlatlng.lat() + "," + NElanlng.lng() + "," + NElanlng.lat(),
+                        //locations: "-122.75,36.8,-121.75,37.8,-74,40,-73,41",
+                        //track: "Москве",
+                        stall_warnings: "true"
+                        //geocode: center.lat() + ',' + center.lng() + ',' + radius + 'km',
+                        //result_type: 'recent' //'mixed', 'popular' or 'recent'
+                    };
+                    socket.send(JSON.stringify(searchOptions));
+                };
+                socket.onmessage = function (event) {
+                    console.log("Message received");
+                    console.dir(event);
+                    var incomingMessage = event.data;
+                    var status = JSON.parse(incomingMessage);
+                    status.isRetweet = !!status.retweeted_status;
+                    status.canShowOnMap = !!status.coordinates;
+                    searchResult.unshift(status);
+                };
+                socket.onerror = function (event) {
+                    console.log("Webcoket error");
+                    console.dir(event);
+                };
+                socket.onclose = function (event) {
+                    console.log("Websocket close");
+                    console.dir(event);
+                }
+            };
+
+            testWebsocket();
         };
+
         var getStatusHref = function (tweet) {
             var result = "https://twitter.com/" + tweet.user.screen_name + "/status/" + tweet.id_str;
             return result;

@@ -6,7 +6,8 @@ var store = require('./store').store;
 var OAuth = require('oauth').OAuth;
 var tokens = require('../config/tokens');
 var url = require('url');
-var _ = require('underscrore');
+var _ = require('underscore');
+var querystring = require('querystring');
 
 var oAuthConsumer = function () {
     return  new OAuth("https://api.twitter.com/oauth/request_token",
@@ -78,6 +79,7 @@ var performStatusesFilterStream = function (opts) {
 
     var _buffer = "";
     var _onError = function (error, data) {
+        console.log("Error: " + error);
         _eventHandlersExecutor.onRequestError(error, data);
     };
 
@@ -112,12 +114,13 @@ var performStatusesFilterStream = function (opts) {
     };
 
     var _onChunkReceived = function (chunk) {
+        console.log("Chunk received len=" + chunk.length);
         _buffer += chunk.toString();
         var rnPosition = _buffer.indexOf("\r\n");
         var holeTweet;
         while (rnPosition !== -1) {
             holeTweet = _buffer.substring(0, rnPosition);
-            _buffer = _buffer.substring(rnPosition);
+            _buffer = _buffer.substring(rnPosition + 2);
             if (holeTweet.length) {
                 _onTweetReceived(holeTweet);
             }
@@ -125,19 +128,33 @@ var performStatusesFilterStream = function (opts) {
         }
     };
     var _onTweetReceived = function (oneTweet) {
+        console.log("Tweet extracted len=" + oneTweet.length);
         _eventHandlersExecutor.onTweetReceived(oneTweet);
     };
     var _onCloseConnection = function () {
+        console.log("Close connection");
         _eventHandlersExecutor.onCloseConnection();
     };
     var _startRequest = function (secret) {
         var oa = oAuthConsumer();
+
         var filterStreamUrl = "https://stream.twitter.com/1.1/statuses/filter.json";
+        //var body = querystring.stringify(_filterOptions);
+        //console.log("body: "+body);
         _streamRequest = oa.post(filterStreamUrl, _accessToken, secret, _filterOptions);
+        //_streamRequest.write(_filterOptions);
+
+        //var searchUrl = url.parse("https://stream.twitter.com/1.1/statuses/filter.json");
+        //searchUrl.query = _filterOptions;
+        //var actualUnwrapped = url.format(searchUrl);
+        //_streamRequest = oa.get(actualUnwrapped, _accessToken, secret);
+
         _streamRequest.on("error", function (err) {
             _onError(err);
         });
         _streamRequest.on('response', function (responseLocal) {
+            console.log("Get response");
+            //console.dir(responseLocal);
             _streamResponse = responseLocal;
             _streamResponse.setEncoding('utf8');
             _streamResponse.on('data', function (chunk) {
@@ -148,7 +165,7 @@ var performStatusesFilterStream = function (opts) {
             });
         });
 
-        //streamRequest.end();
+        _streamRequest.end();
     };
     var _addHandler = function (eventName, callback) {
         if (!_eventHandlers[eventName]) {
@@ -157,8 +174,10 @@ var performStatusesFilterStream = function (opts) {
         _eventHandlers[eventName].push(callback);
     };
     var _removeHandler = function (eventName) {
-        if (_eventHandlers[eventName]) {
-            _eventHandlers[eventName] = [];
+        if (eventName) {
+            if (_eventHandlers[eventName]) {
+                _eventHandlers[eventName] = [];
+            }
         }
     };
     var _closeConnection = function (callback) {
