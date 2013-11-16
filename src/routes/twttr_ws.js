@@ -7,7 +7,8 @@ var WebSocket = require("ws");
 
 exports.webSocketServer = function (ws) {
     console.log("Websocket connection receive");
-    express.cookieParser('A12-dmcd=Asd365%bjldkloed(uhn')(ws.upgradeReq, null, function () {});
+    express.cookieParser('A12-dmcd=Asd365%bjldkloed(uhn')(ws.upgradeReq, null, function () {
+    });
     var accessToken = ws.upgradeReq.signedCookies.at;
     var twitterStreamRequest;
 
@@ -18,6 +19,7 @@ exports.webSocketServer = function (ws) {
     };
 
     twitterHelper.isAccessTokenValid(accessToken, function (error, accountInfo) {
+        var clientMessage;
         if (error) {
             console.log("Reject websocket");
             onReject();
@@ -25,6 +27,22 @@ exports.webSocketServer = function (ws) {
         }
         ws.on('message', function (message) {
             console.log('received: %s', message);
+            try {
+               clientMessage  = JSON.parse(message);
+            }
+            catch (error) {
+                ws.send(JSON.stringify(error));
+                return;
+            }
+
+            /*
+            TODO: сделать универсальный класс для запросов к
+            твиттеру. Клиент будет передавать url, параметры, тип (get post, stream или нет),
+            Класс должен будет открывать запрос, обрабатывать ошибки
+            и отдавать через события ответы твиттера
+            */
+
+
             if (twitterStreamRequest) {
                 twitterStreamRequest.end();
                 twitterStreamRequest = null;
