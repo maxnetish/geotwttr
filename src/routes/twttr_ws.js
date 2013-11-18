@@ -56,7 +56,12 @@ exports.webSocketServer = function (ws) {
                 ws.send(oneTweet);
             });
             twitterStreamRequest.on("closeConnection", function () {
-                ws.send(JSON.stringify({meta: {code: 400, error_message: "Stream closed"}}), function (error) {
+                ws.send(JSON.stringify({
+                    meta: {
+                        code: 400,
+                        error_message: "Stream closed"
+                    }
+                }), function (error) {
                     //ws.terminate();
                 });
             });
