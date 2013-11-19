@@ -4,13 +4,15 @@
 var express = require('express');
 var twitterHelper = require('../helpers/twitter').twitter;
 var WebSocket = require("ws");
+var _ = require("underscore");
 
 exports.webSocketServer = function (ws) {
     console.log("Websocket connection receive");
     express.cookieParser('A12-dmcd=Asd365%bjldkloed(uhn')(ws.upgradeReq, null, function () {
     });
+    var streamRequests = {};
     var accessToken = ws.upgradeReq.signedCookies.at;
-    var twitterStreamRequest;
+    //var twitterStreamRequest;
 
     var onReject = function () {
         ws.send(JSON.stringify({meta: {code: 400, error_message: "Unauthorized"}}), function (error) {
@@ -19,43 +21,52 @@ exports.webSocketServer = function (ws) {
     };
 
     twitterHelper.isAccessTokenValid(accessToken, function (error, accountInfo) {
-        var clientMessage;
+
         if (error) {
             console.log("Reject websocket");
             onReject();
             return;
         }
         ws.on('message', function (message) {
+            var clientMessage;
             console.log('received: %s', message);
+            var sanitizeClientMessage = function (mess) {
+                var result = {};
+                result.requestUrl = _.isString(mess.requestUrl) ? mess.requestUrl : null;
+                result.requestMethod = _.indexOf(["GET", "POST"], mess.requestMethod) !== -1 ? mess.requestMethod : null;
+                result.requestParams = _.isObject(mess.requestParams) ? mess.requestParams : null;
+                result.requestStream = _.isBoolean(mess.requestStream) ? mess.requestStream : false;
+                result.requestId = (_.isString(mess.requestId) || _.isFinite(mess.requestId)) ? mess.requestId : _.uniqueId();
+                result.requestClose = _.isBoolean(mess.requestClose) ? mess.requestClose : false;
+                return result;
+            };
+
             try {
-               clientMessage  = JSON.parse(message);
+                clientMessage = JSON.parse(message);
+                clientMessage = sanitizeClientMessage(clientMessage);
             }
             catch (error) {
                 ws.send(JSON.stringify(error));
                 return;
             }
 
-            /*
-            TODO: сделать универсальный класс для запросов к
-            твиттеру. Клиент будет передавать url, параметры, тип (get post, stream или нет),
-            Класс должен будет открывать запрос, обрабатывать ошибки
-            и отдавать через события ответы твиттера
-            */
-
-
-            if (twitterStreamRequest) {
-                twitterStreamRequest.end();
-                twitterStreamRequest = null;
+            if (clientMessage.requestClose && clientMessage.requestId) {
+                streamRequests[clientMessage.requestId].end();
+                streamRequests[clientMessage.requestId] = undefined;
+                return;
             }
-            twitterStreamRequest = new twitterHelper.statusesFilterStream({
-                accessToken: accessToken,
-                filterOptions: JSON.parse(message)
-            });
-            twitterStreamRequest.on("tweetReceived", function (oneTweet) {
+
+            clientMessage.accessToken = accessToken;
+
+            var newRequest = new twitterHelper.proxyRequest(clientMessage);
+            if (clientMessage.requestStream) {
+                streamRequests[clientMessage.requestId] = newRequest;
+            }
+            newRequest.on("tweetReceived", function (oneTweet) {
                 console.log("Send tweet to client");
-                ws.send(oneTweet);
+                ws.send(JSON.stringify(oneTweet));
             });
-            twitterStreamRequest.on("closeConnection", function () {
+            newRequest.on("closeConnection", function () {
                 ws.send(JSON.stringify({
                     meta: {
                         code: 400,
@@ -65,7 +76,7 @@ exports.webSocketServer = function (ws) {
                     //ws.terminate();
                 });
             });
-            twitterStreamRequest.on("requestError", function (error, data) {
+            newRequest.on("requestError", function (error, data) {
                 ws.send(JSON.stringify({
                     meta: {
                         error: error
@@ -76,10 +87,9 @@ exports.webSocketServer = function (ws) {
         });
         ws.on('close', function () {
             console.log('disconnected');
-            if (twitterStreamRequest) {
-                twitterStreamRequest.end();
-                twitterStreamRequest = null;
-            }
+            _.each(streamRequests, function (oneRequest) {
+                oneRequest.end();
+            });
         });
     });
 

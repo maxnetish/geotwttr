@@ -68,6 +68,196 @@ var searchTweets = function (accessToken, searchOptions, callback) {
     });
 };
 
+var performProxyTwitterRequest = function (opts) {
+    opts = opts || {};
+
+    var _accessToken = opts.accessToken || null,
+        _requestUrl = opts.requestUrl || "",
+        _requestMethod = opts.requestMethod || "GET",
+        _requestParams = opts.requestParams || null,
+        _requestIsStream = opts.requestStream || false,
+        _requestId = opts.requestId || null,
+        _eventHandlers = {
+            tweetReceived: [],
+            closeConnection: [],
+            requestError: []
+        },
+        _buffer = "",
+        _streamResponse,
+        _streamRequest,
+        _eventHandlersExecutor = {
+            onTweetReceived: function (oneTweet) {
+                var sendBody = {
+                    requestId: _requestId,
+                    tweet: oneTweet
+                };
+                _.each(_eventHandlers.tweetReceived, function (oneOnTweetReceivedCallback) {
+                    if (_.isFunction(oneOnTweetReceivedCallback)) {
+                        oneOnTweetReceivedCallback(sendBody);
+                    }
+                });
+            },
+            onCloseConnection: function () {
+                var sendBody = {
+                    requestId: _requestId
+                };
+                _.each(_eventHandlers.closeConnection, function (oneOnCLoseConnectionCallback) {
+                    if (_.isFunction(oneOnCLoseConnectionCallback)) {
+                        oneOnCLoseConnectionCallback(sendBody);
+                    }
+                });
+            },
+            onRequestError: function (error, data) {
+                var sendBody = {
+                    error: error,
+                    error_data: data,
+                    requestId: _requestId
+                };
+                _.each(_eventHandlers.requestError, function (oneOnRequestErrorCallback) {
+                    if (_.isFunction(oneOnRequestErrorCallback)) {
+                        oneOnRequestErrorCallback(sendBody);
+                    }
+                });
+            }
+        },
+        _addHandler = function (eventName, callback) {
+            if (!_eventHandlers[eventName]) {
+                _eventHandlers[eventName] = [];
+            }
+            _eventHandlers[eventName].push(callback);
+        },
+        _removeHandler = function (eventName) {
+            if (eventName) {
+                if (_eventHandlers[eventName]) {
+                    _eventHandlers[eventName] = [];
+                }
+            }
+        },
+        _onChunkReceived = function (chunk) {
+            console.log("Chunk received len=" + chunk.length);
+            _buffer += chunk.toString();
+            var rnPosition = _buffer.indexOf("\r\n");
+            var holeTweet;
+            while (rnPosition !== -1) {
+                holeTweet = _buffer.substring(0, rnPosition);
+                _buffer = _buffer.substring(rnPosition + 2);
+                if (holeTweet.length) {
+                    _onTweetReceived(JSON.parse(holeTweet));
+                }
+                rnPosition = _buffer.indexOf("\r\n");
+            }
+        },
+        _onResponseCallback = function (error, data) {
+            if (error) {
+                _onError(error, data);
+                return;
+            }
+            var parsedData = JSON.parse(data);
+            if (parsedData.statuses && _.isArray(parsedData.statuses)) {
+                _.each(parsedData.statuses, function (status) {
+                    _onTweetReceived(status);
+                });
+            }
+        },
+        _onTweetReceived = function (oneTweet) {
+            console.log("Tweet extracted len=" + oneTweet.length);
+            _eventHandlersExecutor.onTweetReceived(oneTweet);
+        },
+        _onCloseConnection = function () {
+            console.log("Close connection");
+            _eventHandlersExecutor.onCloseConnection();
+        },
+        _onError = function (error, data) {
+            console.log("Error: " + error);
+            _eventHandlersExecutor.onRequestError(error, data);
+        },
+        _closeConnection = function (callback) {
+            var error = null;
+            if (_streamResponse) {
+                _streamResponse.destroy();
+            } else {
+                error = "Response stream not created.";
+            }
+            if (_streamRequest) {
+                _streamRequest.end();
+            } else {
+                var msg = "Request not created.";
+                error = error ? error + " " + msg : msg;
+            }
+            if (_.isFunction(callback)) {
+                callback(error);
+            }
+        },
+        _startRequestStream = function (secret) {
+            var oa = oAuthConsumer();
+            var url = url.parse(_requestUrl);
+            if (_requestMethod === "GET") {
+                url.query = _requestParams;
+                _streamRequest = oa.get(url.format(), _accessToken, secret);
+            } else if (_requestMethod === "POST") {
+                _streamRequest = oa.post(url.format(), _accessToken, secret, _requestParams);
+            } else {
+                _onError("Support only GET and POST");
+                return;
+            }
+            _streamRequest.on("error", function (err) {
+                _onError(err);
+            });
+            _streamRequest.on('response', function (responseLocal) {
+                console.log("Get response");
+
+                _streamResponse = responseLocal;
+                _streamResponse.setEncoding('utf8');
+                _streamResponse.on('data', function (chunk) {
+                    _onChunkReceived(chunk);
+                });
+                _streamResponse.on('close', function () {
+                    _onCloseConnection();
+                });
+            });
+            _streamRequest.end();
+        },
+        _startRequest = function (secret) {
+            var oa = oAuthConsumer();
+            var url = url.parse(_requestUrl);
+            var request;
+            if (_requestMethod === "GET") {
+                url.query = _requestParams;
+                request = oa.get(url.format(), _accessToken, secret, _onResponseCallback);
+            } else if (_requestMethod === "POST") {
+                request = oa.post(url.format(), _accessToken, secret, _requestParams, _onResponseCallback);
+            } else {
+                _onError("Support only GET and POST");
+                return;
+            }
+        };
+
+    /* publics */
+    this.on = function (eventName, callback) {
+        _addHandler(eventName, callback);
+    };
+    this.off = function (eventName) {
+        _removeHandler(eventName);
+    };
+    this.end = function (callback) {
+        _closeConnection(callback);
+    };
+    /***********/
+
+    /* init */
+    store.getSecret(_accessToken, function (error, secret) {
+        if (error) {
+            _onError(error);
+            return;
+        }
+        if (_requestIsStream) {
+            _startRequestStream(secret);
+        } else {
+            _startRequest(secret);
+        }
+    });
+};
+
 var performStatusesFilterStream = function (opts) {
     //var self = this;
 
@@ -224,5 +414,6 @@ exports.twitter = {
     getAccessToken: getAccessToken,
     getRequestToken: getRequestToken,
     searchTweets: searchTweets,
-    statusesFilterStream: performStatusesFilterStream
+    statusesFilterStream: performStatusesFilterStream,
+    proxyRequest: performProxyTwitterRequest
 };
