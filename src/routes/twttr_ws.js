@@ -22,11 +22,16 @@ exports.webSocketServer = function (ws) {
 
     twitterHelper.isAccessTokenValid(accessToken, function (error, accountInfo) {
 
+        console.log("Access token checked...");
+
         if (error) {
             console.log("Reject websocket");
             onReject();
             return;
         }
+
+        console.log("Set event listener");
+
         ws.on('message', function (message) {
             var clientMessage;
             console.log('received: %s', message);

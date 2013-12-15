@@ -46,6 +46,86 @@
             this.bounds = _bounds;
         };
 
+        //TODO: берем твиты с сервера этим объектом,
+        //в процессе в result проталкиваются новые твиты
+        var wsConnection = function (result) {
+            // создать подключениеe
+            var socket = new WebSocket("ws://127.0.0.1:3000");
+            console.dir(socket);
+            socket.onopen = function (event) {
+                console.log("Websocket open");
+                console.dir(event);
+
+            };
+            socket.onmessage = function (event) {
+                console.log("Message received");
+                console.dir(event);
+                var incomingMessage = event.data;
+                var status = JSON.parse(incomingMessage);
+                status.isRetweet = !!status.retweeted_status;
+                status.canShowOnMap = !!status.coordinates;
+                result.unshift(status);
+            };
+            socket.onerror = function (event) {
+                console.log("Webcoket error");
+                console.dir(event);
+            };
+            socket.onclose = function (event) {
+                console.log("Websocket close");
+                console.dir(event);
+            };
+
+            this.openRequest=function(selectedLocationInstance){
+                var selectedLocationUnwrapped=ko.utils.unwrapObservable(selectedLocationInstance);
+                var center = selectedLocationUnwrapped.center();
+                var radius = selectedLocationUnwrapped.radius() / 1000;
+                var bounds=selectedLocationUnwrapped.bounds();
+                var SWlatlng=bounds.getSouthWest();
+                var NElanlng=bounds.getNorthEast();
+
+                /*
+                var searchOptions = {
+                    locations: SWlatlng.lng() + "," + SWlatlng.lat() + "," + NElanlng.lng() + "," + NElanlng.lat(),
+                    //locations: "-122.75,36.8,-121.75,37.8,-74,40,-73,41",
+                    //track: "Москве",
+                    stall_warnings: "true"
+                    //geocode: center.lat() + ',' + center.lng() + ',' + radius + 'km',
+                    //result_type: 'recent' //'mixed', 'popular' or 'recent'
+                };
+                */
+
+                var messageInitial={
+                    requestUrl: "https://api.twitter.com/1.1/search/tweets.json",
+                    requestMethod: "GET",
+                    requestParams:{
+                        geocode: center.lat() + ',' + center.lng() + ',' + radius + 'km',
+                        result_type: 'recent' //'mixed', 'popular' or 'recent'
+                    },
+                    requestStream: false,
+                    requestClose: false
+                };
+                socket.send(JSON.stringify(messageInitial));
+                var messageStream={
+                    requestUrl:"https://stream.twitter.com/1.1/statuses/filter.json",
+                    requestMethod: "GET",
+                    requestParams:{
+                        locations: SWlatlng.lng() + "," + SWlatlng.lat() + "," + NElanlng.lng() + "," + NElanlng.lat(),
+                        stall_warnings: "true"
+                    },
+                    requestStream: true,
+                    requestClose: false
+                };
+                socket.send(JSON.stringify(messageStream));
+                /*
+                setTimeout(function(){
+                    console.log("send message to server:");
+                    console.dir(searchOptions);
+                    socket.send(JSON.stringify(searchOptions));
+                }, 1000);
+                */
+            };
+        };
+
         /*  private methods */
         var updateSearchResult = function () {
             var center = selectedLocation().center();
@@ -120,7 +200,7 @@
 
         var searchButtonClick = function () {
             //updateSearchResult();
-
+            /*
             var testWebsocket = function () {
                 searchResult.removeAll();
                 // создать подключение
@@ -143,7 +223,13 @@
                         //geocode: center.lat() + ',' + center.lng() + ',' + radius + 'km',
                         //result_type: 'recent' //'mixed', 'popular' or 'recent'
                     };
-                    socket.send(JSON.stringify(searchOptions));
+
+                    setTimeout(function(){
+                        console.log("send message to server:");
+                        console.dir(searchOptions);
+                        socket.send(JSON.stringify(searchOptions));
+                    }, 1000);
+
                 };
                 socket.onmessage = function (event) {
                     console.log("Message received");
@@ -165,6 +251,7 @@
             };
 
             testWebsocket();
+            */
         };
 
         var getStatusHref = function (tweet) {

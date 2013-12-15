@@ -6,6 +6,8 @@ var redis = require('redis');
 var client = redis.createClient();
 
 var getAccessTokenSecret = function (accessToken, callback) {
+    console.log("We are get secret from store, accessToken="+accessToken);
+
     callback = callback || function () {
     };
 
@@ -16,7 +18,7 @@ var getAccessTokenSecret = function (accessToken, callback) {
 
     client.get(accessToken, function (err, reply) {
         // reply is null when the key is missing
-        //console.log(reply);
+        console.log("Secret received from strore, secret="+reply);
         if (err) {
             callback(err, null);
             return;
