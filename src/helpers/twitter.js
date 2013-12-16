@@ -190,12 +190,12 @@ var performProxyTwitterRequest = function (opts) {
         },
         _startRequestStream = function (secret) {
             var oa = oAuthConsumer();
-            var url = url.parse(_requestUrl);
+            var urlTarget = url.parse(_requestUrl);
             if (_requestMethod === "GET") {
-                url.query = _requestParams;
-                _streamRequest = oa.get(url.format(), _accessToken, secret);
+                urlTarget.query = _requestParams;
+                _streamRequest = oa.get(urlTarget.format(), _accessToken, secret);
             } else if (_requestMethod === "POST") {
-                _streamRequest = oa.post(url.format(), _accessToken, secret, _requestParams);
+                _streamRequest = oa.post(urlTarget.format(), _accessToken, secret, _requestParams);
             } else {
                 _onError("Support only GET and POST");
                 return;
@@ -219,13 +219,13 @@ var performProxyTwitterRequest = function (opts) {
         },
         _startRequest = function (secret) {
             var oa = oAuthConsumer();
-            var url = url.parse(_requestUrl);
+            var targetUrl = url.parse(_requestUrl);
             var request;
             if (_requestMethod === "GET") {
-                url.query = _requestParams;
-                request = oa.get(url.format(), _accessToken, secret, _onResponseCallback);
+                targetUrl.query = _requestParams;
+                request = oa.get(targetUrl.format(), _accessToken, secret, _onResponseCallback);
             } else if (_requestMethod === "POST") {
-                request = oa.post(url.format(), _accessToken, secret, _requestParams, _onResponseCallback);
+                request = oa.post(targetUrl.format(), _accessToken, secret, _requestParams, _onResponseCallback);
             } else {
                 _onError("Support only GET and POST");
                 return;

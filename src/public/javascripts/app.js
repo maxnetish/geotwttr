@@ -48,86 +48,116 @@
 
         //TODO: берем твиты с сервера этим объектом,
         //в процессе в result проталкиваются новые твиты
-        var wsConnection = function (result) {
-            // создать подключениеe
-            var socket = new WebSocket("ws://127.0.0.1:3000");
-            console.dir(socket);
-            socket.onopen = function (event) {
-                console.log("Websocket open");
-                console.dir(event);
+        var wsConnection = function () {
+            var result = searchResult;
+            var socketUrl = "ws://127.0.0.1:3000";
+            var socket;
 
-            };
-            socket.onmessage = function (event) {
-                console.log("Message received");
-                console.dir(event);
-                var incomingMessage = event.data;
-                var status = JSON.parse(incomingMessage);
-                status.isRetweet = !!status.retweeted_status;
-                status.canShowOnMap = !!status.coordinates;
-                result.unshift(status);
-            };
-            socket.onerror = function (event) {
-                console.log("Webcoket error");
-                console.dir(event);
-            };
-            socket.onclose = function (event) {
-                console.log("Websocket close");
-                console.dir(event);
+            var initSocket = function () {
+                // создать подключениеe
+                socket = new WebSocket(socketUrl);
+                console.dir(socket);
+
+                socket.onmessage = function (event) {
+
+                    var incomingMessage = event.data;
+                    var status = JSON.parse(incomingMessage).tweet;
+                    if(!status || !status.id){
+                        console.log("Message unknown received");
+                        console.dir(event);
+                        return;
+                    }
+                    status.isRetweet = !!status.retweeted_status;
+                    status.canShowOnMap = !!status.coordinates;
+                    result.unshift(status);
+                };
+                socket.onerror = function (event) {
+                    console.log("Webcoket error");
+                    console.dir(event);
+                };
+                socket.onclose = function (event) {
+                    console.log("Websocket close");
+                    console.dir(event);
+                };
             };
 
-            this.openRequest=function(selectedLocationInstance){
-                var selectedLocationUnwrapped=ko.utils.unwrapObservable(selectedLocationInstance);
+            this.openRequest = function (selectedLocationInstance) {
+                var selectedLocationUnwrapped = ko.utils.unwrapObservable(selectedLocationInstance);
                 var center = selectedLocationUnwrapped.center();
                 var radius = selectedLocationUnwrapped.radius() / 1000;
-                var bounds=selectedLocationUnwrapped.bounds();
-                var SWlatlng=bounds.getSouthWest();
-                var NElanlng=bounds.getNorthEast();
+                var bounds = selectedLocationUnwrapped.bounds();
+                var SWlatlng = bounds.getSouthWest();
+                var NElanlng = bounds.getNorthEast();
 
-                /*
-                var searchOptions = {
-                    locations: SWlatlng.lng() + "," + SWlatlng.lat() + "," + NElanlng.lng() + "," + NElanlng.lat(),
-                    //locations: "-122.75,36.8,-121.75,37.8,-74,40,-73,41",
-                    //track: "Москве",
-                    stall_warnings: "true"
-                    //geocode: center.lat() + ',' + center.lng() + ',' + radius + 'km',
-                    //result_type: 'recent' //'mixed', 'popular' or 'recent'
-                };
-                */
+                console.log("openRequest, bound="+bounds);
 
-                var messageInitial={
+                var messageInitial = {
                     requestUrl: "https://api.twitter.com/1.1/search/tweets.json",
                     requestMethod: "GET",
-                    requestParams:{
+                    requestParams: {
                         geocode: center.lat() + ',' + center.lng() + ',' + radius + 'km',
                         result_type: 'recent' //'mixed', 'popular' or 'recent'
                     },
                     requestStream: false,
                     requestClose: false
                 };
-                socket.send(JSON.stringify(messageInitial));
-                var messageStream={
-                    requestUrl:"https://stream.twitter.com/1.1/statuses/filter.json",
+
+                var messageStream = {
+                    requestUrl: "https://stream.twitter.com/1.1/statuses/filter.json",
                     requestMethod: "GET",
-                    requestParams:{
+                    requestParams: {
                         locations: SWlatlng.lng() + "," + SWlatlng.lat() + "," + NElanlng.lng() + "," + NElanlng.lat(),
                         stall_warnings: "true"
                     },
                     requestStream: true,
                     requestClose: false
                 };
-                socket.send(JSON.stringify(messageStream));
-                /*
-                setTimeout(function(){
-                    console.log("send message to server:");
-                    console.dir(searchOptions);
-                    socket.send(JSON.stringify(searchOptions));
-                }, 1000);
-                */
+
+                if(!socket){
+                    initSocket();
+                }
+
+                switch (socket.readyState) {
+                    case socket.OPEN:       // 1
+                        console.log("socket.send immediate");
+                        socket.send(JSON.stringify(messageInitial));
+                        socket.send(JSON.stringify(messageStream));
+                        break;
+                    case socket.CONNECTING: // 0
+                        socket.onopen =  function () {
+                            setTimeout(function(){
+                                console.log("socket.send after connecting->onopen");
+                                socket.send(JSON.stringify(messageInitial));
+                                socket.send(JSON.stringify(messageStream));
+                            },1000);
+                        };
+                        break;
+                    case socket.CLOSING:    // 3
+                    case socket.CLOSED:     // 2
+                        initSocket();
+                        socket.onopen=function () {
+                            setTimeout(function(){
+                                console.log("socket.send after closed->onopen");
+                                socket.send(JSON.stringify(messageInitial));
+                                socket.send(JSON.stringify(messageStream));
+                            },1000);
+                        };
+                        break;
+                    default:
+                        console.log("Socket unknown state");
+                        break;
+                }
             };
         };
 
         /*  private methods */
         var updateSearchResult = function () {
+
+            searchResult.removeAll();
+            connection.openRequest(selectedLocation);
+
+
+            /*
             var center = selectedLocation().center();
             var radius = selectedLocation().radius() / 1000;
 
@@ -155,6 +185,7 @@
                 type: 'GET',
                 url: '/searchtweets'
             });
+            */
         };
 
         /*  public observables */
@@ -172,6 +203,8 @@
                 }
             }
         });
+
+        var connection=new wsConnection();
 
         /*  public methods */
         var setTweetContentWidth = function () {
@@ -199,59 +232,60 @@
         };
 
         var searchButtonClick = function () {
+            //var ws = new wsConnection(searchResult);
             //updateSearchResult();
             /*
-            var testWebsocket = function () {
-                searchResult.removeAll();
-                // создать подключение
-                var socket = new WebSocket("ws://127.0.0.1:3000");
-                console.dir(socket);
-                socket.onopen = function (event) {
-                    console.log("Websocket open");
-                    console.dir(event);
+             var testWebsocket = function () {
+             searchResult.removeAll();
+             // создать подключение
+             var socket = new WebSocket("ws://127.0.0.1:3000");
+             console.dir(socket);
+             socket.onopen = function (event) {
+             console.log("Websocket open");
+             console.dir(event);
 
-                    var center = selectedLocation().center();
-                    var radius = selectedLocation().radius() / 1000;
-                    var bounds=selectedLocation().bounds();
-                    var SWlatlng=bounds.getSouthWest();
-                    var NElanlng=bounds.getNorthEast();
-                    var searchOptions = {
-                        locations: SWlatlng.lng() + "," + SWlatlng.lat() + "," + NElanlng.lng() + "," + NElanlng.lat(),
-                        //locations: "-122.75,36.8,-121.75,37.8,-74,40,-73,41",
-                        //track: "Москве",
-                        stall_warnings: "true"
-                        //geocode: center.lat() + ',' + center.lng() + ',' + radius + 'km',
-                        //result_type: 'recent' //'mixed', 'popular' or 'recent'
-                    };
+             var center = selectedLocation().center();
+             var radius = selectedLocation().radius() / 1000;
+             var bounds=selectedLocation().bounds();
+             var SWlatlng=bounds.getSouthWest();
+             var NElanlng=bounds.getNorthEast();
+             var searchOptions = {
+             locations: SWlatlng.lng() + "," + SWlatlng.lat() + "," + NElanlng.lng() + "," + NElanlng.lat(),
+             //locations: "-122.75,36.8,-121.75,37.8,-74,40,-73,41",
+             //track: "Москве",
+             stall_warnings: "true"
+             //geocode: center.lat() + ',' + center.lng() + ',' + radius + 'km',
+             //result_type: 'recent' //'mixed', 'popular' or 'recent'
+             };
 
-                    setTimeout(function(){
-                        console.log("send message to server:");
-                        console.dir(searchOptions);
-                        socket.send(JSON.stringify(searchOptions));
-                    }, 1000);
+             setTimeout(function(){
+             console.log("send message to server:");
+             console.dir(searchOptions);
+             socket.send(JSON.stringify(searchOptions));
+             }, 1000);
 
-                };
-                socket.onmessage = function (event) {
-                    console.log("Message received");
-                    console.dir(event);
-                    var incomingMessage = event.data;
-                    var status = JSON.parse(incomingMessage);
-                    status.isRetweet = !!status.retweeted_status;
-                    status.canShowOnMap = !!status.coordinates;
-                    searchResult.unshift(status);
-                };
-                socket.onerror = function (event) {
-                    console.log("Webcoket error");
-                    console.dir(event);
-                };
-                socket.onclose = function (event) {
-                    console.log("Websocket close");
-                    console.dir(event);
-                }
-            };
+             };
+             socket.onmessage = function (event) {
+             console.log("Message received");
+             console.dir(event);
+             var incomingMessage = event.data;
+             var status = JSON.parse(incomingMessage);
+             status.isRetweet = !!status.retweeted_status;
+             status.canShowOnMap = !!status.coordinates;
+             searchResult.unshift(status);
+             };
+             socket.onerror = function (event) {
+             console.log("Webcoket error");
+             console.dir(event);
+             };
+             socket.onclose = function (event) {
+             console.log("Websocket close");
+             console.dir(event);
+             }
+             };
 
-            testWebsocket();
-            */
+             testWebsocket();
+             */
         };
 
         var getStatusHref = function (tweet) {

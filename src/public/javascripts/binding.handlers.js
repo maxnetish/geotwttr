@@ -12,6 +12,7 @@
 
                 statusOnMap = allBindings().statusOnMap;
 
+
             var mapOptions = {
                 center: selectedCenterObservable(),
                 zoom: 12,
@@ -35,6 +36,11 @@
                 strokeOpacity: 0.2,
                 strokeWeight: 1
             });
+
+            if(!selectedBoundsObservable()){
+                console.log("Set bound to "+circle.getBounds());
+                selectedBoundsObservable(circle.getBounds());
+            }
 
             var statusMarker = new google.maps.Marker({
                 animation: google.maps.Animation.DROP,  //DROP BOUNCE
@@ -74,6 +80,7 @@
                     return;
                 }
                 selectedCenterObservable(newCenter);
+                console.log("Set bounds to "+circle.getBounds());
                 selectedBoundsObservable(circle.getBounds());
                 selectedLocationObservable.valueHasMutated();
                 updateGeoName();
@@ -85,6 +92,7 @@
                 if (currentRadius == newRadius) {
                     return;
                 }
+                console.log("Set bounds to "+circle.getBounds());
                 selectedBoundsObservable(circle.getBounds());
                 selectedRadiusObservable(newRadius);
                 selectedLocationObservable.valueHasMutated();
@@ -96,6 +104,8 @@
                 map.setCenter(newCenter);
                 circle.setCenter(newCenter);
                 circle.setRadius(newRadius);
+                console.log("Set bounds to "+circle.getBounds());
+                selectedBoundsObservable(circle.getBounds());
                 updateGeoName();
             });
 

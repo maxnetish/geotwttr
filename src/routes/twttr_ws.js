@@ -34,7 +34,7 @@ exports.webSocketServer = function (ws) {
 
         ws.on('message', function (message) {
             var clientMessage;
-            console.log('received: %s', message);
+            console.log('received on WS: len='+message.length);
             var sanitizeClientMessage = function (mess) {
                 var result = {};
                 result.requestUrl = _.isString(mess.requestUrl) ? mess.requestUrl : null;
