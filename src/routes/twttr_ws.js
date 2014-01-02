@@ -1,26 +1,26 @@
 /**
  * Created by mgordeev on 14.11.13.
  */
-var express = require('express');
-var twitterHelper = require('../helpers/twitter').twitter;
-var WebSocket = require("ws");
-var _ = require("underscore");
+var express = require('express'),
+    twitterHelper = require('../helpers/twitter').twitter,
+    WebSocket = require("ws"),
+    _ = require("underscore");
 
 exports.webSocketServer = function (ws) {
+    var streamRequests = {},
+        accessToken,
+        onReject = function () {
+            ws.send(JSON.stringify({meta: {code: 400, error_message: "Unauthorized"}}), function (error) {
+                ws.terminate();
+            });
+        };
+
     console.log("Websocket connection receive");
     express.cookieParser('A12-dmcd=Asd365%bjldkloed(uhn')(ws.upgradeReq, null, function () {
     });
-    var streamRequests = {};
-    var accessToken = ws.upgradeReq.signedCookies.at;
-    //var twitterStreamRequest;
+    accessToken = ws.upgradeReq.signedCookies.at;
 
-    var onReject = function () {
-        ws.send(JSON.stringify({meta: {code: 400, error_message: "Unauthorized"}}), function (error) {
-            ws.terminate();
-        });
-    };
-
-    twitterHelper.isAccessTokenValid(accessToken, function (error, accountInfo) {
+    twitterHelper.isAccessTokenValid(accessToken, function (error) {
 
         console.log("Access token checked...");
 
@@ -30,11 +30,8 @@ exports.webSocketServer = function (ws) {
             return;
         }
 
-        console.log("Set event listener");
-
         ws.on('message', function (message) {
             var clientMessage;
-            console.log('received on WS: len='+message.length);
             var sanitizeClientMessage = function (mess) {
                 var result = {};
                 result.requestUrl = _.isString(mess.requestUrl) ? mess.requestUrl : null;
@@ -97,23 +94,4 @@ exports.webSocketServer = function (ws) {
             });
         });
     });
-
-    /*
-     ws.on('message', function (message) {
-     console.log('received: %s', message);
-     ws.send("i receieve '" + message + "'");
-     });
-
-     var accessToken = req.signedCookies.at;
-     var searchOptions = req.query;
-
-     var wsServer = new WebSocket.Server({port: 3001});
-
-     wsServer.on('connection', function(ws) {
-     ws.on('message', function(message) {
-     console.log('received: %s', message);
-     });
-     ws.send('something');
-     });
-     */
 };

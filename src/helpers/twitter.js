@@ -160,7 +160,6 @@ var performProxyTwitterRequest = function (opts) {
             }
         },
         _onTweetReceived = function (oneTweet) {
-            console.log("Tweet extracted len=" + oneTweet.length);
             _eventHandlersExecutor.onTweetReceived(oneTweet);
         },
         _onCloseConnection = function () {
@@ -258,162 +257,10 @@ var performProxyTwitterRequest = function (opts) {
     });
 };
 
-var performStatusesFilterStream = function (opts) {
-    //var self = this;
-
-    opts = opts || {};
-    var _accessToken = opts.accessToken || null;
-    var _filterOptions = opts.filterOptions || null;
-    var _streamRequest;
-    var _streamResponse;
-
-    var _buffer = "";
-    var _onError = function (error, data) {
-        console.log("Error: " + error);
-        _eventHandlersExecutor.onRequestError(error, data);
-    };
-
-    var _eventHandlers = {
-        tweetReceived: [],
-        closeConnection: [],
-        requestError: []
-    };
-
-    var _eventHandlersExecutor = {
-        onTweetReceived: function (oneTweet) {
-            _.each(_eventHandlers.tweetReceived, function (oneOnTweetReceivedCallback) {
-                if (_.isFunction(oneOnTweetReceivedCallback)) {
-                    oneOnTweetReceivedCallback(oneTweet);
-                }
-            });
-        },
-        onCloseConnection: function () {
-            _.each(_eventHandlers.closeConnection, function (oneOnCLoseConnectionCallback) {
-                if (_.isFunction(oneOnCLoseConnectionCallback)) {
-                    oneOnCLoseConnectionCallback();
-                }
-            });
-        },
-        onRequestError: function (error, data) {
-            _.each(_eventHandlers.requestError, function (oneOnRequestErrorCallback) {
-                if (_.isFunction(oneOnRequestErrorCallback)) {
-                    oneOnRequestErrorCallback(error, data);
-                }
-            });
-        }
-    };
-
-    var _onChunkReceived = function (chunk) {
-        console.log("Chunk received len=" + chunk.length);
-        _buffer += chunk.toString();
-        var rnPosition = _buffer.indexOf("\r\n");
-        var holeTweet;
-        while (rnPosition !== -1) {
-            holeTweet = _buffer.substring(0, rnPosition);
-            _buffer = _buffer.substring(rnPosition + 2);
-            if (holeTweet.length) {
-                _onTweetReceived(holeTweet);
-            }
-            rnPosition = _buffer.indexOf("\r\n");
-        }
-    };
-    var _onTweetReceived = function (oneTweet) {
-        console.log("Tweet extracted len=" + oneTweet.length);
-        _eventHandlersExecutor.onTweetReceived(oneTweet);
-    };
-    var _onCloseConnection = function () {
-        console.log("Close connection");
-        _eventHandlersExecutor.onCloseConnection();
-    };
-    var _startRequest = function (secret) {
-        var oa = oAuthConsumer();
-
-        var filterStreamUrl = "https://stream.twitter.com/1.1/statuses/filter.json";
-        //var body = querystring.stringify(_filterOptions);
-        //console.log("body: "+body);
-        _streamRequest = oa.post(filterStreamUrl, _accessToken, secret, _filterOptions);
-        //_streamRequest.write(_filterOptions);
-
-        //var searchUrl = url.parse("https://stream.twitter.com/1.1/statuses/filter.json");
-        //searchUrl.query = _filterOptions;
-        //var actualUnwrapped = url.format(searchUrl);
-        //_streamRequest = oa.get(actualUnwrapped, _accessToken, secret);
-
-        _streamRequest.on("error", function (err) {
-            _onError(err);
-        });
-        _streamRequest.on('response', function (responseLocal) {
-            console.log("Get response");
-            //console.dir(responseLocal);
-            _streamResponse = responseLocal;
-            _streamResponse.setEncoding('utf8');
-            _streamResponse.on('data', function (chunk) {
-                _onChunkReceived(chunk);
-            });
-            _streamResponse.on('close', function () {
-                _onCloseConnection();
-            });
-        });
-
-        _streamRequest.end();
-    };
-    var _addHandler = function (eventName, callback) {
-        if (!_eventHandlers[eventName]) {
-            _eventHandlers[eventName] = [];
-        }
-        _eventHandlers[eventName].push(callback);
-    };
-    var _removeHandler = function (eventName) {
-        if (eventName) {
-            if (_eventHandlers[eventName]) {
-                _eventHandlers[eventName] = [];
-            }
-        }
-    };
-    var _closeConnection = function (callback) {
-        var error = null;
-        if (_streamResponse) {
-            _streamResponse.destroy();
-        } else {
-            error = "Response stream not created.";
-        }
-        if (_streamRequest) {
-            _streamRequest.end();
-        } else {
-            var msg = "Request not created.";
-            error = error ? error + " " + msg : msg;
-        }
-        if (_.isFunction(callback)) {
-            callback(error);
-        }
-    };
-    /* publics */
-    this.on = function (eventName, callback) {
-        _addHandler(eventName, callback);
-    };
-    this.off = function (eventName) {
-        _removeHandler(eventName);
-    };
-    this.end = function (callback) {
-        _closeConnection(callback);
-    };
-    /***********/
-
-    /* init */
-    store.getSecret(_accessToken, function (error, secret) {
-        if (error) {
-            _onError(error);
-            return;
-        }
-        _startRequest(secret);
-    });
-};
-
 exports.twitter = {
     isAccessTokenValid: verifyCredentials,
     getAccessToken: getAccessToken,
     getRequestToken: getRequestToken,
     searchTweets: searchTweets,
-    statusesFilterStream: performStatusesFilterStream,
     proxyRequest: performProxyTwitterRequest
 };

@@ -5,7 +5,9 @@
 exports.indexVm = function () {
     var self = this;
     var title = "Geo statuses";
+    var clientScripts = require("../config/client-script.json");
     return{
-        title: title
+        title: title,
+        clientScripts: clientScripts
     };
 };
