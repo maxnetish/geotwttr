@@ -14,9 +14,9 @@ block content
             button.search-button(type="button", data-bind="click: searchButtonClick") Update
             input.geo-autocomplete(data-bind="geoAutocomplete: '.gmap'", type="search")
             div.gmap(data-bind='gmap: selectedLocation, statusOnMap: statusOnMap')
-            span(data-bind='text: selectedLocation().center')
-            span.geo-radius-value(data-bind="text: searchRadius")
-            span(data-bind='text: selectedLocation().bounds')
+            //span(data-bind='text: selectedLocation().center')
+            //span.geo-radius-value(data-bind="text: searchRadius")
+            //span(data-bind='text: selectedLocation().bounds')
             p
                 span(data-bind='text: hidedIncomingCount')
                 span &nbsp;hided
@@ -47,7 +47,8 @@ block content
                         p.tweet-meta
                             a.entity(data-bind="visible: canShowOnMap, click: $parent.showTweetOnMap", href="javascript:void(0)")
                                 span.show-on-map Show on map
-    each val in clientScripts
-        script(src=val)
-    script(src="http://maps.googleapis.com/maps/api/js?key="+googleAPiToken+"&sensor=true&libraries=places,geometry")
+    script(data-main="javascripts/app/main.js", src="javascripts/lib/require.js")
+    //each val in clientScripts
+    //    script(src=val)
+    //script(src="http://maps.googleapis.com/maps/api/js?key="+googleAPiToken+"&sensor=true&libraries=places,geometry")
 
