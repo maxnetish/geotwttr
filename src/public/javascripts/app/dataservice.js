@@ -26,8 +26,10 @@ define(["underscore"],
         var socketUrl = "ws://" + window.location.host;
         var requests = {};
         var webSocketConnection;
+        var socketOpenListeners = [];
 
         var initAndBindConnection = function () {
+            socketOpenListeners.length = 0;
             webSocketConnection = new WebSocket(socketUrl);
             webSocketConnection.onmessage = function (event) {
                 var incomingMessage = JSON.parse(event.data);
@@ -48,6 +50,14 @@ define(["underscore"],
                     });
                 });
             };
+            webSocketConnection.onopen = function (event) {
+                console.log("socket open, notify subscribers...");
+                _.each(socketOpenListeners, function (listener) {
+                    if (_.isFunction(listener)) {
+                        listener(event);
+                    }
+                })
+            }
         };
 
         var getSocketConnection = function (callback) {
@@ -59,20 +69,21 @@ define(["underscore"],
                     callback(webSocketConnection);
                     break;
                 case webSocketConnection.CONNECTING: // 0
-                    webSocketConnection.onopen = function () {
+                    console.log("[DATA] socket state is CONNECTING, wait onopen");
+                    socketOpenListeners.push(function (event) {
                         setTimeout(function () {
                             callback(webSocketConnection);
                         }, 1000);
-                    };
+                    });
                     break;
                 case webSocketConnection.CLOSING:    // 3
                 case webSocketConnection.CLOSED:     // 2
                     initAndBindConnection();
-                    webSocketConnection.onopen = function () {
+                    socketOpenListeners.push(function (event) {
                         setTimeout(function () {
                             callback(webSocketConnection);
                         }, 1000);
-                    };
+                    });
                     break;
                 default:
                     console.log("Socket unknown state");
@@ -100,7 +111,11 @@ define(["underscore"],
             var newRequest = new ModelRequest(options);
 
             requests[newRequest.requestId] = newRequest;
+            console.log("[DATA] wait for socket ready...")
+            console.dir(newRequest);
             getSocketConnection(function (socketConnection) {
+                console.log("[DATA] sending to socket...");
+                console.dir(newRequest);
                 socketConnection.send(newRequest.messageToSend(false));
             });
 

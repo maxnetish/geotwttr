@@ -53,8 +53,10 @@ exports.webSocketServer = function (ws) {
             }
 
             if (clientMessage.requestClose && clientMessage.requestId) {
-                streamRequests[clientMessage.requestId].end();
-                streamRequests[clientMessage.requestId] = undefined;
+                if (streamRequests[clientMessage.requestId]) {
+                    streamRequests[clientMessage.requestId].end();
+                    streamRequests[clientMessage.requestId] = undefined;
+                }
                 return;
             }
 
@@ -90,7 +92,9 @@ exports.webSocketServer = function (ws) {
         ws.on('close', function () {
             console.log('disconnected');
             _.each(streamRequests, function (oneRequest) {
-                oneRequest.end();
+                if (oneRequest) {
+                    oneRequest.end();
+                }
             });
         });
     });

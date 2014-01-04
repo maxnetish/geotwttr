@@ -14,9 +14,9 @@ block content
             button.search-button(type="button", data-bind="click: searchButtonClick") Update
             input.geo-autocomplete(data-bind="geoAutocomplete: '.gmap'", type="search")
             div.gmap(data-bind='gmap: selectedLocation, statusOnMap: statusOnMap')
-            //span(data-bind='text: selectedLocation().center')
-            //span.geo-radius-value(data-bind="text: searchRadius")
-            //span(data-bind='text: selectedLocation().bounds')
+            span(data-bind='text: selectedLocation().center')
+            span.geo-radius-value(data-bind="text: searchRadius")
+            span(data-bind='text: selectedLocation().bounds')
             p
                 span(data-bind='text: hidedIncomingCount')
                 span &nbsp;hided
@@ -29,7 +29,7 @@ block content
                 span(data-bind='text: hidedIncomingCount')
                 span &nbsp;received statuses
             ul#tweet-list.scroll(data-bind='foreach: searchResult, endlessList: needMore')
-                li.li-tweet
+                li.li-tweet(data-bind="visible: visible")
                     div.tweet-left
                         img.avatar(data-bind="attr: {src: isRetweet? retweeted_status.user.profile_image_url:user.profile_image_url}")
                     div.tweet-right
