@@ -39,14 +39,28 @@ define(["ko", "gmaps", "jquery"],
                         strokeWeight: 1
                     });
 
-                    var rect = new gmaps.Rectangle({
-                        bounds: selectedBoundsObservable(),
+                    /*
+                     var rect = new gmaps.Rectangle({
+                     bounds: selectedBoundsObservable(),
+                     clickable: false,
+                     draggable: false,
+                     editable: false,
+                     fillColor: "#86AAE1",
+                     fillOpacity: 0.1,
+                     map: map
+                     });
+                     */
+
+                    var placePolygon = new gmaps.Polygon({
                         clickable: false,
                         draggable: false,
                         editable: false,
-                        fillColor: "#86AAE1",
-                        fillOpacity: 0.1,
-                        map: map
+                        fillColor: "#2622E1",
+                        fillOpacity: 0.2,
+                        map: map,
+                        strokeWeight: 1,
+                        strokeOpacity: 1,
+                        visible: false
                     });
 
                     var statusMarker = new gmaps.Marker({
@@ -107,7 +121,7 @@ define(["ko", "gmaps", "jquery"],
                         map.setCenter(newCenter);
                         circle.setCenter(newCenter);
                         circle.setRadius(newRadius);
-                        rect.setBounds(data.bounds());
+                        //rect.setBounds(data.bounds());
                         updateGeoName();
                     });
 
@@ -122,9 +136,25 @@ define(["ko", "gmaps", "jquery"],
                                     statusMarker.setTitle(null);
                                 }
                                 statusMarker.setVisible(true);
+                                placePolygon.setVisible(false);
                                 map.panTo(newPosition);
+                            } else if (data && data.place && data.place.bounding_box && data.place.bounding_box.coordinates) {
+                                var tweetPath = data.place.bounding_box.coordinates;
+                                //array of array of [lng, lat]
+                                var gPath = [];
+                                for (var i = 0, iLen = tweetPath.length; i < iLen; i++) {
+                                    gPath.push([]);
+                                    for (var j = 0, jLen = tweetPath[i].length; j < jLen; j++) {
+                                        gPath[i].push(new gmaps.LatLng(tweetPath[i][j][1], tweetPath[i][j][0]));
+                                    }
+                                }
+                                placePolygon.setPaths(gPath);
+
+                                statusMarker.setVisible(false);
+                                placePolygon.setVisible(true);
                             } else {
                                 statusMarker.setVisible(false);
+                                placePolygon.setVisible(false);
                             }
                         });
                     }

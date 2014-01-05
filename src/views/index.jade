@@ -11,46 +11,46 @@ block content
     div.view
         h2.text-center(data-bind='text: title')
         div.pane-left
-            button.search-button(type="button", data-bind="click: searchButtonClick") Update
             input.geo-autocomplete(data-bind="geoAutocomplete: '.gmap'", type="search")
             div.gmap(data-bind='gmap: selectedLocation, statusOnMap: statusOnMap')
-            span(data-bind='text: selectedLocation().center')
-            span.geo-radius-value(data-bind="text: searchRadius")
-            span(data-bind='text: selectedLocation().bounds')
-            p
+            //span(data-bind='text: selectedLocation().center')
+            //span.geo-radius-value(data-bind="text: searchRadius")
+            //span(data-bind='text: selectedLocation().bounds')
+            //p
                 span(data-bind='text: hidedIncomingCount')
                 span &nbsp;hided
-            p
+            //p
                 span(data-bind='text: displayedCount')
                 span &nbsp;on screen
         div.pane-right
+            button(data-bind='click: startStreaming') Start streaming
+            button(data-bind='click: stopStreaming') Stop streaming
             button.button-show-incoming(data-bind='visible: hidedIncomingCount()>0, click: showHidedStatuses')
                 span Show&nbsp;
                 span(data-bind='text: hidedIncomingCount')
                 span &nbsp;received statuses
-            button(data-bind='click: startStreaming') Start streaming
-            button(data-bind='click: stopStreaming') Stop streaming
-            ul#tweet-list.scroll(data-bind='foreach: searchResult, endlessList: needMore')
-                li.li-tweet(data-bind="visible: visible")
+            ul#tweet-list.scroll(data-bind='endlessList: needMore')
+    script#tweet-template(type='text/html')
+        li.li-tweet(data-bind="visible: visible")
                     div.tweet-left
-                        img.avatar(data-bind="attr: {src: isRetweet? retweeted_status.user.profile_image_url:user.profile_image_url}")
+                        img.avatar(data-bind="attr: {src: avatarUrl}")
                     div.tweet-right
                         p.tweet-usernames
-                            a.no-decoration(data-bind="attr: {href: $parent.getUserHref($data)}", target="_blank")
-                                span.full-name(data-bind="text: isRetweet? retweeted_status.user.name : user.name")
-                                span.screen-name(data-bind="text: isRetweet? retweeted_status.user.screen_name : user.screen_name")
+                            a.no-decoration(data-bind="attr: {href: profileUrl}", target="_blank")
+                                span.full-name(data-bind="text: realFullName")
+                                span.screen-name(data-bind="text: realScreenName")
                         p.tweet-text(data-bind='renderTweetTextContent: $data')
                         p.tweet-meta
-                            a.no-decoration(data-bind="attr: {href: $parent.getStatusHref($data)}", target="_blank")
+                            a.no-decoration(data-bind="attr: {href: statusUrl}", target="_blank")
                                 span.tweet-date(data-bind='tweetDate: $data')
                             span.retweet-from(data-bind="visible: isRetweet") RT from
-                            a.no-decoration(data-bind="visible: isRetweet, attr: {href: $parent.getUserHref($data, true)}", target="_blank")
+                            // , attr: {href: $parent.getUserHref($data, true)}
+                            a.no-decoration(data-bind="attr: {href: profileOriginalUrl}, visible: isRetweet", target="_blank")
                                 span.screen-name(data-bind="text: user.screen_name")
+                        p.tweet-meta(data-bind='visible: !!nearPlace')
+                            span Near&nbsp;
+                            span(data-bind='text: nearPlace')
                         p.tweet-meta
-                            a.entity(data-bind="visible: canShowOnMap, click: $parent.showTweetOnMap", href="javascript:void(0)")
+                            button.entity(data-bind="visible: canShowOnMap, click: showOnMap")
                                 span.show-on-map Show on map
     script(data-main="javascripts/app/main.js", src="javascripts/lib/require.js")
-    //each val in clientScripts
-    //    script(src=val)
-    //script(src="http://maps.googleapis.com/maps/api/js?key="+googleAPiToken+"&sensor=true&libraries=places,geometry")
-

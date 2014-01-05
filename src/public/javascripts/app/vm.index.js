@@ -1,16 +1,16 @@
 /**
  * Created by max on 03.01.14.
  */
-define(["ko", "models", "statuses.set", "dataservice.stream-tweets"],
-    function (ko, models, statusesSet, srcDataservice) {
-        var selectedLocationObservable= ko.observable(new models.ModelSelectedLocation());
-        var listOfTweets=new statusesSet(srcDataservice);
+define(["ko", "models", "statuses.set", "dataservice.stream-tweets", "jquery"],
+    function (ko, models, statusesSet, srcDataservice, $) {
+        var selectedLocationObservable = ko.observable(new models.ModelSelectedLocation());
+        var listOfTweets = new statusesSet(srcDataservice, $("#tweet-list"), document.getElementById("tweet-template").innerHTML);
 
-        selectedLocationObservable.subscribe(function(locationUnwrapped){
-             listOfTweets.filter(locationUnwrapped);
+        selectedLocationObservable.subscribe(function (locationUnwrapped) {
+            listOfTweets.filter(locationUnwrapped);
         });
 
-        var needMore=function(){
+        var needMore = function () {
             listOfTweets.requestMorePrevious();
         };
 
@@ -19,21 +19,21 @@ define(["ko", "models", "statuses.set", "dataservice.stream-tweets"],
             selectedLocation: selectedLocationObservable,
             searchResult: listOfTweets.statusesList,
             searchRadius: selectedLocationObservable().radius,
-            title: "Title text",
+            title: ko.computed({
+                read: function () {
+                    var selectedLocation=selectedLocationObservable();
+                    if(selectedLocation.geoName()){
+                        return "Near: "+selectedLocation.geoName();
+                    }else{
+                        return null;
+                    }
+                },
+                deferEvaluate: true
+            }),
             setTweetContentWidth: function () {
                 return 200;
             },
-            //formatTweetDate: formatTweetDate,
-            getUserHref: function () {
-                return null;
-            },
             showTweetOnMap: function () {
-                return null;
-            },
-            searchButtonClick: function () {
-                return null;
-            },
-            getStatusHref: function () {
                 return null;
             },
             hidedIncomingCount: listOfTweets.hidedStatusesCount,
@@ -41,6 +41,7 @@ define(["ko", "models", "statuses.set", "dataservice.stream-tweets"],
             showHidedStatuses: listOfTweets.makeAllVisible,
             needMore: needMore,
             startStreaming: listOfTweets.startStreaming,
-            stopStreaming: listOfTweets.stopStreaming
+            stopStreaming: listOfTweets.stopStreaming,
+            statusOnMap: listOfTweets.statusOnMap
         };
     });

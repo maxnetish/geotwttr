@@ -19,6 +19,7 @@ define(["ko", "jquery", "moment"],
 
                     setElementText();
 
+                    /*
                     intervalId = setInterval(function () {
                         if (element && document.contains(element)) {
                             console.log("[MAP] update datetime text");
@@ -28,6 +29,7 @@ define(["ko", "jquery", "moment"],
                             clearInterval(intervalId);
                         }
                     }, 60000);
+                    */
                 }
             };
 

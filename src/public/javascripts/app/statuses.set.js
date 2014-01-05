@@ -1,24 +1,38 @@
 /**
  * Created by max on 05.01.14.
  */
-define(["ko", "underscore", "models"],
-    function (ko, _, models) {
-        var statusesSet = function (srcDataservice) {
+define(["ko", "underscore", "models", "jquery"],
+    function (ko, _, models, $) {
+        var statusesSet = function (srcDataservice, $container, template) {
             var self = this;
-            var _statusesList = ko.observableArray();
-            var _statusesListUnwrapped = _statusesList();
+            //var _statusesList = ko.observableArray();
+            //var _statusesListUnwrapped = _statusesList();
             var _filterModel;
             var _requestsId = [];
+            var _statusesArray = [];
+            var $template = $(template);
+            var twitterUrl = "https://twitter.com";
 
             var _insertIntoList = function (statusToInsert) {
-                var indexToInsert = _.sortedIndex(_statusesListUnwrapped, statusToInsert, function (oneStatus) {
+                var indexToInsert = _.sortedIndex(_statusesArray, statusToInsert, function (oneStatus) {
                     return -oneStatus.id;
                 });
 
-                statusToInsert.isRetweet = !!statusToInsert.retweeted_status;
-                statusToInsert.canShowOnMap = !!statusToInsert.coordinates;
+                // В statusToInsert добавляем dom эелемент, который будет ему соответствовать
 
-                _statusesList.splice(indexToInsert, 0, statusToInsert);
+                var $newListItemElement = $template.clone();
+                ko.applyBindings(statusToInsert, $newListItemElement.get(0));
+                statusToInsert.$domElement = $newListItemElement;
+                if (_statusesArray.length === 0) {
+                    $container.append($newListItemElement);
+                } else {
+                    if (indexToInsert === 0) {
+                        _statusesArray[indexToInsert].$domElement.before($newListItemElement);
+                    } else {
+                        _statusesArray[indexToInsert - 1].$domElement.after($newListItemElement);
+                    }
+                }
+                _statusesArray.splice(indexToInsert, 0, statusToInsert);
 
                 var visible = _.isFunction(statusToInsert.visible) ? !!statusToInsert.visible() : true;
                 if (visible) {
@@ -29,12 +43,40 @@ define(["ko", "underscore", "models"],
             };
 
             var _extractStatus = function (message) {
+                var result;
                 if (message && message.tweet) {
-                    return message.tweet;
+                    result = message.tweet;
+                    _mapStatusObject(result);
+                    return result;
                 } else {
                     return null;
                 }
             }
+
+            var _mapStatusObject = function (tweet) {
+                tweet.isRetweet = !!tweet.retweeted_status;
+                tweet.canShowOnMap = !!(tweet.coordinates || tweet.place);
+                tweet.avatarUrl = tweet.isRetweet ?
+                    tweet.retweeted_status.user.profile_image_url :
+                    tweet.user.profile_image_url;
+                tweet.profileUrl = tweet.isRetweet ?
+                    twitterUrl + "/" + tweet.retweeted_status.user.screen_name :
+                    twitterUrl + "/" + tweet.user.screen_name;
+                tweet.profileOriginalUrl = twitterUrl + "/" + tweet.user.screen_name;
+                tweet.realFullName = tweet.isRetweet ?
+                    tweet.retweeted_status.user.name :
+                    tweet.user.name;
+                tweet.realScreenName = tweet.isRetweet ?
+                    tweet.retweeted_status.user.screen_name :
+                    tweet.user.screen_name;
+                tweet.statusUrl = twitterUrl + "/" + tweet.user.screen_name + "/status/" + tweet.id_str;
+                tweet.nearPlace = tweet.place ? tweet.place.full_name : null;
+                tweet.showOnMap = _tweetWantsToShowOnMap;
+            };
+
+            var _tweetWantsToShowOnMap = function (data, event) {
+                self.statusOnMap(data);
+            };
 
             var _preprocessStreamResponse = function (message) {
                 if (message.disconnect) {
@@ -50,9 +92,15 @@ define(["ko", "underscore", "models"],
                     srcDataservice.disposeRequest(reqId);
                 });
                 _requestsId.length = 0;
-                _statusesList.removeAll();
+
+                _.each(_statusesArray, function (oneStatus) {
+                    oneStatus.$domElement.remove();
+                });
+                _statusesArray.length = 0;
+
                 self.hidedStatusesCount(0);
                 self.visibleStatusesCount(0);
+                statusOnMap(null);
             }
 
             var _onReceivedFromRest = function (message) {
@@ -89,7 +137,7 @@ define(["ko", "underscore", "models"],
                 if (!_filterModel) {
                     return;
                 }
-                var maxId = _.min(_statusesListUnwrapped,function (oneStatus) {
+                var maxId = _.min(_statusesArray,function (oneStatus) {
                     return oneStatus.id_str;
                 }).id_str;
                 //maxId = maxId - 1;
@@ -111,11 +159,12 @@ define(["ko", "underscore", "models"],
             };
             this.startStreaming = _startStreaming;
             this.stopStreaming = _stopStreaming;
-            this.statusesList = _statusesList;
+            //this.statusesList = _statusesList;
             this.visibleStatusesCount = ko.observable(0);
             this.hidedStatusesCount = ko.observable(0);
+            this.statusOnMap = ko.observable(null);
             this.makeAllVisible = function () {
-                _.each(_statusesListUnwrapped, function (oneStatus) {
+                _.each(_statusesArray, function (oneStatus) {
                     if (_.isFunction(oneStatus.visible)) {
                         if (!oneStatus.visible()) {
                             oneStatus.visible(true);
