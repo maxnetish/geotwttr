@@ -210,7 +210,7 @@ var performProxyTwitterRequest = function (opts) {
                 _streamResponse.on('data', function (chunk) {
                     _onChunkReceived(chunk);
                 });
-                _streamResponse.on('close', function () {
+                _streamResponse.on('close', function (event) {
                     _onCloseConnection();
                 });
             });

@@ -28,6 +28,8 @@ block content
                 span Show&nbsp;
                 span(data-bind='text: hidedIncomingCount')
                 span &nbsp;received statuses
+            button(data-bind='click: startStreaming') Start streaming
+            button(data-bind='click: stopStreaming') Stop streaming
             ul#tweet-list.scroll(data-bind='foreach: searchResult, endlessList: needMore')
                 li.li-tweet(data-bind="visible: visible")
                     div.tweet-left

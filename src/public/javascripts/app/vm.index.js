@@ -1,10 +1,10 @@
 /**
  * Created by max on 03.01.14.
  */
-define(["ko", "models", "dataservice.stream-tweets"],
-    function (ko, models, srcDataservice) {
+define(["ko", "models", "statuses.set", "dataservice.stream-tweets"],
+    function (ko, models, statusesSet, srcDataservice) {
         var selectedLocationObservable= ko.observable(new models.ModelSelectedLocation());
-        var listOfTweets=new models.ModelStatusesList(srcDataservice);
+        var listOfTweets=new statusesSet(srcDataservice);
 
         selectedLocationObservable.subscribe(function(locationUnwrapped){
              listOfTweets.filter(locationUnwrapped);
@@ -39,6 +39,8 @@ define(["ko", "models", "dataservice.stream-tweets"],
             hidedIncomingCount: listOfTweets.hidedStatusesCount,
             displayedCount: listOfTweets.visibleStatusesCount,
             showHidedStatuses: listOfTweets.makeAllVisible,
-            needMore: needMore
+            needMore: needMore,
+            startStreaming: listOfTweets.startStreaming,
+            stopStreaming: listOfTweets.stopStreaming
         };
     });
