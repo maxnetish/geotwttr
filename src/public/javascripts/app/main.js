@@ -29,7 +29,8 @@
     requirejs([
         'binding.gmap',
         'binding.geo-autocomplete',
-        'binding.tweet-content'
+        'binding.tweet-content',
+        'binding.size'
     ], function () {
         //load ko custom bindings
     });

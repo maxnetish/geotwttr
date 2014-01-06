@@ -115,7 +115,11 @@ define(["ko", "underscore", "models", "jquery"],
                 _preprocessStreamResponse(message);
                 var status = _extractStatus(message);
                 if (status && status.id) {
-                    status.visible = ko.observable(false);
+                    if (self.setStreamedTweetsVisible()) {
+                        status.visible = ko.observable(true);
+                    } else {
+                        status.visible = ko.observable(false);
+                    }
                     _.defer(_insertIntoList, status);
                 }
             };
@@ -159,6 +163,7 @@ define(["ko", "underscore", "models", "jquery"],
             };
             this.startStreaming = _startStreaming;
             this.stopStreaming = _stopStreaming;
+            this.streamActive = ko.observable(false);
             //this.statusesList = _statusesList;
             this.visibleStatusesCount = ko.observable(0);
             this.hidedStatusesCount = ko.observable(0);
@@ -174,6 +179,7 @@ define(["ko", "underscore", "models", "jquery"],
                     }
                 });
             };
+            this.setStreamedTweetsVisible = ko.observable(false);
         };
 
         return statusesSet;

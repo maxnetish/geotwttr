@@ -5,6 +5,7 @@ define(["ko", "models", "statuses.set", "dataservice.stream-tweets", "jquery"],
     function (ko, models, statusesSet, srcDataservice, $) {
         var selectedLocationObservable = ko.observable(new models.ModelSelectedLocation());
         var listOfTweets = new statusesSet(srcDataservice, $("#tweet-list"), document.getElementById("tweet-template").innerHTML);
+        var needSetHeight = ko.observable(false);
 
         selectedLocationObservable.subscribe(function (locationUnwrapped) {
             listOfTweets.filter(locationUnwrapped);
@@ -14,6 +15,19 @@ define(["ko", "models", "statuses.set", "dataservice.stream-tweets", "jquery"],
             listOfTweets.requestMorePrevious();
         };
 
+        var oldHidedCount = 0;
+        listOfTweets.hidedStatusesCount.subscribe(function (count) {
+            if (count !== oldHidedCount) {
+                if (count > 0 && oldHidedCount === 0) {
+                    needSetHeight.valueHasMutated();
+                }
+                if (count === 0 && oldHidedCount > 0) {
+                    needSetHeight.valueHasMutated();
+                }
+            }
+            oldHidedCount = count;
+        })
+
         return {
             statusOnMap: null,
             selectedLocation: selectedLocationObservable,
@@ -21,10 +35,10 @@ define(["ko", "models", "statuses.set", "dataservice.stream-tweets", "jquery"],
             searchRadius: selectedLocationObservable().radius,
             title: ko.computed({
                 read: function () {
-                    var selectedLocation=selectedLocationObservable();
-                    if(selectedLocation.geoName()){
-                        return "Near: "+selectedLocation.geoName();
-                    }else{
+                    var selectedLocation = selectedLocationObservable();
+                    if (selectedLocation.geoName()) {
+                        return "Near: " + selectedLocation.geoName();
+                    } else {
                         return null;
                     }
                 },
@@ -42,6 +56,8 @@ define(["ko", "models", "statuses.set", "dataservice.stream-tweets", "jquery"],
             needMore: needMore,
             startStreaming: listOfTweets.startStreaming,
             stopStreaming: listOfTweets.stopStreaming,
-            statusOnMap: listOfTweets.statusOnMap
+            statusOnMap: listOfTweets.statusOnMap,
+            needSetHeight: needSetHeight,
+            showTweetsImmediate: listOfTweets.setStreamedTweetsVisible
         };
     });

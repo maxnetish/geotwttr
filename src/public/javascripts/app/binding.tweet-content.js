@@ -4,32 +4,43 @@
 define(["ko", "jquery", "moment"],
     function (ko, $, moment) {
         (function () {
+            //configure moment:
+            if (window.langCode) {
+                moment.lang(window.langCode);
+            }
             ko.bindingHandlers.tweetDate = {
                 init: function (element, valueAccessor) {
                     var $element = $(element);
                     var tweet = valueAccessor();
                     var created_at = tweet.isRetweet ? tweet.retweeted_status.created_at : tweet.created_at;
                     var momentCreated = moment(created_at);
+                    var momentNow = moment();
+                    var diffDays = momentCreated.diff(momentNow, "days");
+                    var dateFormat;
+                    if (diffDays === 0) {
+                        dateFormat = "LT";
+                    } else {
+                        dateFormat = "lll";
+                    }
 
                     var setElementText = function () {
-                        $element.html(momentCreated.fromNow());
+                        $element.html(momentCreated.format(dateFormat));
                     };
-                    var intervalId;
-
+                    //var intervalId;
 
                     setElementText();
 
                     /*
-                    intervalId = setInterval(function () {
-                        if (element && document.contains(element)) {
-                            console.log("[MAP] update datetime text");
-                            setElementText();
-                        } else {
-                            console.log("[MAP] clear interval datetime update");
-                            clearInterval(intervalId);
-                        }
-                    }, 60000);
-                    */
+                     intervalId = setInterval(function () {
+                     if (element && document.contains(element)) {
+                     console.log("[MAP] update datetime text");
+                     setElementText();
+                     } else {
+                     console.log("[MAP] clear interval datetime update");
+                     clearInterval(intervalId);
+                     }
+                     }, 60000);
+                     */
                 }
             };
 

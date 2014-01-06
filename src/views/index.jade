@@ -10,9 +10,9 @@ block content
     h1.text-center= title
     div.view
         h2.text-center(data-bind='text: title')
-        div.pane-left
+        div.pane-left.pane
             input.geo-autocomplete(data-bind="geoAutocomplete: '.gmap'", type="search")
-            div.gmap(data-bind='gmap: selectedLocation, statusOnMap: statusOnMap')
+            div.gmap(data-bind='gmap: selectedLocation, statusOnMap: statusOnMap, setHeight: needSetHeight')
             //span(data-bind='text: selectedLocation().center')
             //span.geo-radius-value(data-bind="text: searchRadius")
             //span(data-bind='text: selectedLocation().bounds')
@@ -22,14 +22,19 @@ block content
             //p
                 span(data-bind='text: displayedCount')
                 span &nbsp;on screen
-        div.pane-right
-            button(data-bind='click: startStreaming') Start streaming
-            button(data-bind='click: stopStreaming') Stop streaming
-            button.button-show-incoming(data-bind='visible: hidedIncomingCount()>0, click: showHidedStatuses')
-                span Show&nbsp;
-                span(data-bind='text: hidedIncomingCount')
-                span &nbsp;received statuses
-            ul#tweet-list.scroll(data-bind='endlessList: needMore')
+        div.pane-right.pane
+            div.button-set
+                button(data-bind='click: startStreaming') Start streaming
+                button(data-bind='click: stopStreaming') Stop streaming
+                button.button-show-incoming(data-bind='visible: hidedIncomingCount()>0, click: showHidedStatuses')
+                    span Show&nbsp;
+                    span(data-bind='text: hidedIncomingCount')
+                    span &nbsp;received statuses
+                label
+                    input(type='checkbox', data-bind='checked: showTweetsImmediate')
+                    span Update immediately
+            ul#tweet-list.scroll(data-bind='endlessList: needMore, setHeight: needSetHeight')
+    a(href="https://twitter.com/maxnetish", class="twitter-follow-button", data-show-count="false", data-lang="#{langCode}") Follow me
     script#tweet-template(type='text/html')
         li.li-tweet(data-bind="visible: visible")
                     div.tweet-left
@@ -53,4 +58,6 @@ block content
                         p.tweet-meta
                             button.entity(data-bind="visible: canShowOnMap, click: showOnMap")
                                 span.show-on-map Show on map
+    script window.langCode = "#{langCode}";
     script(data-main="javascripts/app/main.js", src="javascripts/lib/require.js")
+    script !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");
