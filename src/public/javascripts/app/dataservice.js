@@ -43,12 +43,14 @@ define(["underscore"],
                 console.dir(event);
             };
             webSocketConnection.onclose = function (event) {
-                console.log("socket closed, reopen...");
+                console.log("socket closed");
+                // FIXME это неправильно - иногда могуь открыться два и более сокетов и со всех данные приходят
                 getSocketConnection(function (socketConnection) {
                     _.each(requests, function (oneRequest) {
                         socketConnection.send(oneRequest.messageToSend(false));
                     });
                 });
+
             };
             webSocketConnection.onopen = function (event) {
                 console.log("socket open, notify subscribers...");
