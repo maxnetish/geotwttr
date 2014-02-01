@@ -71,6 +71,11 @@ h1, h2 {
     text-align: center;
 }
 
+.center-column{
+    max-width: 480px;
+    margin: 0 auto;
+}
+
 .avatar {
     border-radius: 4px;
     border: solid 1px;

@@ -2,11 +2,13 @@
    Created by max on 02.11.13.
 extends layout
 block content
-    div.preloader
-    h1.text-center= title
-    if authFailed
-        p.text-center Auth failed
-    if !authSuccess
-        p.text-center
-            a(href='/auth') Login with twitter
+    div.center-column
+        div.preloader
+        h1.text-center= title
+        if authFailed
+            p.text-center Auth failed
+        if !authSuccess
+            p.text-center
+                a(href='/auth') Login with twitter
+        p.text-annotaion Web service shows tweets sent from a particular geographical location in real time. Application will never know the password for your twitter. It reads only public tweets using the streaming api.
     script window.langCode = "#{langCode}";

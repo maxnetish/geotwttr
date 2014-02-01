@@ -29,7 +29,7 @@ define(["ko", "models", "statuses.set", "dataservice.stream-tweets", "jquery"],
         })
 
         return {
-            statusOnMap: null,
+            //statusOnMap: null,
             selectedLocation: selectedLocationObservable,
             searchResult: listOfTweets.statusesList,
             searchRadius: selectedLocationObservable().radius,

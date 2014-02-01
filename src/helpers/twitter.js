@@ -10,7 +10,7 @@ var _ = require('underscore');
 var querystring = require('querystring');
 
 var oAuthConsumer = function () {
-    return  new OAuth("https://api.twitter.com/oauth/request_token",
+    return new OAuth("https://api.twitter.com/oauth/request_token",
         "https://api.twitter.com/oauth/access_token",
         tokens.twitter.consumerKey,
         tokens.twitter.consumerSecret,

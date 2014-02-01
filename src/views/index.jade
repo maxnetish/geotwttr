@@ -13,19 +13,8 @@ block content
         div.pane-left.pane
             input.geo-autocomplete(data-bind="geoAutocomplete: '.gmap'", type="search")
             div.gmap(data-bind='gmap: selectedLocation, statusOnMap: statusOnMap, setHeight: needSetHeight')
-            //span(data-bind='text: selectedLocation().center')
-            //span.geo-radius-value(data-bind="text: searchRadius")
-            //span(data-bind='text: selectedLocation().bounds')
-            //p
-                span(data-bind='text: hidedIncomingCount')
-                span &nbsp;hided
-            //p
-                span(data-bind='text: displayedCount')
-                span &nbsp;on screen
         div.pane-right.pane
             div.button-set
-                button(data-bind='click: startStreaming') Start streaming
-                button(data-bind='click: stopStreaming') Stop streaming
                 button.button-show-incoming(data-bind='visible: hidedIncomingCount()>0, click: showHidedStatuses')
                     span Show&nbsp;
                     span(data-bind='text: hidedIncomingCount')
@@ -49,7 +38,6 @@ block content
                             a.no-decoration(data-bind="attr: {href: statusUrl}", target="_blank")
                                 span.tweet-date(data-bind='tweetDate: $data')
                             span.retweet-from(data-bind="visible: isRetweet") RT from
-                            // , attr: {href: $parent.getUserHref($data, true)}
                             a.no-decoration(data-bind="attr: {href: profileOriginalUrl}, visible: isRetweet", target="_blank")
                                 span.screen-name(data-bind="text: user.screen_name")
                         p.tweet-meta(data-bind='visible: !!nearPlace')

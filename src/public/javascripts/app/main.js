@@ -17,7 +17,8 @@
             underscore: {
                 exports: '_'
             }
-        }
+        },
+        waitSeconds: 60
     });
 
     define('gmaps', ['async!http://maps.googleapis.com/maps/api/js?key=AIzaSyANnIuW5Xvh3WCEH4MLU0nZTMCJDh-gDLI&sensor=true&libraries=places,geometry'],

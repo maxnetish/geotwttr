@@ -30,6 +30,7 @@
             this.geoName = _geoName;
             this.bounds = _bounds;
 
+
             console.log("[MAP] create instance of selectedLocationModel");
             console.dir(this);
         };
