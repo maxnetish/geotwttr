@@ -28,7 +28,7 @@ exports.index = function (req, res) {
             indexVm.googleAPiToken = tokens.google.apiToken;
             //find ipgeocode:
             mmdbReaderInstance = new mmdbreader("GeoLite2-City.mmdb");
-            indexVm.ipGeocode = mmdbReaderInstance.getGeoData(req.ip);
+            indexVm.ipGeocode = JSON.stringify(mmdbReaderInstance.getGeoData(req.ip));
             //indexVm.ipGeocode = JSON.stringify(mmdbReaderInstance.getGeoData("95.29.232.174"));
             res.render('index', indexVm);
         } else {
