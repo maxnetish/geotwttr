@@ -1,8 +1,8 @@
 /**
  * Created by max on 05.01.14.
  */
-define(["ko", "underscore", "models", "jquery", "logger"],
-    function (ko, _, models, $, logger) {
+define(["ko", "underscore", "models", "jquery", "moment", "logger"],
+    function (ko, _, models, $, moment, logger) {
         var StatusesSet = function (srcDataservice, $container, template) {
             var self = this,
                 _filterModel,
@@ -10,27 +10,40 @@ define(["ko", "underscore", "models", "jquery", "logger"],
                 _statusesArray = [],
                 $template = $(template),
                 twitterUrl = "https://twitter.com",
+                $upperElement = $container.children().first(),
+                _restLoadingState = ko.observable(false),
+                momentFormat = "ddd MMM DD HH:mm:ss ZZ YYYY", // "Sun Feb 02 16:37:22 +0000 2014"
 
                 _insertIntoList = function (statusToInsert) {
                     var indexToInsert = _.sortedIndex(_statusesArray, statusToInsert, function (oneStatus) {
                             return -oneStatus.id;
                         }),
                     // В statusToInsert добавляем dom эелемент, который будет ему соответствовать
-                        $newListItemElement = $template.clone(),
                         visible = false,
-                        statusesCountUnwrapped;
+                        statusesCountUnwrapped,
+                        initDom = function (status) {
+                            var $newListItemElement = $template.clone();
+                            ko.applyBindings(status, $newListItemElement.get(0));
+                            statusToInsert.$domElement = $newListItemElement;
+                            return $newListItemElement;
+                        };
 
-                    ko.applyBindings(statusToInsert, $newListItemElement.get(0));
-                    statusToInsert.$domElement = $newListItemElement;
+                    if (_statusesArray[indexToInsert] && _statusesArray[indexToInsert].id_str === statusToInsert.id_str) {
+                        logger.log("Duplicate status id: " + statusToInsert.id_str, logger.severity.INFO, "STATUSES_SET");
+                        return;
+                    }
+
                     if (_statusesArray.length === 0) {
-                        $container.append($newListItemElement);
+                        //$container.append($newListItemElement);
+                        $upperElement.after(initDom(statusToInsert));
                     } else {
                         if (indexToInsert === 0) {
-                            _statusesArray[indexToInsert].$domElement.before($newListItemElement);
+                            _statusesArray[indexToInsert].$domElement.before(initDom(statusToInsert));
                         } else {
-                            _statusesArray[indexToInsert - 1].$domElement.after($newListItemElement);
+                            _statusesArray[indexToInsert - 1].$domElement.after(initDom(statusToInsert));
                         }
                     }
+
                     _statusesArray.splice(indexToInsert, 0, statusToInsert);
                     visible = _.isFunction(statusToInsert.visible) ? !!statusToInsert.visible() : true;
                     if (visible) {
@@ -53,6 +66,8 @@ define(["ko", "underscore", "models", "jquery", "logger"],
                 },
 
                 _mapStatusObject = function (tweet) {
+                    var createdAt = tweet.isRetweet ? tweet.retweeted_status.created_at : tweet.created_at;
+
                     tweet.isRetweet = !!tweet.retweeted_status;
                     tweet.canShowOnMap = !!(tweet.coordinates || tweet.place);
                     tweet.avatarUrl = tweet.isRetweet ?
@@ -71,6 +86,7 @@ define(["ko", "underscore", "models", "jquery", "logger"],
                     tweet.statusUrl = twitterUrl + "/" + tweet.user.screen_name + "/status/" + tweet.id_str;
                     tweet.nearPlace = tweet.place ? tweet.place.full_name : null;
                     tweet.showOnMap = _tweetWantsToShowOnMap;
+                    tweet.createdAtMoment = moment(createdAt, momentFormat, "en");
                 },
 
                 _tweetWantsToShowOnMap = function (data, event) {
@@ -105,6 +121,7 @@ define(["ko", "underscore", "models", "jquery", "logger"],
                 },
 
                 _onReceivedFromRest = function (message) {
+                    _restLoadingState(false);
                     var status = _extractStatus(message);
                     if (status && status.id) {
                         status.visible = ko.observable(true);
@@ -146,6 +163,7 @@ define(["ko", "underscore", "models", "jquery", "logger"],
                     return oneStatus.id_str;
                 }).id_str;
                 //maxId = maxId - 1;
+                _restLoadingState(true);
                 _requestsId.push(srcDataservice.requestSearchRestApi(_filterModel, _onReceivedFromRest, maxId - 1));
             };
 
@@ -157,6 +175,7 @@ define(["ko", "underscore", "models", "jquery", "logger"],
                     self.stopStreaming();
                     _filterModel = newFilterModel;
                     _resetList();
+                    _restLoadingState(true);
                     srcDataservice.requestSearchRestApi(_filterModel, _onReceivedFromRest);
                     self.startStreaming();
                     return _filterModel;
@@ -181,6 +200,7 @@ define(["ko", "underscore", "models", "jquery", "logger"],
                 });
             };
             this.setStreamedTweetsVisible = ko.observable(false);
+            this.restLoadingState = _restLoadingState;
         };
 
         return {

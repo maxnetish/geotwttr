@@ -17,7 +17,7 @@ a.no-decoration {
     background: url(../images/preloader.gif) no-repeat 50% 50%;
     height: 24px;
     width: 100%;
-    visibility: hidden;
+    /*visibility: hidden;*/
 }
 
 p {
@@ -54,6 +54,18 @@ h1, h2 {
     text-align: left;
     vertical-align: top;
     margin: 5px;
+}
+
+.pane-right .button-set{
+    text-align: center;
+}
+
+.button-top{
+    width: 100%;
+}
+
+.button-request-previous{
+    width: 100%;
 }
 
 .gmap {

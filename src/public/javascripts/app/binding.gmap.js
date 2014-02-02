@@ -2,8 +2,8 @@
  * Created by max on 02.01.14.
  */
 
-define(["ko", "gmaps", "jquery", "logger"],
-    function (ko, gmaps, $, logger) {
+define(["ko", "gmaps", "jquery", "logger", "underscore"],
+    function (ko, gmaps, $, logger, _) {
         (function () {
             ko.bindingHandlers.gmap = {
                 init: function (element, valueAccessor, allBindings) {
@@ -71,6 +71,14 @@ define(["ko", "gmaps", "jquery", "logger"],
                                     selectedLocation.geoName("");
                                 }
                             });
+                        },
+                        polygon2Bounds = function (polygon) {
+                            var bounds = new google.maps.LatLngBounds(),
+                                path = polygon.getPath();
+                            path.forEach(function(element){
+                                bounds.extend(element);
+                            });
+                            return bounds;
                         };
 
                     $element.data("gmap", map);
@@ -144,6 +152,8 @@ define(["ko", "gmaps", "jquery", "logger"],
                                 placePolygon.setPaths(gPath);
                                 statusMarker.setVisible(false);
                                 placePolygon.setVisible(true);
+                                //map.panToBounds(polygon2Bounds(placePolygon));
+                                map.fitBounds(polygon2Bounds(placePolygon));
                             } else {
                                 statusMarker.setVisible(false);
                                 placePolygon.setVisible(false);

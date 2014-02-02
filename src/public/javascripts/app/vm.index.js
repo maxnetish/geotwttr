@@ -71,6 +71,7 @@ define(["ko", "models", "statuses.set", "dataservice.stream-tweets", "jquery", "
             stopStreaming: listOfTweets.stopStreaming,
             statusOnMap: listOfTweets.statusOnMap,
             needSetHeight: needSetHeight,
-            showTweetsImmediate: listOfTweets.setStreamedTweetsVisible
+            showTweetsImmediate: listOfTweets.setStreamedTweetsVisible,
+            restLoadingNow: listOfTweets.restLoadingState
         };
     });

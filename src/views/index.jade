@@ -6,7 +6,7 @@ block content
         a.no-decoration(href= "https://twitter.com/"+userInfo.screen_name, target="_blank")
             span.screen-name #{userInfo.screen_name}
         a.logout(href="/logout") Sign-out
-    div.preloader
+    //div.preloader
     h1.text-center= title
     div.view
         h2.text-center(data-bind='text: title')
@@ -14,15 +14,20 @@ block content
             input.geo-autocomplete(data-bind="geoAutocomplete: '.gmap'", type="search")
             div.gmap(data-bind='gmap: selectedLocation, statusOnMap: statusOnMap, setHeight: needSetHeight')
         div.pane-right.pane
-            div.button-set
-                button.button-show-incoming(data-bind='visible: hidedIncomingCount()>0, click: showHidedStatuses')
-                    span Show&nbsp;
+            //div.button-set
+                button.button-show-incoming.button-top(data-bind='visible: hidedIncomingCount()>0, click: showHidedStatuses')
+                    span New statuses:&nbsp;
                     span(data-bind='text: hidedIncomingCount')
-                    span &nbsp;received statuses
-                label
+                //label
                     input(type='checkbox', data-bind='checked: showTweetsImmediate')
                     span Update immediately
-            ul#tweet-list.scroll(data-bind='endlessList: needMore, setHeight: needSetHeight')
+            ul#tweet-list.scroll(data-bind='setHeight: needSetHeight')
+                button.button-show-incoming.button-top(data-bind='visible: hidedIncomingCount()>0, click: showHidedStatuses', style='display: none;')
+                    span New statuses:&nbsp;
+                    span(data-bind='text: hidedIncomingCount')
+                div.preloader(data-bind='visible: restLoadingNow')
+                button.button-request-previous(data-bind='click: needMore, visible: !restLoadingNow()', style='display: none;')
+                    span Load more
     a(href="https://twitter.com/maxnetish", class="twitter-follow-button", data-show-count="false", data-lang="#{langCode}") Follow me
     script#tweet-template(type='text/html')
         li.li-tweet(data-bind="visible: visible")
