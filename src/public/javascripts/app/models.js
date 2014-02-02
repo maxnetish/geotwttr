@@ -4,22 +4,27 @@
 
 define(["ko", "gmaps", "underscore"],
     function (ko, gmaps, _) {
-
-
         var ModelSelectedLocation = function (center, radius) {
-            center = center || new gmaps.LatLng(45.43, 12.33); //default: Venice
-            radius = radius || 5000;
-
             var self = this,
-                _center = ko.observable(center),
-                _radius = ko.observable(radius),
-                _geoName = ko.observable(""),
-                _bounds = ko.computed({
-                    read: function () {
-                        return self.calcBounds();
-                    },
-                    deferEvaluation: true
-                });
+                _center,
+                _radius,
+                _geoName,
+                _bounds,
+                init = function () {
+                    center = center || new gmaps.LatLng(45.43, 12.33); //default: Venice
+                    radius = radius || 5000;
+                    _center = ko.observable(center);
+                    _radius = ko.observable(radius);
+                    _geoName = ko.observable("");
+                    _bounds = ko.computed({
+                        read: function () {
+                            return self.calcBounds();
+                        },
+                        deferEvaluation: true
+                    });
+                };
+
+            init();
 
             this.center = _center;
             this.radius = _radius;
@@ -37,16 +42,16 @@ define(["ko", "gmaps", "underscore"],
             return result;
         };
         ModelSelectedLocation.prototype.getTwitterLocationsString = function () {
-            var boundsUnwrapped = this.bounds();
-            var SWlatlng = boundsUnwrapped.getSouthWest();
-            var NElanlng = boundsUnwrapped.getNorthEast();
-            var result = SWlatlng.lng() + "," + SWlatlng.lat() + "," + NElanlng.lng() + "," + NElanlng.lat();
+            var boundsUnwrapped = this.bounds(),
+                SWlatlng = boundsUnwrapped.getSouthWest(),
+                NElanlng = boundsUnwrapped.getNorthEast(),
+                result = SWlatlng.lng() + "," + SWlatlng.lat() + "," + NElanlng.lng() + "," + NElanlng.lat();
             return result;
         };
         ModelSelectedLocation.prototype.getTwitterGeocodeString = function () {
-            var centerUnwrapped = this.center();
-            var radiusUnwrapped = this.radius();
-            var result = centerUnwrapped.lat() + ',' + centerUnwrapped.lng() + ',' + (radiusUnwrapped / 1000) + 'km';
+            var centerUnwrapped = this.center(),
+                radiusUnwrapped = this.radius(),
+                result = centerUnwrapped.lat() + ',' + centerUnwrapped.lng() + ',' + (radiusUnwrapped / 1000) + 'km';
             return result;
         };
 

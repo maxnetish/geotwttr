@@ -3,7 +3,7 @@
  */
 define(["ko", "underscore", "models", "jquery", "logger"],
     function (ko, _, models, $, logger) {
-        var statusesSet = function (srcDataservice, $container, template) {
+        var StatusesSet = function (srcDataservice, $container, template) {
             var self = this,
                 _filterModel,
                 _requestsId = [],
@@ -183,5 +183,8 @@ define(["ko", "underscore", "models", "jquery", "logger"],
             this.setStreamedTweetsVisible = ko.observable(false);
         };
 
-        return statusesSet;
-    });
+        return {
+            StatusesSet: StatusesSet
+        };
+    }
+);

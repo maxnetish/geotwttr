@@ -1,35 +1,49 @@
 /**
  * Created by max on 03.01.14.
  */
-define(["ko", "models", "statuses.set", "dataservice.stream-tweets", "jquery"],
-    function (ko, models, statusesSet, srcDataservice, $) {
-        var selectedLocationObservable = ko.observable(new models.ModelSelectedLocation());
-        var listOfTweets = new statusesSet(srcDataservice, $("#tweet-list"), document.getElementById("tweet-template").innerHTML);
-        var needSetHeight = ko.observable(false);
+define(["ko", "models", "statuses.set", "dataservice.stream-tweets", "jquery", "gmaps", "config"],
+    function (ko, models, statusesSet, srcDataservice, $, gmaps, config) {
+        var selectedLocationObservable,
+            listOfTweets,
+            needSetHeight = ko.observable(false),
+            oldHidedCount = 0,
 
-        selectedLocationObservable.subscribe(function (locationUnwrapped) {
-            listOfTweets.filter(locationUnwrapped);
-        });
+            needMore = function () {
+                listOfTweets.requestMorePrevious();
+            },
 
-        var needMore = function () {
-            listOfTweets.requestMorePrevious();
-        };
-
-        var oldHidedCount = 0;
-        listOfTweets.hidedStatusesCount.subscribe(function (count) {
-            if (count !== oldHidedCount) {
-                if (count > 0 && oldHidedCount === 0) {
-                    needSetHeight.valueHasMutated();
+            createLocationInstance = function () {
+                var defaultLatLng,
+                    defaultRadius = 5000;
+                if (config.ipGeocode && config.ipGeocode.location && config.ipGeocode.location.latitude && config.ipGeocode.location.longitude) {
+                    defaultLatLng = new gmaps.LatLng(config.ipGeocode.location.latitude, config.ipGeocode.location.longitude);
                 }
-                if (count === 0 && oldHidedCount > 0) {
-                    needSetHeight.valueHasMutated();
-                }
-            }
-            oldHidedCount = count;
-        })
+                return new models.ModelSelectedLocation(defaultLatLng, defaultRadius);
+            },
+
+            init = function () {
+                selectedLocationObservable = ko.observable(createLocationInstance());
+                listOfTweets = new statusesSet.StatusesSet(srcDataservice, $("#tweet-list"), document.getElementById("tweet-template").innerHTML);
+
+                listOfTweets.hidedStatusesCount.subscribe(function (count) {
+                    if (count !== oldHidedCount) {
+                        if (count > 0 && oldHidedCount === 0) {
+                            needSetHeight.valueHasMutated();
+                        }
+                        if (count === 0 && oldHidedCount > 0) {
+                            needSetHeight.valueHasMutated();
+                        }
+                    }
+                    oldHidedCount = count;
+                });
+                selectedLocationObservable.subscribe(function (locationUnwrapped) {
+                    listOfTweets.filter(locationUnwrapped);
+                });
+            };
+
+        init();
 
         return {
-            //statusOnMap: null,
             selectedLocation: selectedLocationObservable,
             searchResult: listOfTweets.statusesList,
             searchRadius: selectedLocationObservable().radius,
@@ -38,9 +52,8 @@ define(["ko", "models", "statuses.set", "dataservice.stream-tweets", "jquery"],
                     var selectedLocation = selectedLocationObservable();
                     if (selectedLocation.geoName()) {
                         return "Near: " + selectedLocation.geoName();
-                    } else {
-                        return null;
                     }
+                    return null;
                 },
                 deferEvaluate: true
             }),

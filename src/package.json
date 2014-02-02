@@ -11,6 +11,7 @@
         "oauth": "*",
         "redis": "*",
         "underscore": "*",
-        "ws": "*"
+        "ws": "*",
+        "maxmind-db-reader": "*"
     }
 }

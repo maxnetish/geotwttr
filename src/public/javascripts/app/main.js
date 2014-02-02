@@ -28,6 +28,7 @@
         });
 
     requirejs([
+        'backend-data-loader',
         'binding.gmap',
         'binding.geo-autocomplete',
         'binding.tweet-content',

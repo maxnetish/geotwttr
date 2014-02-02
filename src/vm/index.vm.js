@@ -3,11 +3,13 @@
  */
 
 exports.indexVm = function () {
-    var self = this;
-    var title = "Geo statuses";
-    var clientScripts = require("../config/client-script.json");
+    var self = this,
+        title = "Geo statuses",
+        clientScripts = require("../config/client-script.json"),
+        ipGeocode = null;
     return{
         title: title,
-        clientScripts: clientScripts
+        clientScripts: clientScripts,
+        ipGeocode: ipGeocode
     };
 };

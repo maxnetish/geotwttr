@@ -2,9 +2,12 @@
  * Created by Gordeev on 01.02.14.
  */
 define([], function () {
-    var debug = false;
+    var debug = true,
+        ipGeocode = null;
+
 
     return{
-        debug: debug
+        debug: debug,
+        ipGeocode: ipGeocode
     };
 });
