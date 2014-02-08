@@ -1,9 +1,157 @@
 /**
  * Created by max on 02.01.14.
  */
-define(["ko", "jquery", "moment"],
-    function (ko, $, moment) {
+define(["ko", "jquery", "moment", "underscore"],
+    function (ko, $, moment, _) {
         (function () {
+            var entityTypes = {
+                    MEDIA: "media",
+                    URLS: "urls",
+                    USER_MENTIONS: "user_mentions",
+                    HASHTAGS: "hashtags",
+                    SYMBOLS: "symbols"
+                },
+                tweetTextRenderer = {
+                    generateAndAppendTweetContent: function ($container, tweet) {
+                        var unionEntities = function (t) {
+                                var result = [],
+                                    currentEntityTypeArray,
+                                    prop,
+                                    mapEntity = function (entity) {
+                                        entity.type_of_entity = entityTypes[prop];
+                                        return entity;
+                                    };
+                                for (prop in entityTypes) {
+                                    if (entityTypes.hasOwnProperty(prop)) {
+                                        currentEntityTypeArray = t.entities[entityTypes[prop]];
+                                        if (currentEntityTypeArray && currentEntityTypeArray.length) {
+                                            result = result.concat(_.map(currentEntityTypeArray, mapEntity));
+                                            //$.merge(result, _.map(currentEntityTypeArray, mapEntity, entityTypes[prop]));
+                                        }
+                                    }
+                                }
+                                return result;
+                            },
+                            renderPlainText = function (text) {
+                                var res = $("<span>", {
+                                    "class": "plain"
+                                })
+                                    .html(text);
+                                return res;
+                            },
+                            renderEntity = function (entity) {
+                                var result,
+                                    renderUrl = function (e) {
+                                        var res = $("<a>", {
+                                            target: "_blank",
+                                            "class": "entity url",
+                                            href: e.expanded_url
+                                        })
+                                            .html(e.display_url);
+                                        return res;
+                                    },
+                                    renderUserMention = function (e) {
+                                        var res = $("<a>", {
+                                            target: "_blank",
+                                            "class": "entity user-mention",
+                                            href: "https://twitter.com/" + e.screen_name
+                                        })
+                                            .html(e.screen_name);
+                                        return res;
+                                    },
+                                    renderHashtag = function (e) {
+                                        var res = $("<span>", {
+                                            "class": "entity hashtag"
+                                        })
+                                            .html(e.text);
+                                        return res;
+                                    },
+                                    renderSymbol = function (e) {
+                                        var res = $("<span>", {
+                                            "class": "entity symbol"
+                                        })
+                                            .html(e.text);
+                                        return res;
+                                    },
+                                    renderMedia = function (e) {
+                                        var res = $("<a>", {
+                                            target: "_blank",
+                                            "class": "entity url",
+                                            href: e.expanded_url
+                                        })
+                                            .html(e.display_url);
+                                        return res;
+                                    },
+                                    renderDefault = function (e) {
+                                        var res = $("<span>", {
+                                            "class": "entity"
+                                        })
+                                            .html(e.text);
+                                        return res;
+                                    };
+                                switch (entity.type_of_entity) {
+                                    case entityTypes.URLS:
+                                        result = renderUrl(entity);
+                                        break;
+                                    case entityTypes.USER_MENTIONS:
+                                        result = renderUserMention(entity);
+                                        break;
+                                    case entityTypes.HASHTAGS:
+                                        result = renderHashtag(entity);
+                                        break;
+                                    case entityTypes.MEDIA:
+                                        result = renderMedia(entity);
+                                        break;
+                                    case entityTypes.SYMBOLS:
+                                        result = renderSymbol(entity);
+                                        break;
+                                    default:
+                                        result = renderDefault(entity);
+                                        break;
+                                }
+                                return result;
+                            },
+                            isRetweet = tweet.isRetweet,
+                            allEntities = unionEntities(isRetweet ? tweet.retweeted_status : tweet),
+                            initialText = isRetweet ? tweet.retweeted_status.text : tweet.text,
+                            initialLen = initialText.length,
+                            remainText = initialText,
+                            $resultElements = $(),
+                            origStart, origEnd, plainTextPreEntityLen;
+
+                        allEntities.sort(function (a, b) {
+                            return a.indices[0] - b.indices[0];
+                        });
+                        $.each(allEntities, function (ind, entity) {
+                            origStart = entity.indices[0];
+                            origEnd = entity.indices[1];
+                            plainTextPreEntityLen = origStart - (initialLen - remainText.length);
+                            if (plainTextPreEntityLen) {
+                                $resultElements = $resultElements.add(renderPlainText(remainText.substr(0, plainTextPreEntityLen)));
+                            }
+                            $resultElements = $resultElements.add(renderEntity(entity));
+                            remainText = remainText.substr(origEnd - (initialLen - remainText.length));
+                        });
+                        if (remainText.length) {
+                            $resultElements = $resultElements.add(renderPlainText(remainText));
+                        }
+                        $container.append($resultElements);
+                    },
+                    formatAndSetDate: function ($element, tweet) {
+                        var momentCreated = tweet.createdAtMoment,
+                            momentNow = moment(),
+                            diffDays = momentCreated.diff(momentNow, "days"),
+                            dateFormat;
+
+                        if (diffDays === 0) {
+                            dateFormat = "LT";
+                        } else {
+                            dateFormat = "lll";
+                        }
+                        $element.html(momentCreated.format(dateFormat));
+                    }
+                };
+
             //configure moment:
             if (window.langCode) {
                 moment.lang(window.langCode);
@@ -12,86 +160,16 @@ define(["ko", "jquery", "moment"],
             ko.bindingHandlers.tweetDate = {
                 init: function (element, valueAccessor) {
                     var $element = $(element),
-                        tweet = valueAccessor(),
-                        momentCreated = tweet.createdAtMoment,
-                        momentNow = moment(),
-                        diffDays = momentCreated.diff(momentNow, "days"),
-                        dateFormat,
-                        setElementText = function () {
-                            $element.html(momentCreated.format(dateFormat));
-                        },
-                        init = function () {
-                            if (diffDays === 0) {
-                                dateFormat = "LT";
-                            } else {
-                                dateFormat = "lll";
-                            }
-                        };
-
-                    init();
-                    setElementText();
+                        tweet = valueAccessor();
+                    tweetTextRenderer.formatAndSetDate($element, tweet);
                 }
             };
 
             ko.bindingHandlers.renderTweetTextContent = {
                 init: function (element, valueAccessor) {
-                    var unionEntities = function (tweet, props) {
-                            var result = [],
-                                currentEntityTypeArray,
-                                i, iLen;
-                            for (i = 0, iLen = props.length; i < iLen; i++) {
-                                currentEntityTypeArray = tweet.entities[props[i]];
-                                if (currentEntityTypeArray && currentEntityTypeArray.length) {
-                                    $.merge(result, $.map(currentEntityTypeArray, function (entity) {
-                                        entity.type_of_entity = props[i];
-                                        return entity;
-                                    }));
-                                }
-                            }
-                            return result;
-                        },
-                        renderEntity = function (entity) {
-                            var result;
-                            if (entity.type_of_entity === "urls") {
-                                result = "<a target='_blank' class='entity url' href='" + entity.expanded_url + "'>" + entity.display_url + "</a>";
-                            } else if (entity.type_of_entity === "user_mentions") {
-                                result = "<a target='_blank' class='entity user-mention' href='https://twitter.com/" + entity.screen_name + "'>" + entity.screen_name + "</a>";
-                            } else if (entity.type_of_entity === "hashtags") {
-                                result = "<span class='entity hashtag'>" + entity.text + "</span>";
-                            } else if (entity.type_of_entity === "symbols") {
-                                result = "<span class='entity symbol'>" + entity.text + "</span>";
-                            } else if (entity.type_of_entity === "media") {
-                                result = "<a target='_blank' class='entity media' href='" + entity.expanded_url + "'>" + entity.display_url + "</a>";
-                            } else {
-                                result = "<span class='entity'>" + entity.text + "</span>";
-                            }
-                            return result;
-                        },
-                        $element = $(element),
-                        tweet = valueAccessor(),
-                        isRetweet = tweet.isRetweet,
-                        initialText = isRetweet ? tweet.retweeted_status.text : tweet.text,
-                        initialLen = initialText.length,
-                        resultArray = [],
-                        remainText = initialText,
-                        allEntities = unionEntities(isRetweet ? tweet.retweeted_status : tweet, ["media", "urls", "user_mentions", "hashtags", "symbols"]),
-                        origStart,
-                        origEnd,
-                        generateAndSetHtml = function () {
-                            allEntities.sort(function (a, b) {
-                                return a.indices[0] - b.indices[0];
-                            });
-                            $.each(allEntities, function (ind, entity) {
-                                origStart = entity.indices[0];
-                                origEnd = entity.indices[1];
-                                resultArray.push(remainText.substr(0, origStart - (initialLen - remainText.length)));
-                                resultArray.push(renderEntity(entity));
-                                remainText = remainText.substr(origEnd - (initialLen - remainText.length));
-                            });
-                            resultArray.push(remainText);
-                            $element.html(resultArray.join(""));
-                        };
-                    generateAndSetHtml();
+                    var $element = $(element),
+                        tweet = valueAccessor();
+                    tweetTextRenderer.generateAndAppendTweetContent($element, tweet);
                 }
             };
         })();
