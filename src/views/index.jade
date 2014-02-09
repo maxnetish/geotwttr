@@ -6,7 +6,6 @@ block content
         a.no-decoration(href= "https://twitter.com/"+userInfo.screen_name, target="_blank")
             span.screen-name #{userInfo.screen_name}
         a.logout(href="/logout") Sign-out
-    //div.preloader
     h1.text-center= title
     div.view
         h2.text-center(data-bind='text: title')
@@ -14,13 +13,6 @@ block content
             input.geo-autocomplete(data-bind="geoAutocomplete: '.gmap'", type="search")
             div.gmap(data-bind='gmap: selectedLocation, statusOnMap: statusOnMap, setHeight: needSetHeight')
         div.pane-right.pane
-            //div.button-set
-                button.button-show-incoming.button-top(data-bind='visible: hidedIncomingCount()>0, click: showHidedStatuses')
-                    span New statuses:&nbsp;
-                    span(data-bind='text: hidedIncomingCount')
-                //label
-                    input(type='checkbox', data-bind='checked: showTweetsImmediate')
-                    span Update immediately
             ul#tweet-list.scroll(data-bind='setHeight: needSetHeight')
                 button.button-show-incoming.button-top(data-bind='visible: hidedIncomingCount()>0, click: showHidedStatuses', style='display: none;')
                     span New statuses:&nbsp;
@@ -30,28 +22,8 @@ block content
                     span Load more
     a(href="https://twitter.com/maxnetish", class="twitter-follow-button", data-show-count="false", data-lang="#{langCode}") Follow me
     script#tweet-template(type='text/html')
-        li.li-tweet(data-bind="visible: visible")
-                    div.tweet-left
-                        img.avatar(data-bind="attr: {src: avatarUrl}")
-                    div.tweet-right
-                        p.tweet-usernames
-                            a.no-decoration(data-bind="attr: {href: profileUrl}", target="_blank")
-                                span.full-name(data-bind="text: realFullName")
-                                span.screen-name(data-bind="text: realScreenName")
-                        p.tweet-text(data-bind='renderTweetTextContent: $data')
-                        p.tweet-meta
-                            a.no-decoration(data-bind="attr: {href: statusUrl}", target="_blank")
-                                span.tweet-date(data-bind='tweetDate: $data')
-                            span.retweet-from(data-bind="visible: isRetweet") RT from
-                            a.no-decoration(data-bind="attr: {href: profileOriginalUrl}, visible: isRetweet", target="_blank")
-                                span.screen-name(data-bind="text: user.screen_name")
-                        p.tweet-meta(data-bind='visible: !!nearPlace')
-                            span Near&nbsp;
-                            span(data-bind='text: nearPlace')
-                        p.tweet-meta
-                            button.entity(data-bind="visible: canShowOnMap, click: showOnMap")
-                                span.show-on-map Show on map
+        include tweet_template_mini
     script window.langCode = "#{langCode}";
     script(data-main="javascripts/app/main.js", src="javascripts/lib/require.js")
-    script define("backend-data-loader", ["config"], function(config){config.ipGeocode = !{ipGeocode};})
-    script !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");
+    include backend_data_loader
+    include twitter_follow_script

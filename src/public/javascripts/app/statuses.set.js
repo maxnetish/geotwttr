@@ -87,6 +87,20 @@ define(["ko", "underscore", "models", "jquery", "moment", "logger"],
                     tweet.nearPlace = tweet.place ? tweet.place.full_name : null;
                     tweet.showOnMap = _tweetWantsToShowOnMap;
                     tweet.createdAtMoment = moment(createdAt, momentFormat, "en");
+                    tweet.clickTweet = _tweetClick;
+                    tweet.details = ko.observable(false);
+                },
+
+                _tweetClick = function (data, event) {
+                    var $target = $(event.target);
+                    if (!$target.is(".notoggle") && $target.parentsUntil(".li-tweet", ".notoggle").length === 0) {
+                        if (_.isFunction(data.details)) {
+                            data.details(!data.details());
+                            return false;
+                        }
+                        return true;
+                    }
+                    return true;
                 },
 
                 _tweetWantsToShowOnMap = function (data, event) {

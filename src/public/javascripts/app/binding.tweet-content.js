@@ -44,7 +44,7 @@ define(["ko", "jquery", "moment", "underscore"],
                                     renderUrl = function (e) {
                                         var res = $("<a>", {
                                             target: "_blank",
-                                            "class": "entity url",
+                                            "class": "entity url notoggle",
                                             href: e.expanded_url
                                         })
                                             .html(e.display_url);
@@ -53,7 +53,7 @@ define(["ko", "jquery", "moment", "underscore"],
                                     renderUserMention = function (e) {
                                         var res = $("<a>", {
                                             target: "_blank",
-                                            "class": "entity user-mention",
+                                            "class": "entity user-mention notoggle",
                                             href: "https://twitter.com/" + e.screen_name
                                         })
                                             .html(e.screen_name);
@@ -61,14 +61,14 @@ define(["ko", "jquery", "moment", "underscore"],
                                     },
                                     renderHashtag = function (e) {
                                         var res = $("<span>", {
-                                            "class": "entity hashtag"
+                                            "class": "entity hashtag notoggle"
                                         })
                                             .html(e.text);
                                         return res;
                                     },
                                     renderSymbol = function (e) {
                                         var res = $("<span>", {
-                                            "class": "entity symbol"
+                                            "class": "entity symbol notoggle"
                                         })
                                             .html(e.text);
                                         return res;
@@ -76,7 +76,7 @@ define(["ko", "jquery", "moment", "underscore"],
                                     renderMedia = function (e) {
                                         var res = $("<a>", {
                                             target: "_blank",
-                                            "class": "entity url",
+                                            "class": "entity url notoggle",
                                             href: e.expanded_url
                                         })
                                             .html(e.display_url);
@@ -84,7 +84,7 @@ define(["ko", "jquery", "moment", "underscore"],
                                     },
                                     renderDefault = function (e) {
                                         var res = $("<span>", {
-                                            "class": "entity"
+                                            "class": "entity notoggle"
                                         })
                                             .html(e.text);
                                         return res;
