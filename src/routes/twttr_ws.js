@@ -3,14 +3,13 @@
  */
 var express = require('express'),
     twitterHelper = require('../helpers/twitter').twitter,
-    WebSocket = require("ws"),
     _ = require("underscore");
 
 exports.webSocketServer = function (ws) {
     var streamRequests = {},
         accessToken,
         onReject = function () {
-            ws.send(JSON.stringify({meta: {code: 400, error_message: "Unauthorized"}}), function (error) {
+            ws.send(JSON.stringify({meta: {code: 400, error_message: "Unauthorized"}}), function () {
                 ws.terminate();
             });
         };
@@ -76,7 +75,7 @@ exports.webSocketServer = function (ws) {
                         code: 400,
                         error_message: "Stream closed"
                     }
-                }), function (error) {
+                }), function () {
                     //ws.terminate();
                 });
             });

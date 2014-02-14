@@ -2,15 +2,15 @@
  * Created by max on 29.10.13.
  */
 
-var vm = require('../vm/index.vm');
-var store = require('../helpers/store').store;
-var twitterHelper=require('../helpers/twitter').twitter;
+var vm = require('../vm/index.vm'),
+    store = require('../helpers/store').store,
+    twitterHelper = require('../helpers/twitter').twitter,
 
-var onAuthFailed = function (req, res) {
-    indexVm = new vm.indexVm();
-    indexVm.authFailed = true;
-    res.render('login', indexVm);
-};
+    onAuthFailed = function (req, res) {
+        var indexVm = new vm.indexVm();
+        indexVm.authFailed = true;
+        res.render('login', indexVm);
+    };
 
 exports.redirectFromAuth = function (req, res) {
     if (req.query.denied) {
