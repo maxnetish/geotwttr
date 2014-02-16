@@ -1,8 +1,8 @@
 /**
  * Created by max on 05.01.14.
  */
-define(["ko", "underscore", "models", "jquery", "moment", "logger"],
-    function (ko, _, models, $, moment, logger) {
+define(["ko", "underscore", "models", "jquery", "moment", "gmaps", "logger"],
+    function (ko, _, models, $, moment, gmaps, logger) {
         var StatusesSet = function (srcDataservice, $container, template) {
             var self = this,
                 _filterModel,
@@ -69,7 +69,7 @@ define(["ko", "underscore", "models", "jquery", "moment", "logger"],
                     var createdAt = tweet.isRetweet ? tweet.retweeted_status.created_at : tweet.created_at;
 
                     tweet.isRetweet = !!tweet.retweeted_status;
-                    tweet.canShowOnMap = !!(tweet.coordinates || tweet.place);
+                    //tweet.canShowOnMap = !!(tweet.coordinates || tweet.place);
                     tweet.avatarUrl = tweet.isRetweet ?
                         tweet.retweeted_status.user.profile_image_url :
                         tweet.user.profile_image_url;
@@ -85,10 +85,21 @@ define(["ko", "underscore", "models", "jquery", "moment", "logger"],
                         tweet.user.screen_name;
                     tweet.statusUrl = twitterUrl + "/" + tweet.user.screen_name + "/status/" + tweet.id_str;
                     tweet.nearPlace = tweet.place ? tweet.place.full_name : null;
-                    tweet.showOnMap = _tweetWantsToShowOnMap;
+                    tweet.showOnMapCoord = _tweetWantsToShowCoord;
+                    tweet.showOnMapPlace = _tweetWantsToShowPlace;
                     tweet.createdAtMoment = moment(createdAt, momentFormat, "en");
                     tweet.clickTweet = _tweetClick;
                     tweet.details = ko.observable(false);
+                    if (tweet.coordinates && tweet.coordinates.coordinates && tweet.coordinates.coordinates.length === 2) {
+                        tweet.distance = _calcDistance(tweet);
+                    }
+                    tweet.checkVisibility = _checkVisibility;
+                },
+
+                _calcDistance = function (tweet) {
+                    var tweetLatlng = new gmaps.LatLng(tweet.coordinates.coordinates[1], tweet.coordinates.coordinates[0]),
+                        distanceNumKm = gmaps.geometry.spherical.computeDistanceBetween(tweetLatlng, _filterModel.center()) / 1000;
+                    return distanceNumKm.toLocaleString();
                 },
 
                 _tweetClick = function (data, event) {
@@ -103,8 +114,12 @@ define(["ko", "underscore", "models", "jquery", "moment", "logger"],
                     return true;
                 },
 
-                _tweetWantsToShowOnMap = function (data, event) {
-                    self.statusOnMap(data);
+                _tweetWantsToShowCoord = function (data, event) {
+                    self.statusOnMap(data.coordinates);
+                },
+
+                _tweetWantsToShowPlace = function (data, event) {
+                    self.statusOnMap(data.place);
                 },
 
                 _preprocessStreamResponse = function (message) {
@@ -140,6 +155,7 @@ define(["ko", "underscore", "models", "jquery", "moment", "logger"],
                     if (status && status.id) {
                         status.visible = ko.observable(true);
                         _.defer(_insertIntoList, status);
+                        _debounceCheckVisibilityNeeded();
                     }
                 },
 
@@ -153,6 +169,7 @@ define(["ko", "underscore", "models", "jquery", "moment", "logger"],
                             status.visible = ko.observable(false);
                         }
                         _.defer(_insertIntoList, status);
+                        //_debounceCheckVisibilityNeeded();
                     }
                 },
 
@@ -167,7 +184,12 @@ define(["ko", "underscore", "models", "jquery", "moment", "logger"],
                         srcDataservice.disposeRequest(reqId);
                     });
                     _requestsId.length = 0;
-                };
+                },
+
+                _checkVisibility = ko.observable(false),
+                _debounceCheckVisibilityNeeded = _.debounce(function () {
+                    _checkVisibility.valueHasMutated();
+                }, 500);
 
             this.requestMorePrevious = function () {
                 if (!_filterModel) {
@@ -212,6 +234,7 @@ define(["ko", "underscore", "models", "jquery", "moment", "logger"],
                         }
                     }
                 });
+                _.defer(_checkVisibility.valueHasMutated);
             };
             this.setStreamedTweetsVisible = ko.observable(false);
             this.restLoadingState = _restLoadingState;

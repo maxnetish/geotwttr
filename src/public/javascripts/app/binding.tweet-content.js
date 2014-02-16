@@ -130,7 +130,8 @@ define(["ko", "jquery", "moment", "underscore"],
                                 $resultElements = $resultElements.add(renderPlainText(remainText.substr(0, plainTextPreEntityLen)));
                             }
                             $resultElements = $resultElements.add(renderEntity(entity));
-                            remainText = remainText.substr(origEnd - (initialLen - remainText.length));
+                            //remainText = remainText.substr(origEnd - (initialLen - remainText.length));
+                            remainText = initialText.substr(origEnd);
                         });
                         if (remainText.length) {
                             $resultElements = $resultElements.add(renderPlainText(remainText));
@@ -150,6 +151,36 @@ define(["ko", "jquery", "moment", "underscore"],
                         }
                         $element.html(momentCreated.format(dateFormat));
                     }
+                },
+                isElementInViewport = function ($element, fullVisible) {
+                    var $window = $(window),
+                        viewport = {
+                            top: $window.scrollTop(),
+                            left: $window.scrollLeft()
+                        },
+                        bounds;
+
+                    if (!$element.is(":visible")) {
+                        return false;
+                    }
+
+                    viewport.right = viewport.left + $window.width();
+                    viewport.bottom = viewport.top + $window.height();
+
+                    bounds = $element.offset();
+                    bounds.right = bounds.left + $element.outerWidth();
+                    bounds.bottom = bounds.top + $element.outerHeight();
+
+                    if (fullVisible) {
+                        return viewport.top <= bounds.top
+                            && viewport.right >= bounds.right
+                            && viewport.left <= bounds.left
+                            && viewport.bottom >= bounds.bottom;
+                    }
+                    return (!(viewport.right < bounds.left
+                        || viewport.left > bounds.right
+                        || viewport.bottom < bounds.top
+                        || viewport.top > bounds.bottom));
                 };
 
             //configure moment:
@@ -170,6 +201,70 @@ define(["ko", "jquery", "moment", "underscore"],
                     var $element = $(element),
                         tweet = valueAccessor();
                     tweetTextRenderer.generateAndAppendTweetContent($element, tweet);
+                }
+            };
+
+            ko.bindingHandlers.lazyLoadingImage = {
+                init: function (element, valueAccessor) {
+                    var $element = $(element),
+                        options = valueAccessor(),
+                        $scrollContainer = $(options.container),
+                        eventId = _.uniqueId(".scroll_"),
+                        srcSubscribeHandler,
+                        checkVisibilityHandler,
+                        prepareElement = function () {
+                            $element.css({
+                                visibility: "hidden"
+                            });
+                        },
+                        setImgSrc = function () {
+                            $element.one("load", function () {
+                                $element.css({
+                                    visibility: "visible"
+                                });
+                            });
+                            $element.attr("src", ko.utils.unwrapObservable(options.src));
+                        },
+                        waitForBecomeVisible = function () {
+                            var checkVisibility = function () {
+                                if (isElementInViewport($element, true)) {
+                                    $scrollContainer.off(eventId);
+                                    $(window).off(eventId);
+                                    if (checkVisibilityHandler) {
+                                        checkVisibilityHandler.dispose();
+                                        checkVisibilityHandler = null;
+                                    }
+                                    setImgSrc();
+                                    return true;
+                                }
+                                return false;
+                            };
+                            if (!checkVisibility()) {
+                                $scrollContainer.on("scroll" + eventId, _.debounce(checkVisibility, 500));
+                                $(window).on("resize" + eventId, _.debounce(checkVisibility, 500));
+                                if (ko.isObservable(options.checkVisibility)) {
+                                    checkVisibilityHandler = options.checkVisibility.subscribe(checkVisibility);
+                                }
+                            }
+                        };
+                    if (!options.src) {
+                        return;
+                    }
+                    prepareElement();
+                    if (ko.isObservable(options.src)) {
+                        if (options.src()) {
+                            waitForBecomeVisible();
+                        } else {
+                            srcSubscribeHandler = options.src.subscribe(function (srcUnwrapped) {
+                                if (srcUnwrapped) {
+                                    waitForBecomeVisible();
+                                    srcSubscribeHandler.dispose();
+                                }
+                            });
+                        }
+                    } else if (options.src) {
+                        waitForBecomeVisible();
+                    }
                 }
             };
         })();

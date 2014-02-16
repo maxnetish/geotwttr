@@ -129,7 +129,7 @@ define(["ko", "gmaps", "jquery", "logger", "underscore"],
                                 tweetPath,
                                 gPath;
                             if (data && data.coordinates) {
-                                newPosition = new gmaps.LatLng(data.coordinates.coordinates[1], data.coordinates.coordinates[0]);
+                                newPosition = new gmaps.LatLng(data.coordinates[1], data.coordinates[0]);
                                 statusMarker.setPosition(newPosition);
                                 if (data.place && data.place.name) {
                                     statusMarker.setTitle(data.place.name);
@@ -139,8 +139,8 @@ define(["ko", "gmaps", "jquery", "logger", "underscore"],
                                 statusMarker.setVisible(true);
                                 placePolygon.setVisible(false);
                                 map.panTo(newPosition);
-                            } else if (data && data.place && data.place.bounding_box && data.place.bounding_box.coordinates) {
-                                tweetPath = data.place.bounding_box.coordinates;
+                            } else if (data && data.bounding_box && data.bounding_box.coordinates) {
+                                tweetPath = data.bounding_box.coordinates;
                                 //array of array of [lng, lat]
                                 gPath = [];
                                 for (i = 0, iLen = tweetPath.length; i < iLen; i = i + 1) {

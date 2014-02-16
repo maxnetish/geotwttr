@@ -1,0 +1,12 @@
+div.details(data-bind="if: details")
+    p.tweet-meta(data-bind="if: coordinates && coordinates.coordinates")
+        button.entity.notoggle(data-bind="click: showOnMapCoord")
+            span.coordinates-lng(data-bind="text: coordinates.coordinates[0].toLocaleString()")
+            span.coordinates-lat(data-bind="text: coordinates.coordinates[1].toLocaleString()")
+        span.tweet-distance(data-bind="text: distance")
+    p.tweet-meta(data-bind="if: place && place.bounding_box")
+        button.entity.notoggle(data-bind="click: showOnMapPlace")
+            span.tweet-near(data-bind="text: place.full_name")
+    p.tweet-meta
+        span.tweet-lang(data-bind="visible: lang, text: lang")
+        span.tweet-source.notoggle(data-bind="html: source")

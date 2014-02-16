@@ -44,12 +44,22 @@ define(["dataservice", "underscore", "models"],
                 // return requestId
                 return dataservice.openRequest(requestOptions);
             },
-            disposeRequest = function (requestId) {
-                dataservice.closeRequest(requestId);
-            };
+            requestPlaceDetails = function (url, callback) {
+                var requestOptions = {
+                    requestUrl: url,
+                    requestMethod: "GET",
+                    requestStream: false,
+                    onResponse: callback
+                };
+                return dataservice.openRequest(requestOptions);
+            }
+        disposeRequest = function (requestId) {
+            dataservice.closeRequest(requestId);
+        };
         return{
             beginFilterStreamUpdates: beginFilterStreamUpdates,
             requestSearchRestApi: requestSearchRestApi,
+            requestPlaceDetails: requestPlaceDetails,
             disposeRequest: disposeRequest
         };
     });

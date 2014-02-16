@@ -12,6 +12,7 @@
         "redis": "*",
         "underscore": "*",
         "ws": "*",
-        "maxmind-db-reader": "*"
+        "maxmind-db-reader": "*",
+        "less-middleware": "*"
     }
 }

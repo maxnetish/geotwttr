@@ -1,0 +1,224 @@
+/***   variables   ***/
+@marginSmall: 5px;
+@colorEntity: #0099B9;
+@colorGray: darkgray;
+@colorBackgroundHover: rgba(0, 153, 185, 0.1);
+@colorBackgroundSmallInfo: rgba(235, 200, 148, 1);
+
+/***  mixins  ***/
+.fontText(@fontSize: 14px) {
+  font: @fontSize "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+.transition-hover-background(@hoverBackground: @colorBackgroundHover) {
+  transition: background 0.3s ease;
+  &:hover {
+    background: @hoverBackground;
+  }
+}
+
+body {
+  padding: @marginSmall;
+  .fontText();
+}
+
+iframe.twitter-follow-button {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.no-decoration {
+  text-decoration: none;
+}
+
+.preloader {
+  background: url(../images/preloader.gif) no-repeat 50% 50%;
+  height: 24px;
+  width: 100%;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.screen-name:before {
+  content: '@';
+}
+
+.scroll {
+  overflow-x: auto;
+}
+
+a {
+  color: @colorEntity;
+}
+
+.center-column {
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+h1, h2 {
+  margin-top: @marginSmall;
+  margin-bottom: @marginSmall;
+}
+
+p {
+  margin-bottom: @marginSmall;
+  margin-top: 0;
+}
+
+button {
+  span {
+    margin-right: 1em;
+  }
+  span:last-child {
+    margin-right: 0;
+  }
+}
+
+ul {
+  padding-left: 0;
+  list-style: none;
+  margin: 0;
+}
+
+.view {
+  text-align: center;
+  .pane {
+    display: inline-block;
+    text-align: left;
+    vertical-align: top;
+    margin: @marginSmall;
+    &.pane-left {
+      width: 60%;
+    }
+    &.pane-right {
+      width: 30%;
+    }
+  }
+  .button-show-incoming,
+  .button-request-previous {
+    width: 100%;
+  }
+}
+
+.gmap {
+  width: 100%;
+  height: 526px;
+}
+
+.geo-autocomplete {
+  width: 100%;
+  padding-right: 0;
+  margin-bottom: @marginSmall;
+}
+
+.li-tweet {
+  border-top: 1px solid @colorGray;
+  padding: @marginSmall;
+  min-height: 50px;
+  cursor: pointer;
+  .transition-hover-background();
+  .tweet-right {
+    margin-left: 58px;
+    overflow: hidden;
+  }
+  .tweet-left {
+    float: left;
+  }
+  .screen-name {
+    font-size: 12px;
+    color: @colorGray;
+  }
+  .full-name {
+    font-weight: bold;
+    margin-right: @marginSmall;
+    color: black;
+  }
+  .tweet-date {
+    font-size: 12px;
+    color: @colorGray;
+    margin-right: 10px;
+  }
+  .retweet-from {
+    font-size: 12px;
+    color: @colorGray;
+    margin-right: @marginSmall;
+  }
+  .avatar {
+    border-radius: 4px;
+    border: solid 1px;
+    width: 48px;
+    height: 48px;
+    margin-right: @marginSmall;
+    vertical-align: top;
+  }
+  .entity {
+    color: @colorEntity;
+    text-decoration: none;
+  }
+  .user-mention:before {
+    content: '@';
+  }
+  .hashtag:before {
+    content: '#';
+  }
+  .tweet-meta {
+    font-size: 12px;
+    color: @colorGray;
+  }
+  .tweet-lang {
+    border-radius: 6px;
+    background: @colorBackgroundSmallInfo;
+    color: black;
+    padding: 0 @marginSmall;
+    margin-right: 1em;
+  }
+  .coordinates-lng:before {
+    content: "Lng: ";
+  }
+  .coordinates-lat:before {
+    content: "Lat: ";
+  }
+  .tweet-near:before {
+    content: "Near: ";
+  }
+  .tweet-distance {
+    &:before {
+      content: "Distance: ";
+    }
+    &:after {
+      content: "km";
+    }
+  }
+
+  .tweet-source {
+    &:before {
+      content: "Via: ";
+    }
+    a {
+      text-decoration: none;
+    }
+  }
+  button {
+    margin-right: 1em;
+  }
+  .details {
+    padding-top: @marginSmall * 2;
+    padding-bottom: @marginSmall;
+    p {
+      margin-bottom: @marginSmall;
+    }
+  }
+}
+
+.account-card {
+  span {
+    margin-right: @marginSmall;
+  }
+  .logout {
+    margin-left: 10px;
+  }
+}

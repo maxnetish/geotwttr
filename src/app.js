@@ -26,6 +26,7 @@ app.use(express.cookieParser('A12-dmcd=Asd365%bjldkloed(uhn'));
 app.use(express.bodyParser());
 app.use(express.methodOverride());
 app.use(app.router);
+app.use(require('less-middleware')({ src: path.join(__dirname, 'public') }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // development only

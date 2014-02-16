@@ -1,7 +1,7 @@
 extends layout
 
 block content
-    div.account-card
+    div.account-card.text-center
         span Signed in as
         a.no-decoration(href= "https://twitter.com/"+userInfo.screen_name, target="_blank")
             span.screen-name #{userInfo.screen_name}
@@ -14,7 +14,7 @@ block content
             div.gmap(data-bind='gmap: selectedLocation, statusOnMap: statusOnMap, setHeight: needSetHeight')
         div.pane-right.pane
             ul#tweet-list.scroll(data-bind='setHeight: needSetHeight')
-                button.button-show-incoming.button-top(data-bind='visible: hidedIncomingCount()>0, click: showHidedStatuses', style='display: none;')
+                button.button-show-incoming(data-bind='visible: hidedIncomingCount()>0, click: showHidedStatuses', style='display: none;')
                     span New statuses:&nbsp;
                     span(data-bind='text: hidedIncomingCount')
                 div.preloader(data-bind='visible: restLoadingNow')
@@ -23,6 +23,8 @@ block content
     a(href="https://twitter.com/maxnetish", class="twitter-follow-button", data-show-count="false", data-lang="#{langCode}") Follow me
     script#tweet-template(type='text/html')
         include tweet_template_mini
+    script#tweet-template-details(type='text/html')
+        include tweet_template_details
     script window.langCode = "#{langCode}";
     script(data-main="javascripts/app/main.js", src="javascripts/lib/require.js")
     include backend_data_loader
