@@ -2,7 +2,7 @@
 li.li-tweet(data-bind="visible: visible, click: clickTweet")
     div.tweet-left
         a.no-decoration.notoggle(data-bind="attr: {href: profileUrl}", target="_blank")
-            img.avatar(data-bind="lazyLoadingImage: {container: 'ul#tweet-list', src: avatarUrl, checkVisibility: checkVisibility}")
+            img.avatar.hided(data-bind="lazyLoadingImage: {container: 'ul#tweet-list', src: avatarUrl, checkVisibility: checkVisibility}")
     div.tweet-right
         p.tweet-usernames
             a.no-decoration.notoggle(data-bind="attr: {href: profileUrl}", target="_blank")

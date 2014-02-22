@@ -213,15 +213,11 @@ define(["ko", "jquery", "moment", "underscore"],
                         srcSubscribeHandler,
                         checkVisibilityHandler,
                         prepareElement = function () {
-                            $element.css({
-                                visibility: "hidden"
-                            });
+                            $element.addClass("hided");
                         },
                         setImgSrc = function () {
-                            $element.one("load", function () {
-                                $element.css({
-                                    visibility: "visible"
-                                });
+                            $element.one("load error", function () {
+                                $element.removeClass("hided");
                             });
                             $element.attr("src", ko.utils.unwrapObservable(options.src));
                         },

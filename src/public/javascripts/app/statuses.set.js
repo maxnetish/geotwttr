@@ -13,6 +13,7 @@ define(["ko", "underscore", "models", "jquery", "moment", "gmaps", "logger"],
                 $upperElement = $container.children().first(),
                 _restLoadingState = ko.observable(false),
                 momentFormat = "ddd MMM DD HH:mm:ss ZZ YYYY", // "Sun Feb 02 16:37:22 +0000 2014"
+                geocoder = new gmaps.Geocoder(),
 
                 _insertIntoList = function (statusToInsert) {
                     var indexToInsert = _.sortedIndex(_statusesArray, statusToInsert, function (oneStatus) {
@@ -92,8 +93,37 @@ define(["ko", "underscore", "models", "jquery", "moment", "gmaps", "logger"],
                     tweet.details = ko.observable(false);
                     if (tweet.coordinates && tweet.coordinates.coordinates && tweet.coordinates.coordinates.length === 2) {
                         tweet.distance = _calcDistance(tweet);
+                        tweet.geocodeObservable = ko.observable(null);
+                        tweet.geocodeComputed = ko.computed({
+                            read: function () {
+                                var geocodeUnwrapped = tweet.geocodeObservable();
+                                if (!geocodeUnwrapped) {
+                                    _getGoogleGeocode(tweet);
+                                    return _tweetCoordsToString(tweet);
+                                } else {
+                                    return geocodeUnwrapped;
+                                }
+                            },
+                            deferEvaluation: true
+                        });
                     }
                     tweet.checkVisibility = _checkVisibility;
+                },
+
+                _tweetCoordsToString = function (tweet) {
+                    return "Lat: " + tweet.coordinates.coordinates[1].toLocaleString() + " Lng: " + tweet.coordinates.coordinates[0].toLocaleString();
+                },
+
+                _getGoogleGeocode = function (tweet) {
+                    geocoder.geocode({
+                        location: new gmaps.LatLng(tweet.coordinates.coordinates[1], tweet.coordinates.coordinates[0])
+                    }, function (result, status) {
+                        if (result && result.length) {
+                            tweet.geocodeObservable(result[0].formatted_address)
+                        } else {
+                            tweet.geocodeObservable(_tweetCoordsToString(tweet));
+                        }
+                    });
                 },
 
                 _calcDistance = function (tweet) {

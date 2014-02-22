@@ -14,8 +14,13 @@ define(["ko", "models", "statuses.set", "dataservice.stream-tweets", "jquery", "
 
             createLocationInstance = function () {
                 var defaultLatLng,
-                    defaultRadius = 5000;
-                if (config.ipGeocode && config.ipGeocode.location && config.ipGeocode.location.latitude && config.ipGeocode.location.longitude) {
+                    defaultRadius = 5000,
+                    configCoords = config.coordinates();
+
+                if (configCoords) {
+                    defaultLatLng = new gmaps.LatLng(configCoords.lat, configCoords.lng);
+                }
+                else if (config.ipGeocode && config.ipGeocode.location && config.ipGeocode.location.latitude && config.ipGeocode.location.longitude) {
                     defaultLatLng = new gmaps.LatLng(config.ipGeocode.location.latitude, config.ipGeocode.location.longitude);
                 }
                 return new models.ModelSelectedLocation(defaultLatLng, defaultRadius);
@@ -38,6 +43,10 @@ define(["ko", "models", "statuses.set", "dataservice.stream-tweets", "jquery", "
                 });
                 selectedLocationObservable.subscribe(function (locationUnwrapped) {
                     listOfTweets.filter(locationUnwrapped);
+                    config.coordinates({
+                        lat: locationUnwrapped.center().lat(),
+                        lng: locationUnwrapped.center().lng()
+                    });
                 });
             };
 

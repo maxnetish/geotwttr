@@ -17,6 +17,10 @@
   }
 }
 
+.transition-opacity(@duration: 0.3s){
+  transition: opacity @duration ease;
+}
+
 body {
   padding: @marginSmall;
   .fontText();
@@ -154,6 +158,11 @@ ul {
     height: 48px;
     margin-right: @marginSmall;
     vertical-align: top;
+    opacity: 1;
+    .transition-opacity();
+    &.hided{
+      opacity: 0;
+    }
   }
   .entity {
     color: @colorEntity;

@@ -1,13 +1,36 @@
 /**
  * Created by Gordeev on 01.02.14.
  */
-define([], function () {
+define(["cookies"], function (docCookies) {
     var debug = true,
-        ipGeocode = null;
-
+        ipGeocode = null,
+        coordinatesKey = "coord",
+        setCoord = function (coord) {
+            docCookies.setItem(coordinatesKey, JSON.stringify(coord), Infinity);
+        },
+        getCoord = function () {
+            var result = null;
+            try {
+                result = JSON.parse(docCookies.getItem(coordinatesKey));
+            }
+            catch (err) {
+                docCookies.removeItem(coordinatesKey);
+                result = null;
+            }
+            return result;
+        },
+        coordinates = function (coord) {
+            if (coord && coord.lat && coord.lng) {
+                setCoord(coord);
+                return coord;
+            } else {
+                return getCoord();
+            }
+        };
 
     return{
         debug: debug,
-        ipGeocode: ipGeocode
+        ipGeocode: ipGeocode,
+        coordinates: coordinates
     };
 });
