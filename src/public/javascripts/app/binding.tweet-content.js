@@ -181,6 +181,15 @@ define(["ko", "jquery", "moment", "underscore"],
                         || viewport.left > bounds.right
                         || viewport.bottom < bounds.top
                         || viewport.top > bounds.bottom));
+                },
+                tweetClickHandler = function (event) {
+                    var $target = $(event.target);
+                    if (!$target.is(".notoggle") && $target.parentsUntil(".li-tweet", ".notoggle").length === 0) {
+                        if (_.isFunction(this.details)) {
+                            this.details(!this.details());
+                            event.preventDefault();
+                        }
+                    }
                 };
 
             //configure moment:
@@ -261,6 +270,16 @@ define(["ko", "jquery", "moment", "underscore"],
                     } else if (options.src) {
                         waitForBecomeVisible();
                     }
+                }
+            };
+            ko.bindingHandlers.tweetCustomEvents = {
+                init: function (element, valueAccessor) {
+                    var $element = $(element),
+                        data = valueAccessor();
+
+                    $element.on("click", function (event) {
+                        tweetClickHandler.call(data, event);
+                    });
                 }
             };
         })();

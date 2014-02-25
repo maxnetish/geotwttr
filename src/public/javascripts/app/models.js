@@ -2,8 +2,36 @@
  * Created by max on 03.01.14.
  */
 
-define(["ko", "gmaps", "underscore"],
-    function (ko, gmaps, _) {
+define(["ko", "gmaps", "underscore", "moment", "jquery"],
+    function (ko, gmaps, _, moment, $) {
+        var twitterUrl = "https://twitter.com",
+            valueOfOriginalTweet = function () {
+                return this.retweeted_status || this;
+            };
+
+        var ModelTweet = function (rowTweet) {
+            var originalRowTweet = valueOfOriginalTweet.call(rowTweet);
+
+            this.details = ko.observable(false);
+            this.visible = ko.observable(false);
+            this.isRetweet = !!rowTweet.retweeted_status;
+            this.id_str = rowTweet.id_str;
+            this.id = rowTweet.id;
+            this.profileUrl = twitterUrl + "/" + originalRowTweet.user.screen_name;
+            this.avatarUrl = originalRowTweet.user.profile_image_url;
+            this.realFullName = originalRowTweet.user.name;
+            this.realScreenName = originalRowTweet.user.screen_name;
+            this.text = originalRowTweet.text;
+            this.entities = originalRowTweet.entities;
+            this.statusUrl = twitterUrl + "/" + rowTweet.user.screen_name + "/status/" + rowTweet.id_str;
+            this.createdAtMoment = moment(originalRowTweet.created_at, momentFormat, "en");
+            this.isRetweet = !!rowTweet.retweeted_status;
+            this.profileOriginalUrl = twitterUrl + "/" + rowTweet.user.screen_name;
+            this.screenName = rowTweet.user.screen_name;
+            this.nearPlace = rowTweet.place && rowTweet.place.full_name;
+            this.coordinates = rowTweet.coordinates;
+        };
+
         var ModelSelectedLocation = function (center, radius) {
             var self = this,
                 _center,
@@ -56,6 +84,7 @@ define(["ko", "gmaps", "underscore"],
         };
 
         return{
-            ModelSelectedLocation: ModelSelectedLocation
+            ModelSelectedLocation: ModelSelectedLocation,
+            ModelTweet: ModelTweet
         }
     });

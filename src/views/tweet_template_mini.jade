@@ -1,5 +1,5 @@
 - // Created by Gordeev on 09.02.14.
-li.li-tweet(data-bind="visible: visible, click: clickTweet")
+li.li-tweet(data-bind="visible: visible, tweetCustomEvents: $data")
     div.tweet-left
         a.no-decoration.notoggle(data-bind="attr: {href: profileUrl}", target="_blank")
             img.avatar.hided(data-bind="lazyLoadingImage: {container: 'ul#tweet-list', src: avatarUrl, checkVisibility: checkVisibility}")

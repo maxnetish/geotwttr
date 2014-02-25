@@ -27,9 +27,10 @@ exports.index = function (req, res) {
             indexVm.userInfo = userInfo;
             indexVm.googleAPiToken = tokens.google.apiToken;
             //find ipgeocode:
-            mmdbReaderInstance = new mmdbreader("GeoLite2-City.mmdb");
-            indexVm.ipGeocode = JSON.stringify(mmdbReaderInstance.getGeoData(req.ip));
-            //indexVm.ipGeocode = JSON.stringify(mmdbReaderInstance.getGeoData("95.29.232.174"));
+            if (req && req.ip) {
+                mmdbReaderInstance = new mmdbreader("GeoLite2-City.mmdb");
+                indexVm.ipGeocode = JSON.stringify(mmdbReaderInstance.getGeoData(req.ip));
+            }
             res.render('index', indexVm);
         } else {
             res.render('login', indexVm);

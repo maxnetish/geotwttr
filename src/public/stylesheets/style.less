@@ -32,6 +32,19 @@ iframe.twitter-follow-button {
   margin-right: auto;
 }
 
+button{
+  border: solid 1px darkgray;
+  border-radius: 3px;
+  background: lightgray;
+  .transition-hover-background(bisque);
+  span {
+    margin-right: 1em;
+  }
+  span:last-child {
+    margin-right: 0;
+  }
+}
+
 .no-decoration {
   text-decoration: none;
 }
@@ -71,15 +84,6 @@ h1, h2 {
 p {
   margin-bottom: @marginSmall;
   margin-top: 0;
-}
-
-button {
-  span {
-    margin-right: 1em;
-  }
-  span:last-child {
-    margin-right: 0;
-  }
 }
 
 ul {
@@ -213,6 +217,9 @@ ul {
   }
   button {
     margin-right: 1em;
+    span{
+        color: initial;
+    }
   }
   .details {
     padding-top: @marginSmall * 2;

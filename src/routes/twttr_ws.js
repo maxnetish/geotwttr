@@ -12,6 +12,14 @@ exports.webSocketServer = function (ws) {
             ws.send(JSON.stringify({meta: {code: 400, error_message: "Unauthorized"}}), function () {
                 ws.terminate();
             });
+        },
+
+    // we are exec callback after data actually been sent to client
+    // if error - websocket already down  and nothing can be send to client in that case
+        onWsDataSent = function (error) {
+            if (error) {
+                console.log("Error while send data to websocket. Error: " + error);
+            }
         };
 
     console.log("Websocket connection receive");
@@ -47,7 +55,7 @@ exports.webSocketServer = function (ws) {
                 clientMessage = sanitizeClientMessage(clientMessage);
             }
             catch (error) {
-                ws.send(JSON.stringify(error));
+                ws.send(JSON.stringify(error), onWsDataSent);
                 return;
             }
 
@@ -66,8 +74,7 @@ exports.webSocketServer = function (ws) {
                 streamRequests[clientMessage.requestId] = newRequest;
             }
             newRequest.on("tweetReceived", function (oneTweet) {
-                console.log("Send tweet to client");
-                ws.send(JSON.stringify(oneTweet));
+                ws.send(JSON.stringify(oneTweet), onWsDataSent);
             });
             newRequest.on("closeConnection", function () {
                 ws.send(JSON.stringify({
@@ -75,9 +82,7 @@ exports.webSocketServer = function (ws) {
                         code: 400,
                         error_message: "Stream closed"
                     }
-                }), function () {
-                    //ws.terminate();
-                });
+                }), onWsDataSent);
             });
             newRequest.on("requestError", function (error, data) {
                 ws.send(JSON.stringify({
@@ -85,7 +90,7 @@ exports.webSocketServer = function (ws) {
                         error: error
                     },
                     data: data
-                }));
+                }), onWsDataSent);
             });
         });
         ws.on('close', function () {

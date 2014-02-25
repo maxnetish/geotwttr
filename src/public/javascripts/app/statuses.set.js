@@ -69,6 +69,7 @@ define(["ko", "underscore", "models", "jquery", "moment", "gmaps", "logger"],
                 _mapStatusObject = function (tweet) {
                     var createdAt = tweet.isRetweet ? tweet.retweeted_status.created_at : tweet.created_at;
 
+                    tweet.visible = ko.observable(true);
                     tweet.isRetweet = !!tweet.retweeted_status;
                     //tweet.canShowOnMap = !!(tweet.coordinates || tweet.place);
                     tweet.avatarUrl = tweet.isRetweet ?
@@ -183,7 +184,7 @@ define(["ko", "underscore", "models", "jquery", "moment", "gmaps", "logger"],
                     _restLoadingState(false);
                     var status = _extractStatus(message);
                     if (status && status.id) {
-                        status.visible = ko.observable(true);
+                        status.visible(true);
                         _.defer(_insertIntoList, status);
                         _debounceCheckVisibilityNeeded();
                     }
@@ -194,9 +195,9 @@ define(["ko", "underscore", "models", "jquery", "moment", "gmaps", "logger"],
                     var status = _extractStatus(message);
                     if (status && status.id) {
                         if (self.setStreamedTweetsVisible()) {
-                            status.visible = ko.observable(true);
+                            status.visible(true);
                         } else {
-                            status.visible = ko.observable(false);
+                            status.visible(false);
                         }
                         _.defer(_insertIntoList, status);
                         //_debounceCheckVisibilityNeeded();
