@@ -224,9 +224,35 @@ ul {
   .details {
     padding-top: @marginSmall * 2;
     padding-bottom: @marginSmall;
-    p {
+    p, ul {
       margin-bottom: @marginSmall;
     }
+  }
+
+  .tweet-media-thumb {
+    /*width: 3em;
+    height: 3em;*/
+    max-width: 100%;
+    min-width: 3em;
+    opacity: 1;
+    .transition-opacity();
+    &.hided{
+      opacity: 0;
+    }
+  }
+
+  .tweet-media-element{
+    display: inline-block;
+    position: relative;
+  }
+
+  .thumb-zoom{
+    position: absolute;
+    top: 0.5em;
+    right: 0.5em;
+    margin: 0;
+    width: 1.5em;
+    height: 1.5em;
   }
 }
 

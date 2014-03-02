@@ -111,9 +111,8 @@ define(["ko", "jquery", "moment", "underscore"],
                                 }
                                 return result;
                             },
-                            isRetweet = tweet.isRetweet,
-                            allEntities = unionEntities(isRetweet ? tweet.retweeted_status : tweet),
-                            initialText = isRetweet ? tweet.retweeted_status.text : tweet.text,
+                            allEntities = unionEntities(tweet),
+                            initialText = tweet.text,
                             initialLen = initialText.length,
                             remainText = initialText,
                             $resultElements = $(),
@@ -152,6 +151,7 @@ define(["ko", "jquery", "moment", "underscore"],
                         $element.html(momentCreated.format(dateFormat));
                     }
                 },
+                body=$("body").get(0),
                 isElementInViewport = function ($element, fullVisible) {
                     var $window = $(window),
                         viewport = {
@@ -162,6 +162,8 @@ define(["ko", "jquery", "moment", "underscore"],
 
                     if (!$element.is(":visible")) {
                         return false;
+                    }else{
+                        console.log("[LAZY] $element visible!")
                     }
 
                     viewport.right = viewport.left + $window.width();
@@ -232,6 +234,15 @@ define(["ko", "jquery", "moment", "underscore"],
                         },
                         waitForBecomeVisible = function () {
                             var checkVisibility = function () {
+                                if(!body.contains($element.get(0))){
+                                    $scrollContainer.off(eventId);
+                                    $(window).off(eventId);
+                                    if (checkVisibilityHandler) {
+                                        checkVisibilityHandler.dispose();
+                                        checkVisibilityHandler = null;
+                                    }
+                                    return false;
+                                }
                                 if (isElementInViewport($element, true)) {
                                     $scrollContainer.off(eventId);
                                     $(window).off(eventId);
@@ -242,6 +253,7 @@ define(["ko", "jquery", "moment", "underscore"],
                                     setImgSrc();
                                     return true;
                                 }
+
                                 return false;
                             };
                             if (!checkVisibility()) {
@@ -268,7 +280,7 @@ define(["ko", "jquery", "moment", "underscore"],
                             });
                         }
                     } else if (options.src) {
-                        waitForBecomeVisible();
+                        _.defer(waitForBecomeVisible);
                     }
                 }
             };

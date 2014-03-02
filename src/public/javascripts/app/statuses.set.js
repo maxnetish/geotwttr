@@ -9,10 +9,8 @@ define(["ko", "underscore", "models", "jquery", "moment", "gmaps", "logger"],
                 _requestsId = [],
                 _statusesArray = [],
                 $template = $(template),
-                twitterUrl = "https://twitter.com",
                 $upperElement = $container.children().first(),
                 _restLoadingState = ko.observable(false),
-                momentFormat = "ddd MMM DD HH:mm:ss ZZ YYYY", // "Sun Feb 02 16:37:22 +0000 2014"
                 geocoder = new gmaps.Geocoder(),
 
                 _insertIntoList = function (statusToInsert) {
@@ -59,90 +57,17 @@ define(["ko", "underscore", "models", "jquery", "moment", "gmaps", "logger"],
                 _extractStatus = function (message) {
                     var result;
                     if (message && message.tweet) {
-                        result = message.tweet;
-                        _mapStatusObject(result);
-                        return result;
+                        return _mapStatusObject(message.tweet);
                     }
                     return null;
                 },
 
                 _mapStatusObject = function (tweet) {
-                    var createdAt = tweet.isRetweet ? tweet.retweeted_status.created_at : tweet.created_at;
-
-                    tweet.visible = ko.observable(true);
-                    tweet.isRetweet = !!tweet.retweeted_status;
-                    //tweet.canShowOnMap = !!(tweet.coordinates || tweet.place);
-                    tweet.avatarUrl = tweet.isRetweet ?
-                        tweet.retweeted_status.user.profile_image_url :
-                        tweet.user.profile_image_url;
-                    tweet.profileUrl = tweet.isRetweet ?
-                        twitterUrl + "/" + tweet.retweeted_status.user.screen_name :
-                        twitterUrl + "/" + tweet.user.screen_name;
-                    tweet.profileOriginalUrl = twitterUrl + "/" + tweet.user.screen_name;
-                    tweet.realFullName = tweet.isRetweet ?
-                        tweet.retweeted_status.user.name :
-                        tweet.user.name;
-                    tweet.realScreenName = tweet.isRetweet ?
-                        tweet.retweeted_status.user.screen_name :
-                        tweet.user.screen_name;
-                    tweet.statusUrl = twitterUrl + "/" + tweet.user.screen_name + "/status/" + tweet.id_str;
-                    tweet.nearPlace = tweet.place ? tweet.place.full_name : null;
-                    tweet.showOnMapCoord = _tweetWantsToShowCoord;
-                    tweet.showOnMapPlace = _tweetWantsToShowPlace;
-                    tweet.createdAtMoment = moment(createdAt, momentFormat, "en");
-                    tweet.clickTweet = _tweetClick;
-                    tweet.details = ko.observable(false);
-                    if (tweet.coordinates && tweet.coordinates.coordinates && tweet.coordinates.coordinates.length === 2) {
-                        tweet.distance = _calcDistance(tweet);
-                        tweet.geocodeObservable = ko.observable(null);
-                        tweet.geocodeComputed = ko.computed({
-                            read: function () {
-                                var geocodeUnwrapped = tweet.geocodeObservable();
-                                if (!geocodeUnwrapped) {
-                                    _getGoogleGeocode(tweet);
-                                    return _tweetCoordsToString(tweet);
-                                } else {
-                                    return geocodeUnwrapped;
-                                }
-                            },
-                            deferEvaluation: true
-                        });
-                    }
-                    tweet.checkVisibility = _checkVisibility;
-                },
-
-                _tweetCoordsToString = function (tweet) {
-                    return "Lat: " + tweet.coordinates.coordinates[1].toLocaleString() + " Lng: " + tweet.coordinates.coordinates[0].toLocaleString();
-                },
-
-                _getGoogleGeocode = function (tweet) {
-                    geocoder.geocode({
-                        location: new gmaps.LatLng(tweet.coordinates.coordinates[1], tweet.coordinates.coordinates[0])
-                    }, function (result, status) {
-                        if (result && result.length) {
-                            tweet.geocodeObservable(result[0].formatted_address)
-                        } else {
-                            tweet.geocodeObservable(_tweetCoordsToString(tweet));
-                        }
-                    });
-                },
-
-                _calcDistance = function (tweet) {
-                    var tweetLatlng = new gmaps.LatLng(tweet.coordinates.coordinates[1], tweet.coordinates.coordinates[0]),
-                        distanceNumKm = gmaps.geometry.spherical.computeDistanceBetween(tweetLatlng, _filterModel.center()) / 1000;
-                    return distanceNumKm.toLocaleString();
-                },
-
-                _tweetClick = function (data, event) {
-                    var $target = $(event.target);
-                    if (!$target.is(".notoggle") && $target.parentsUntil(".li-tweet", ".notoggle").length === 0) {
-                        if (_.isFunction(data.details)) {
-                            data.details(!data.details());
-                            return false;
-                        }
-                        return true;
-                    }
-                    return true;
+                    var result = new models.ModelTweet(tweet);
+                    result.checkVisibility = _checkVisibility;
+                    result.showOnMapCoord = _tweetWantsToShowCoord;
+                    result.showOnMapPlace = _tweetWantsToShowPlace;
+                    return result;
                 },
 
                 _tweetWantsToShowCoord = function (data, event) {

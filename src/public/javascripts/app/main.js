@@ -29,6 +29,7 @@
 
     requirejs([
         'backend-data-loader',
+        'base-prototypes',
         'binding.gmap',
         'binding.geo-autocomplete',
         'binding.tweet-content',
