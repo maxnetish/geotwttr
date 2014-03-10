@@ -9,6 +9,7 @@ var authCallback = require('./routes/auth_callback');
 var auth = require('./routes/auth');
 var twttrProxy = require('./routes/twttr_proxy');
 var logout = require('./routes/logout');
+var fsProxy = require('./routes/fs_proxy');
 var http = require('http');
 var path = require('path');
 var WebSocket = require('ws');
@@ -26,7 +27,8 @@ app.use(express.cookieParser('A12-dmcd=Asd365%bjldkloed(uhn'));
 app.use(express.bodyParser());
 app.use(express.methodOverride());
 app.use(app.router);
-app.use(require('less-middleware')({ src: path.join(__dirname, 'public') }));
+//app.use(require('less-middleware')({ src: path.join(__dirname, 'public') }));
+app.use(require('less-middleware')(path.join(__dirname, '/public')));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // development only
@@ -40,6 +42,7 @@ app.get('/auth_callback', authCallback.redirectFromAuth);
 app.get('/auth', auth.auth);
 app.get('/searchtweets', twttrProxy.searchTweets);
 app.get('/logout', logout.logout);
+app.get('/fscheckin', fsProxy.fsProxy);
 
 var httpServer = http.createServer(app);
 httpServer.listen(app.get('port'), '127.0.0.1', function () {

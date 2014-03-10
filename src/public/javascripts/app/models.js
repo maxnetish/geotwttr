@@ -4,7 +4,75 @@
 
 define(["ko", "gmaps", "underscore", "moment", "jquery"],
     function (ko, gmaps, _, moment, $) {
-        var twitterUrl = "https://twitter.com",
+        var instagramPatterns =
+                [
+                    "://instagram.com/p/",
+                    "://instagr.am/p/"
+                ],
+            instagramEmbedUrlAddoon = "media/?size=t",
+            foursquarePatterns =
+                [
+                    "://4sq.com/"
+                ],
+            detectFoursquareUrl = function (urlToTest) {
+                if (!_.isString(urlToTest)) {
+                    return false;
+                }
+                return _.some(foursquarePatterns, function (pattern) {
+                    return urlToTest.contains(pattern);
+                });
+            },
+            getFoursquareCheckinData = function (shortUrl, callback) {
+                callback = callback || function () {
+                };
+                $.ajax({
+                    data: {
+                        fs: shortUrl
+                    },
+                    dataType: 'json',
+                    type: "GET",
+                    url: "/fscheckin",
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        callback(errorThrown);
+                    },
+                    success: function (data, textStatus, jqXHR) {
+                        callback(null, data);
+                    },
+                    complete: function (jqXHR, textStatus) {
+
+                    }
+                });
+            },
+            getFoursquareUrlFrom = function (tweet) {
+                var fsEntity;
+                fsEntity = _.find(tweet.entities.urls, function (entity) {
+                    return detectFoursquareUrl(entity.expanded_url);
+                });
+                if (fsEntity) {
+                    return fsEntity.expanded_url;
+                } else {
+                    return null;
+                }
+            },
+            detectInstagramUrl = function (urlToTest) {
+                if (!_.isString(urlToTest)) {
+                    return false;
+                }
+                return _.some(instagramPatterns, function (pattern) {
+                    return urlToTest.contains(pattern);
+                });
+            },
+            createInstagramEmbedEndpoint = function (instagramUrl) {
+                if (!_.isString(instagramUrl)) {
+                    return instagramUrl;
+                }
+                if (instagramUrl.endsWith("/")) {
+                    return instagramUrl + instagramEmbedUrlAddoon;
+                } else {
+                    return instagramUrl + "/" + instagramEmbedUrlAddoon;
+                }
+            },
+            twitterUrl = "https://twitter.com",
             valueOfOriginalTweet = function () {
                 return this.retweeted_status || this;
             },
@@ -22,7 +90,11 @@ define(["ko", "gmaps", "underscore", "moment", "jquery"],
                 if (tweet && tweet.entities && tweet.entities.urls) {
                     for (i = 0, iLen = tweet.entities.urls.length; i < iLen; i++) {
                         x = tweet.entities.urls[i].expanded_url;
-                        if (x.endsWith(".jpg") || x.endsWith(".jpeg") || x.endsWith(".gif") || x.endsWith(".png")) {
+                        if (detectInstagramUrl(x)) {
+                            tweet.entities.urls[i].media_instagram_url = createInstagramEmbedEndpoint(x);
+                            result.push(new ModelMediaElement(tweet.entities.urls[i]));
+                        }
+                        else if (x.endsWith(".jpg") || x.endsWith(".jpeg") || x.endsWith(".gif") || x.endsWith(".png")) {
                             result.push(new ModelMediaElement(tweet.entities.urls[i]));
                         }
                     }
@@ -37,7 +109,10 @@ define(["ko", "gmaps", "underscore", "moment", "jquery"],
                 this.expandedUrl = mediaEntity.expanded_url || null;
                 if (mediaEntity.media_url) {
                     this.thumbnailUrl = mediaEntity.media_url + ":thumb";
-                } else {
+                } else if (mediaEntity.media_instagram_url) {
+                    this.thumbnailUrl = mediaEntity.media_instagram_url;
+                }
+                else {
                     this.thumbnailUrl = mediaEntity.expanded_url || null;
                 }
                 this.mediaUrl = mediaEntity.media_url || mediaEntity.expanded_url || null;
@@ -81,6 +156,12 @@ define(["ko", "gmaps", "underscore", "moment", "jquery"],
                 this.lang = rowTweet.lang === "und" ? null : rowTweet.lang;
                 this.source = rowTweet.source;
                 this.mediaList = createMediaList(originalRowTweet);
+                this.foursquareCheckinObservable = ko.observable();
+                this.foursquareCheckinComputed = ko.computed({
+                    read: this._readFoursquareCheckinComputed,
+                    deferEvaluation: true,
+                    owner: this
+                });
             },
             ModelSelectedLocation = function (center, radius) {
                 var self = this,
@@ -108,7 +189,36 @@ define(["ko", "gmaps", "underscore", "moment", "jquery"],
                 this.radius = _radius;
                 this.geoName = _geoName;
                 this.bounds = _bounds;
-            };
+            }
+        ModelFoursquareCheckin = function (rowCheckin, shortUrl) {
+            this.id = rowCheckin.id;
+            this.checkinUrl = shortUrl;
+            this.shout = rowCheckin.shout;
+            this.userId = rowCheckin.user && rowCheckin.user.id;
+            this.userFullName = (rowCheckin.user && rowCheckin.user.firstName) ? rowCheckin.user.firstName : "" + " " + (rowCheckin.user && rowCheckin.user.lastName) ? rowCheckin.user.lastName : "";
+            if (rowCheckin.user) {
+                this.userAvatarUrl = rowCheckin.user.photo.prefix + "100x100" + rowCheckin.user.photo.suffix;
+            } else {
+                this.userAvatarUrl = null;
+            }
+            this.venueId = rowCheckin.venue && rowCheckin.venue.id;
+            this.venueName = rowCheckin.venue && rowCheckin.venue.name;
+            this.venueUrl = rowCheckin.venue && ("https://foursquare.com/v/" + this.venueId);
+            this.lat = (rowCheckin.location && rowCheckin.location.lat) || (rowCheckin.venue && rowCheckin.venue.location && rowCheckin.venue.location.lat);
+            this.lng = (rowCheckin.location && rowCheckin.location.lng) || (rowCheckin.venue && rowCheckin.venue.location && rowCheckin.venue.location.lng);
+            if (rowCheckin.venue && rowCheckin.venue.categories && rowCheckin.venue.categories.length) {
+                this.iconUrl = rowCheckin.venue.categories[0].icon.prefix + "32" + rowCheckin.venue.categories[0].icon.suffix;
+                this.venueCategoryName = rowCheckin.venue.categories[0].name;
+            } else {
+                this.iconUrl = null;
+                this.venueCategoryName = null;
+            }
+            if (rowCheckin.photos.count) {
+                this.thumbnailUrl = rowCheckin.photos.items[0].prefix + "100x100" + rowCheckin.photos.items[0].suffix;
+            } else {
+                this.thumbnailUrl = null;
+            }
+        };
 
         ModelTweet.prototype._readGeocodeComputed = function () {
             var geocodeUnwrapped = this.geocodeObservable();
@@ -128,6 +238,26 @@ define(["ko", "gmaps", "underscore", "moment", "jquery"],
         };
         ModelTweet.prototype._coordsToString = function (coordinates) {
             return "Lat: " + coordinates.coordinates[1].toLocaleString() + " Lng: " + coordinates.coordinates[0].toLocaleString();
+        };
+        ModelTweet.prototype._readFoursquareCheckinComputed = function () {
+            var foursquareCheckinUnwrapped = this.foursquareCheckinObservable(),
+                shortUrl,
+                self = this;
+            if (_.isUndefined(foursquareCheckinUnwrapped)) {
+                shortUrl = getFoursquareUrlFrom(this);
+                if (shortUrl) {
+                    getFoursquareCheckinData(shortUrl, function (error, data) {
+                        if (!error && data && data.data && data.data.response && data.data.response.checkin) {
+                            self.foursquareCheckinObservable(new ModelFoursquareCheckin(data.data.response.checkin, shortUrl));
+                        } else {
+                            self.foursquareCheckinObservable(null);
+                        }
+                    });
+                } else {
+                    self.foursquareCheckinObservable(null);
+                }
+            }
+            return foursquareCheckinUnwrapped;
         };
 
         ModelSelectedLocation.prototype.calcBounds = function () {

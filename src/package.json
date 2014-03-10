@@ -13,6 +13,7 @@
         "underscore": "*",
         "ws": "*",
         "maxmind-db-reader": "*",
-        "less-middleware": "*"
+        "less-middleware": "*",
+        "request": "*"
     }
 }

@@ -4,6 +4,7 @@
 @colorGray: darkgray;
 @colorBackgroundHover: rgba(0, 153, 185, 0.1);
 @colorBackgroundSmallInfo: rgba(235, 200, 148, 1);
+@colorFoursquare: #1DAFEC;
 
 /***  mixins  ***/
 .fontText(@fontSize: 14px) {
@@ -43,6 +44,14 @@ button{
   span:last-child {
     margin-right: 0;
   }
+}
+
+.clear{
+  clear: both;
+}
+
+.left{
+  float: left;
 }
 
 .no-decoration {
@@ -226,6 +235,34 @@ ul {
     padding-bottom: @marginSmall;
     p, ul {
       margin-bottom: @marginSmall;
+    }
+
+    .tweet-checkin{
+      fieldset{
+        border: solid 1px @colorFoursquare;
+        border-radius: 4px;
+        padding: @marginSmall;
+        legend{
+          font-size: smaller;
+          color: @colorFoursquare;
+        }
+      }
+      span{
+        color: #000000;
+      }
+      .icon{
+        background: @colorFoursquare; /* foursquare color */
+        border-radius: 4px;
+        margin-right: @marginSmall;
+        margin-bottom: @marginSmall;
+      }
+      .tweet-media-thumb{
+        margin-right: @marginSmall;
+        margin-bottom: @marginSmall;
+      }
+      .full-name{
+        font-weight: bold;
+      }
     }
   }
 

@@ -33,6 +33,7 @@ exports.index = function (req, res) {
             }
             res.render('index', indexVm);
         } else {
+            indexVm.authError = error && error.data && error.data.message;
             res.render('login', indexVm);
         }
     });

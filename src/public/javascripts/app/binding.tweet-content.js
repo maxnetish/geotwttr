@@ -151,38 +151,20 @@ define(["ko", "jquery", "moment", "underscore"],
                         $element.html(momentCreated.format(dateFormat));
                     }
                 },
-                body=$("body").get(0),
-                isElementInViewport = function ($element, fullVisible) {
-                    var $window = $(window),
-                        viewport = {
-                            top: $window.scrollTop(),
-                            left: $window.scrollLeft()
-                        },
-                        bounds;
-
-                    if (!$element.is(":visible")) {
-                        return false;
-                    }else{
-                        console.log("[LAZY] $element visible!")
-                    }
-
-                    viewport.right = viewport.left + $window.width();
-                    viewport.bottom = viewport.top + $window.height();
-
-                    bounds = $element.offset();
-                    bounds.right = bounds.left + $element.outerWidth();
-                    bounds.bottom = bounds.top + $element.outerHeight();
-
+                isElementInViewport = function ($element, $scroller, fullVisible) {
+                    var scrollerBounds, elementBounds;
+                    scrollerBounds = $scroller.get(0).getBoundingClientRect();
+                    elementBounds = $element.get(0).getBoundingClientRect();
                     if (fullVisible) {
-                        return viewport.top <= bounds.top
-                            && viewport.right >= bounds.right
-                            && viewport.left <= bounds.left
-                            && viewport.bottom >= bounds.bottom;
+                        return scrollerBounds.top <= elementBounds.top
+                            && scrollerBounds.right >= elementBounds.right
+                            && scrollerBounds.left <= elementBounds.left
+                            && scrollerBounds.bottom >= elementBounds.bottom;
                     }
-                    return (!(viewport.right < bounds.left
-                        || viewport.left > bounds.right
-                        || viewport.bottom < bounds.top
-                        || viewport.top > bounds.bottom));
+                    return (!(scrollerBounds.right < elementBounds.left
+                        || scrollerBounds.left > elementBounds.right
+                        || scrollerBounds.bottom < elementBounds.top
+                        || scrollerBounds.top > elementBounds.bottom));
                 },
                 tweetClickHandler = function (event) {
                     var $target = $(event.target);
@@ -215,73 +197,82 @@ define(["ko", "jquery", "moment", "underscore"],
                 }
             };
 
+            var ImageLoaderWhenScrollInView = function (element, valueAccessor) {
+                var self = this;
+
+                this.$element = $(element);
+                this.options = valueAccessor();
+                this.$scrollContainer = $(this.options.container);
+                this.eventId = _.uniqueId(".scroll_");
+                this.srcSubscribeHandler;
+                this.checkVisibilityHandler;
+
+                if (!this.options.src) {
+                    return;
+                }
+
+                this.prepareElement();
+                if (ko.isObservable(this.options.src)) {
+                    if (this.options.src()) {
+                        this.waitForBecomeVisible();
+                    } else {
+                        this.srcSubscribeHandler = this.options.src.subscribe(function (srcUnwrapped) {
+                            if (srcUnwrapped) {
+                                this.waitForBecomeVisible();
+                                this.srcSubscribeHandler.dispose();
+                            }
+                        }, this);
+                    }
+                } else if (this.options.src) {
+                    _.defer(_.bind(this.waitForBecomeVisible, this));
+                }
+            };
+            ImageLoaderWhenScrollInView.prototype.body = $("body").get(0);
+            ImageLoaderWhenScrollInView.prototype.isElementInViewport = isElementInViewport;
+            ImageLoaderWhenScrollInView.prototype.prepareElement = function () {
+                this.$element.addClass("hided");
+            };
+            ImageLoaderWhenScrollInView.prototype.setImgSrc = function () {
+                var self = this;
+                this.$element.one("load error", function () {
+                    self.$element.removeClass("hided");
+                });
+                this.$element.attr("src", ko.utils.unwrapObservable(this.options.src));
+            };
+            ImageLoaderWhenScrollInView.prototype.checkVisibility = function () {
+                if (!this.body.contains(this.$element.get(0))) {
+                    this.disposeEventHandlers();
+                    return false;
+                }
+                if (this.isElementInViewport(this.$element, this.$scrollContainer, true)) {
+                    this.disposeEventHandlers();
+                    this.setImgSrc();
+                    return true;
+                }
+                return false;
+            };
+            ImageLoaderWhenScrollInView.prototype.disposeEventHandlers = function () {
+                this.$scrollContainer.off(this.eventId);
+                $(window).off(this.eventId);
+                if (this.checkVisibilityHandler) {
+                    this.checkVisibilityHandler.dispose();
+                    this.checkVisibilityHandler = null;
+                }
+            };
+            ImageLoaderWhenScrollInView.prototype.waitForBecomeVisible = function () {
+                var debouncedCheckVisibility = _.bind(_.debounce(this.checkVisibility, 1000), this);
+                if (!this.checkVisibility()) {
+                    this.$scrollContainer.on("scroll" + this.eventId, debouncedCheckVisibility);
+                    $(window).on("resize" + this.eventId, debouncedCheckVisibility);
+                    if (ko.isObservable(this.options.checkVisibility)) {
+                        this.checkVisibilityHandler = this.options.checkVisibility.subscribe(this.checkVisibility, this);
+                    }
+                }
+            };
+
             ko.bindingHandlers.lazyLoadingImage = {
                 init: function (element, valueAccessor) {
-                    var $element = $(element),
-                        options = valueAccessor(),
-                        $scrollContainer = $(options.container),
-                        eventId = _.uniqueId(".scroll_"),
-                        srcSubscribeHandler,
-                        checkVisibilityHandler,
-                        prepareElement = function () {
-                            $element.addClass("hided");
-                        },
-                        setImgSrc = function () {
-                            $element.one("load error", function () {
-                                $element.removeClass("hided");
-                            });
-                            $element.attr("src", ko.utils.unwrapObservable(options.src));
-                        },
-                        waitForBecomeVisible = function () {
-                            var checkVisibility = function () {
-                                if(!body.contains($element.get(0))){
-                                    $scrollContainer.off(eventId);
-                                    $(window).off(eventId);
-                                    if (checkVisibilityHandler) {
-                                        checkVisibilityHandler.dispose();
-                                        checkVisibilityHandler = null;
-                                    }
-                                    return false;
-                                }
-                                if (isElementInViewport($element, true)) {
-                                    $scrollContainer.off(eventId);
-                                    $(window).off(eventId);
-                                    if (checkVisibilityHandler) {
-                                        checkVisibilityHandler.dispose();
-                                        checkVisibilityHandler = null;
-                                    }
-                                    setImgSrc();
-                                    return true;
-                                }
-
-                                return false;
-                            };
-                            if (!checkVisibility()) {
-                                $scrollContainer.on("scroll" + eventId, _.debounce(checkVisibility, 500));
-                                $(window).on("resize" + eventId, _.debounce(checkVisibility, 500));
-                                if (ko.isObservable(options.checkVisibility)) {
-                                    checkVisibilityHandler = options.checkVisibility.subscribe(checkVisibility);
-                                }
-                            }
-                        };
-                    if (!options.src) {
-                        return;
-                    }
-                    prepareElement();
-                    if (ko.isObservable(options.src)) {
-                        if (options.src()) {
-                            waitForBecomeVisible();
-                        } else {
-                            srcSubscribeHandler = options.src.subscribe(function (srcUnwrapped) {
-                                if (srcUnwrapped) {
-                                    waitForBecomeVisible();
-                                    srcSubscribeHandler.dispose();
-                                }
-                            });
-                        }
-                    } else if (options.src) {
-                        _.defer(waitForBecomeVisible);
-                    }
+                    var loader = new ImageLoaderWhenScrollInView(element, valueAccessor);
                 }
             };
             ko.bindingHandlers.tweetCustomEvents = {
