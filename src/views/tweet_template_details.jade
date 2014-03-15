@@ -1,4 +1,4 @@
-div.details(data-bind="if: details, visible: details")
+section.details(data-bind="if: details, visible: details")
     p.tweet-meta(data-bind="if: $data.coordinates")
         button.entity.notoggle(data-bind="click: showOnMapCoord")
             span.tweet-geocode(data-bind="text: geocodeComputed")
@@ -12,7 +12,7 @@ div.details(data-bind="if: details, visible: details")
     p.tweet-meta
         span.tweet-lang(data-bind="visible: lang, text: lang")
         span.tweet-source.notoggle(data-bind="html: source")
-    div.tweet-checkin(data-bind="with: foursquareCheckinComputed")
+    section.tweet-checkin(data-bind="with: foursquareCheckinComputed")
         fieldset
             legend Foursquare checkin
             a.no-decoration(target="_blank", data-bind="attr: {href: venueUrl}")

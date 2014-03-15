@@ -1,8 +1,9 @@
 /**
  * Created by max on 02.01.14.
  */
-define(["ko", "jquery", "moment", "underscore"],
-    function (ko, $, moment, _) {
+define(["ko", "jquery", "moment", "underscore", "youtube-player"],
+    function (ko, $, moment, _, youtubePlayer) {
+
         (function () {
             var entityTypes = {
                     MEDIA: "media",
@@ -148,7 +149,7 @@ define(["ko", "jquery", "moment", "underscore"],
                         } else {
                             dateFormat = "lll";
                         }
-                        $element.html(momentCreated.format(dateFormat));
+                        $element.html(momentCreated.format(dateFormat)).attr('datetime', momentCreated.toISOString());
                     }
                 },
                 isElementInViewport = function ($element, $scroller, fullVisible) {
