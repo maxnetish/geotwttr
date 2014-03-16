@@ -14,6 +14,21 @@ define(["ko", "gmaps", "underscore", "moment", "jquery"],
                 [
                     "://4sq.com/"
                 ],
+            ytRegexPattern = /\/\/(?:www\.)?youtu(?:\.be|be\.com)\/(?:watch\?v=|embed\/)?([a-z0-9_\-]+)/i,
+            detectAndExtractYtIds = function (tweet) {
+                var urls = tweet && tweet.entities && tweet.entities.urls;
+                var result = [];
+                _.each(urls, function (urlEntity) {
+                    var matches = ytRegexPattern.exec(urlEntity.expanded_url);
+                    if (matches && matches.length > 1) {
+                        result.push(matches[1])
+                    }
+                });
+                if (result.length) {
+                    return result;
+                }
+                return null;
+            },
             detectFoursquareUrl = function (urlToTest) {
                 if (!_.isString(urlToTest)) {
                     return false;
@@ -162,6 +177,7 @@ define(["ko", "gmaps", "underscore", "moment", "jquery"],
                     deferEvaluation: true,
                     owner: this
                 });
+                this.youtubeVideos = detectAndExtractYtIds(this);
             },
             ModelSelectedLocation = function (center, radius) {
                 var self = this,

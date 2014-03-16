@@ -19,7 +19,7 @@ define(["jquery", "underscore"],
         };
 
         var initBeforeCreateInstance = function (callback) {
-            if (_.isUndefined(YT) || _.isUndefined(YT.Player)) {
+            if (_.isUndefined(window.YT) || _.isUndefined(window.YT.Player)) {
                 onYouTubeIframeAPIReadyCallbacks.push(callback);
                 $.getScript('//www.youtube.com/iframe_api');
             } else {

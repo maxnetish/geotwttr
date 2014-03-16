@@ -1,17 +1,18 @@
 section.details(data-bind="if: details, visible: details")
-    p.tweet-meta(data-bind="if: $data.coordinates")
-        button.entity.notoggle(data-bind="click: showOnMapCoord")
-            span.tweet-geocode(data-bind="text: geocodeComputed")
-    p.tweet-meta(data-bind="if: place && place.bounding_box")
-        button.entity.notoggle(data-bind="click: showOnMapPlace")
-            span.tweet-near(data-bind="text: place.full_name")
-    ul.tweet-media-list(data-bind="foreach: mediaList")
-        li.tweet-media-element
-            a(target="_blank", data-bind="attr: {href: expandedUrl}")
-                img.tweet-media-thumb.notoggle(data-bind="lazyLoadingImage: {container: 'ul#tweet-list', src: thumbnailUrl, checkVisibility: $parent.checkVisibility}")
-    p.tweet-meta
-        span.tweet-lang(data-bind="visible: lang, text: lang")
-        span.tweet-source.notoggle(data-bind="html: source")
+    section
+        p.tweet-meta(data-bind="if: $data.coordinates")
+            button.entity.notoggle(data-bind="click: showOnMapCoord")
+                span.tweet-geocode(data-bind="text: geocodeComputed")
+        p.tweet-meta(data-bind="if: place && place.bounding_box")
+            button.entity.notoggle(data-bind="click: showOnMapPlace")
+                span.tweet-near(data-bind="text: place.full_name")
+        ul.tweet-media-list(data-bind="foreach: mediaList")
+            li.tweet-media-element
+                a(target="_blank", data-bind="attr: {href: expandedUrl}")
+                    img.tweet-media-thumb.notoggle(data-bind="lazyLoadingImage: {container: 'ul#tweet-list', src: thumbnailUrl, checkVisibility: $parent.checkVisibility}")
+        p.tweet-meta
+            span.tweet-lang(data-bind="visible: lang, text: lang")
+            span.tweet-source.notoggle(data-bind="html: source")
     section.tweet-checkin(data-bind="with: foursquareCheckinComputed")
         fieldset
             legend Foursquare checkin
@@ -34,4 +35,7 @@ section.details(data-bind="if: details, visible: details")
                 a.no-decoration(target="_blank", data-bind="attr: {href: checkinUrl}")
                     span.full-name(data-bind="text: userFullName")
             div.clear
-
+    section.tweet-video(data-bind="with: $data.youtubeVideos")
+        ul.tweet-video-list(data-bind="foreach: $data")
+            li(data-bind="youtubeIframe: {iframe: '.yt-iframe', id: $data}")
+                div.yt-iframe

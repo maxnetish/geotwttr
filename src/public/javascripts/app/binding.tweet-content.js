@@ -286,5 +286,43 @@ define(["ko", "jquery", "moment", "underscore", "youtube-player"],
                     });
                 }
             };
+            ko.bindingHandlers.youtubeIframe = {
+                init: function (element, valueAccessor) {
+                    var options = valueAccessor() || {},
+                        maxWidth = 400,
+                        $element = $(element),
+                        elementWidth,
+                        $targetContainer = $(options.iframe, $element),
+                        targetContainerId = _.uniqueId("gs_yt_iframe_"),
+                        youtubeOptions = {
+                            videoId: options.id,
+                            playerVars: {
+                                autohide: 2,
+                                autoplay: 0,
+                                controls: 1,
+                                modestbranding: 1,
+                                rel: 0
+                            }
+                        },
+                        iframeWidth, iframeHeight;
+
+                    _.defer(function(){
+                        elementWidth=$element.parent().width();
+                        if (elementWidth > maxWidth) {
+                            iframeWidth = maxWidth;
+                        } else {
+                            iframeWidth = elementWidth;
+                        }
+                        iframeHeight = iframeWidth * 2 / 3;
+                        youtubeOptions.height = iframeHeight;
+                        youtubeOptions.width = iframeWidth;
+                        $targetContainer.attr("id", targetContainerId);
+                        youtubePlayer.createPlayerInstance(targetContainerId, youtubeOptions, function () {
+                            var foo=arguments;
+                        });
+                    });
+
+                }
+            };
         })();
     });

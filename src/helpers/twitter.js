@@ -134,7 +134,7 @@ var store = require('./store').store,
                 }
             },
             _onChunkReceived = function (chunk) {
-                console.log("Chunk received len=" + chunk.length);
+                //console.log("Chunk received len=" + chunk.length);
                 _buffer += chunk.toString();
                 var rnPosition = _buffer.indexOf("\r\n");
                 var holeTweet;
@@ -163,7 +163,7 @@ var store = require('./store').store,
                 _eventHandlersExecutor.onTweetReceived(oneTweet);
             },
             _onCloseConnection = function () {
-                console.log("Close connection");
+                //console.log("Close connection");
                 _eventHandlersExecutor.onCloseConnection();
             },
             _onError = function (error, data) {
@@ -203,7 +203,7 @@ var store = require('./store').store,
                     _onError(err);
                 });
                 _streamRequest.on('response', function (responseLocal) {
-                    console.log("Get response");
+                    //console.log("Get response");
 
                     _streamResponse = responseLocal;
                     _streamResponse.setEncoding('utf8');
