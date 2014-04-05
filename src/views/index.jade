@@ -10,9 +10,20 @@ block content
     h1.text-center= title
     div.view
         h2.text-center(data-bind='text: title')
-        div.pane-left.pane
-            input.geo-autocomplete(data-bind="geoAutocomplete: '.gmap'", type="search")
-            div.gmap(data-bind='gmap: selectedLocation, statusOnMap: statusOnMap, setHeight: needSetHeight')
+        div.pane-left.pane(data-bind='css: {"control-hide": controlPanelHide}')
+            div.pane.gmap-column
+                input.geo-autocomplete(data-bind="geoAutocomplete: '.gmap'", type="search")
+                div.gmap(data-bind='gmap: selectedLocation, statusOnMap: statusOnMap, setHeight: needSetHeight')
+            div.pane.control-column
+                div.controls(data-bind='setHeight: needSetHeight')
+                    button.show-hide-controls(data-bind='click: toggleControlPanel')
+                        span.icon.icon-equalizer
+                    div.clear
+                    div.control-table(data-bind='foreach: settings')
+                        div.control-item
+                            label.control-label(data-bind='attr: {"for": id, title: promptOrTitle}, text: name', for='use-stream-api')
+                            div.control-element
+                                input.control-element(data-bind='attr: {"id": id, "type": type, placeholder: promptOrTitle}, value: realValue, checked: checked', type='text')
         div.pane-right.pane
             ul#tweet-list.scroll(data-bind='setHeight: needSetHeight')
                 button.button-show-incoming(data-bind='visible: hidedIncomingCount()>0, click: showHidedStatuses', style='display: none;')

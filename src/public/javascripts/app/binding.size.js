@@ -20,7 +20,7 @@ define(["ko", "jquery", "underscore", "gmaps"],
                         });
                         var paneContainerOffset = $paneContainer.offset();
                         var availablePaneHeight = $window.height() - paneContainerOffset.top;
-                        var availableHeightForElement = availablePaneHeight - siblingsHeight - 41;    //magic
+                        var availableHeightForElement = availablePaneHeight - siblingsHeight - 46;    //magic
                         $element.height(availableHeightForElement);
 
                         //костыль для gmap:

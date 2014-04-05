@@ -1,8 +1,8 @@
 /**
  * Created by max on 05.01.14.
  */
-define(["ko", "underscore", "models", "jquery", "moment", "gmaps", "logger"],
-    function (ko, _, models, $, moment, gmaps, logger) {
+define(["ko", "underscore", "models", "jquery", "moment", "gmaps", "logger", "config"],
+    function (ko, _, models, $, moment, gmaps, logger, config) {
         var StatusesSet = function (srcDataservice, $container, template) {
             var self = this,
                 _filterModel,
@@ -11,6 +11,12 @@ define(["ko", "underscore", "models", "jquery", "moment", "gmaps", "logger"],
                 $template = $(template),
                 $upperElement = $container.children().first(),
                 _restLoadingState = ko.observable(false),
+                _pollNewStatusesIntervalId,
+                statusSrc = {
+                    NONE: 0,
+                    REST: 1,
+                    STREAM: 2
+                },
                 geocoder = new gmaps.Geocoder(),
 
                 _insertIntoList = function (statusToInsert) {
@@ -78,7 +84,7 @@ define(["ko", "underscore", "models", "jquery", "moment", "gmaps", "logger"],
                     self.statusOnMap(data.place);
                 },
 
-                _preprocessStreamResponse = function (message) {
+                _preprocessResponse = function (message) {
                     if (message.disconnect || message.tweet.disconnect) {
                         logger.log("Hmm... Disconnect.", logger.severity.ERROR);
                         logger.dir(message);
@@ -105,33 +111,37 @@ define(["ko", "underscore", "models", "jquery", "moment", "gmaps", "logger"],
                     self.statusOnMap(null);
                 },
 
-                _onReceivedFromRest = function (message) {
-                    _restLoadingState(false);
-                    var status = _extractStatus(message);
-                    if (status && status.id) {
-                        status.visible(true);
-                        _.defer(_insertIntoList, status);
+                _onReceiveMessage = function (options, message) {
+                    var status, showImmediate, src;
+                    options = options || {};
+                    showImmediate = !!options.showImmediate;
+                    src = options.src || statusSrc.NONE;
+                    _preprocessResponse(message);
+                    status = _extractStatus(message);
+                    if (!status || !status.id) {
+                        return;
+                    }
+                    status.visible(showImmediate);
+                    status.srcApi = src;
+                    _.defer(_insertIntoList, status);
+                    if (showImmediate) {
                         _debounceCheckVisibilityNeeded();
+                    }
+                    if (showImmediate && _restLoadingState()) {
+                        _restLoadingState(false);
                     }
                 },
 
-                _onReceivedFromStream = function (message) {
-                    _preprocessStreamResponse(message);
-                    var status = _extractStatus(message);
-                    if (status && status.id) {
-                        if (self.setStreamedTweetsVisible()) {
-                            status.visible(true);
-                        } else {
-                            status.visible(false);
-                        }
-                        _.defer(_insertIntoList, status);
-                        //_debounceCheckVisibilityNeeded();
-                    }
+                _getOnReceiveMessageCallback = function (options) {
+                    return _.partial(_onReceiveMessage, options);
                 },
 
                 _startStreaming = function () {
                     if (_requestsId.length === 0) {
-                        _requestsId.push(srcDataservice.beginFilterStreamUpdates(_filterModel, _onReceivedFromStream));
+                        _requestsId.push(srcDataservice.beginFilterStreamUpdates(_filterModel, _getOnReceiveMessageCallback({
+                            showImmediate: false,
+                            src: statusSrc.STREAM
+                        })));
                     }
                 },
 
@@ -142,34 +152,69 @@ define(["ko", "underscore", "models", "jquery", "moment", "gmaps", "logger"],
                     _requestsId.length = 0;
                 },
 
+                _requestNewStatusesRest = function () {
+                    var minId;
+
+                    if (!_statusesArray.length) {
+                        return;
+                    }
+
+                    minId = _.find(_statusesArray,function (oneStatus) {
+                        return oneStatus.srcApi === statusSrc.REST;
+                    }).id_str;
+                    _requestsId.push(srcDataservice.requestSearchRestApi(_filterModel, _getOnReceiveMessageCallback({
+                        showImmediate: false,
+                        src: statusSrc.REST
+                    }), undefined, minId));
+                },
+
+                _startPollNewStatuses = function () {
+                    _stopPollNewStatuses();
+                    _pollNewStatusesIntervalId = setInterval(_requestNewStatusesRest, config.newStatusesPollInterval);
+                },
+
+                _stopPollNewStatuses = function () {
+                    if (_pollNewStatusesIntervalId) {
+                        clearInterval(_pollNewStatusesIntervalId);
+                        _pollNewStatusesIntervalId = null;
+                    }
+                },
+
                 _checkVisibility = ko.observable(false),
                 _debounceCheckVisibilityNeeded = _.debounce(function () {
                     _checkVisibility.valueHasMutated();
                 }, 500);
 
             this.requestMorePrevious = function () {
+                var maxId;
                 if (!_filterModel) {
                     return;
                 }
-                var maxId = _.min(_statusesArray,function (oneStatus) {
-                    return oneStatus.id_str;
-                }).id_str;
+                maxId = _.last(_statusesArray).id_str;
                 //maxId = maxId - 1;
                 _restLoadingState(true);
-                _requestsId.push(srcDataservice.requestSearchRestApi(_filterModel, _onReceivedFromRest, maxId - 1));
+                _requestsId.push(srcDataservice.requestSearchRestApi(_filterModel, _getOnReceiveMessageCallback({
+                    showImmediate: true,
+                    src: statusSrc.REST
+                }), maxId - 1));
             };
 
             this.filter = function (newFilterModel) {
                 if (!newFilterModel) {
                     return _filterModel;
                 }
-                if (newFilterModel instanceof models.ModelSelectedLocation) {
+                if (newFilterModel instanceof models.ModelSelection) {
+                    _stopPollNewStatuses();
                     self.stopStreaming();
                     _filterModel = newFilterModel;
                     _resetList();
                     _restLoadingState(true);
-                    srcDataservice.requestSearchRestApi(_filterModel, _onReceivedFromRest);
+                    srcDataservice.requestSearchRestApi(_filterModel, _getOnReceiveMessageCallback({
+                        showImmediate: true,
+                        src: statusSrc.REST
+                    }));
                     self.startStreaming();
+                    _startPollNewStatuses();
                     return _filterModel;
                 }
                 throw "Unknown filter model";
@@ -192,7 +237,7 @@ define(["ko", "underscore", "models", "jquery", "moment", "gmaps", "logger"],
                 });
                 _.defer(_checkVisibility.valueHasMutated);
             };
-            this.setStreamedTweetsVisible = ko.observable(false);
+            // this.setStreamedTweetsVisible = ko.observable(false);
             this.restLoadingState = _restLoadingState;
         };
 

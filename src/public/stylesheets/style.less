@@ -18,7 +18,7 @@
   }
 }
 
-.transition-opacity(@duration: 0.3s){
+.transition-opacity(@duration: 0.3s) {
   transition: opacity @duration ease;
 }
 
@@ -33,7 +33,7 @@ iframe.twitter-follow-button {
   margin-right: auto;
 }
 
-button{
+button {
   border: solid 1px darkgray;
   border-radius: 3px;
   background: lightgray;
@@ -46,11 +46,11 @@ button{
   }
 }
 
-.clear{
+.clear {
   clear: both;
 }
 
-.left{
+.left {
   float: left;
 }
 
@@ -108,11 +108,57 @@ ul {
     text-align: left;
     vertical-align: top;
     margin: @marginSmall;
+    transition: width 0.3s ease;
     &.pane-left {
-      width: 60%;
+      width: calc(~"66.66% - 10px");
+      .gmap-column {
+        width: calc(~"60% - 10px");
+      }
+      .control-column {
+        overflow: hidden;
+        width: calc(~"40% - 12px");
+        .controls {
+          .control-table {
+            display: table;
+            width: 100%;
+            .control-item {
+              display: table-row;
+              .control-label {
+                display: table-cell;
+              }
+              .control-element {
+                display: table-cell;
+                text-align: right;
+                & > *{
+                  text-align: initial;
+                }
+              }
+            }
+          }
+        }
+      }
+      .show-hide-controls {
+        float: right;
+      }
+    }
+    &.pane-left.control-hide {
+      .gmap-column {
+        width: calc(~"100% - 54px");
+      }
+      .control-column {
+        width: 32px;
+        .controls {
+          .control-item {
+            display: none;
+          }
+        }
+      }
+      .show-hide-controls {
+
+      }
     }
     &.pane-right {
-      width: 30%;
+      width: calc(~"33.33% - 12px");
     }
   }
   .button-show-incoming,
@@ -123,7 +169,7 @@ ul {
 
 .gmap {
   width: 100%;
-  height: 526px;
+  height: 100%;
 }
 
 .geo-autocomplete {
@@ -173,7 +219,7 @@ ul {
     vertical-align: top;
     opacity: 1;
     .transition-opacity();
-    &.hided{
+    &.hided {
       opacity: 0;
     }
   }
@@ -226,8 +272,8 @@ ul {
   }
   button {
     margin-right: 1em;
-    span{
-        color: initial;
+    span {
+      color: initial;
     }
   }
   .details {
@@ -237,40 +283,39 @@ ul {
       margin-bottom: @marginSmall;
     }
 
-    .tweet-checkin{
-      fieldset{
+    .tweet-checkin {
+      fieldset {
         border: solid 1px @colorFoursquare;
         border-radius: 4px;
         padding: @marginSmall;
-        legend{
+        legend {
           font-size: smaller;
           color: @colorFoursquare;
         }
       }
-      span{
+      span {
         color: #000000;
       }
-      .icon{
+      .icon {
         background: @colorFoursquare; /* foursquare color */
         border-radius: 4px;
         margin-right: @marginSmall;
         margin-bottom: @marginSmall;
       }
-      .tweet-media-thumb{
+      .tweet-media-thumb {
         margin-right: @marginSmall;
         margin-bottom: @marginSmall;
       }
-      .full-name{
+      .full-name {
         font-weight: bold;
       }
     }
 
-    .tweet-video-list{
+    .tweet-video-list {
       width: 100%;
-      li{
+      li {
 
-        .yt-iframe{
-
+        .yt-iframe {
 
         }
       }
@@ -284,17 +329,17 @@ ul {
     min-width: 3em;
     opacity: 1;
     .transition-opacity();
-    &.hided{
+    &.hided {
       opacity: 0;
     }
   }
 
-  .tweet-media-element{
+  .tweet-media-element {
     display: inline-block;
     position: relative;
   }
 
-  .thumb-zoom{
+  .thumb-zoom {
     position: absolute;
     top: 0.5em;
     right: 0.5em;

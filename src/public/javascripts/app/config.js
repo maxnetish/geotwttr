@@ -5,6 +5,7 @@ define(["cookies"], function (docCookies) {
     var debug = true,
         ipGeocode = null,
         coordinatesKey = "coord",
+        newStatusesPollInterval = 60 * 1000,
         setCoord = function (coord) {
             docCookies.setItem(coordinatesKey, JSON.stringify(coord), Infinity);
         },
@@ -31,6 +32,7 @@ define(["cookies"], function (docCookies) {
     return{
         debug: debug,
         ipGeocode: ipGeocode,
-        coordinates: coordinates
+        coordinates: coordinates,
+        newStatusesPollInterval: newStatusesPollInterval
     };
 });

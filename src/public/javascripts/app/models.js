@@ -142,6 +142,7 @@ define(["ko", "gmaps", "underscore", "moment", "jquery"],
 
                 this.details = ko.observable(false);
                 this.visible = ko.observable(false);
+                this.srcApi = 0;
                 this.isRetweet = !!rowTweet.retweeted_status;
                 this.id_str = rowTweet.id_str;
                 this.id = rowTweet.id;
@@ -179,7 +180,7 @@ define(["ko", "gmaps", "underscore", "moment", "jquery"],
                 });
                 this.youtubeVideos = detectAndExtractYtIds(this);
             },
-            ModelSelectedLocation = function (center, radius) {
+            ModelSelection = function (center, radius) {
                 var self = this,
                     _center,
                     _radius,
@@ -205,36 +206,76 @@ define(["ko", "gmaps", "underscore", "moment", "jquery"],
                 this.radius = _radius;
                 this.geoName = _geoName;
                 this.bounds = _bounds;
-            }
-        ModelFoursquareCheckin = function (rowCheckin, shortUrl) {
-            this.id = rowCheckin.id;
-            this.checkinUrl = shortUrl;
-            this.shout = rowCheckin.shout;
-            this.userId = rowCheckin.user && rowCheckin.user.id;
-            this.userFullName = (rowCheckin.user && rowCheckin.user.firstName) ? rowCheckin.user.firstName : "" + " " + (rowCheckin.user && rowCheckin.user.lastName) ? rowCheckin.user.lastName : "";
-            if (rowCheckin.user) {
-                this.userAvatarUrl = rowCheckin.user.photo.prefix + "100x100" + rowCheckin.user.photo.suffix;
-            } else {
-                this.userAvatarUrl = null;
-            }
-            this.venueId = rowCheckin.venue && rowCheckin.venue.id;
-            this.venueName = rowCheckin.venue && rowCheckin.venue.name;
-            this.venueUrl = rowCheckin.venue && ("https://foursquare.com/v/" + this.venueId);
-            this.lat = (rowCheckin.location && rowCheckin.location.lat) || (rowCheckin.venue && rowCheckin.venue.location && rowCheckin.venue.location.lat);
-            this.lng = (rowCheckin.location && rowCheckin.location.lng) || (rowCheckin.venue && rowCheckin.venue.location && rowCheckin.venue.location.lng);
-            if (rowCheckin.venue && rowCheckin.venue.categories && rowCheckin.venue.categories.length) {
-                this.iconUrl = rowCheckin.venue.categories[0].icon.prefix + "32" + rowCheckin.venue.categories[0].icon.suffix;
-                this.venueCategoryName = rowCheckin.venue.categories[0].name;
-            } else {
-                this.iconUrl = null;
-                this.venueCategoryName = null;
-            }
-            if (rowCheckin.photos.count) {
-                this.thumbnailUrl = rowCheckin.photos.items[0].prefix + "100x100" + rowCheckin.photos.items[0].suffix;
-            } else {
-                this.thumbnailUrl = null;
-            }
-        };
+            },
+            ModelSetting = function (plainSettings) {
+                plainSettings = plainSettings || {};
+                this.name = plainSettings.name || "Name";
+                this.value = ko.observable(plainSettings.value);
+                this.type = plainSettings.type || "text";
+                this.promptOrTitle = plainSettings.promptOrTitle || null;
+                this.id = plainSettings.ID || _.uniqueId("setting_");
+                this.checked = ko.computed({
+                    read: function () {
+                        if(this.type==="checkbox" || this.type==="radio"){
+                            return this.value();
+                        }else{
+                            return null;
+                        }
+                    },
+                    write: function (val) {
+                        if(this.type==="checkbox" || this.type==="radio"){
+                            this.value(val);
+                        }
+                    },
+                    owner: this
+                });
+                this.realValue=ko.computed({
+                    read: function(){
+                        if(this.type==="checkbox" || this.type==="radio"){
+                            return this.name;
+                        }else{
+                            return this.value();
+                        }
+                    },
+                    write: function(val){
+                        if(this.type==="checkbox" || this.type==="radio"){
+                            // nothing, wrong case
+                        }else{
+                            this.value(val);
+                        }
+                    },
+                    owner: this
+                });
+            },
+            ModelFoursquareCheckin = function (rowCheckin, shortUrl) {
+                this.id = rowCheckin.id;
+                this.checkinUrl = shortUrl;
+                this.shout = rowCheckin.shout;
+                this.userId = rowCheckin.user && rowCheckin.user.id;
+                this.userFullName = (rowCheckin.user && rowCheckin.user.firstName) ? rowCheckin.user.firstName : "" + " " + (rowCheckin.user && rowCheckin.user.lastName) ? rowCheckin.user.lastName : "";
+                if (rowCheckin.user) {
+                    this.userAvatarUrl = rowCheckin.user.photo.prefix + "100x100" + rowCheckin.user.photo.suffix;
+                } else {
+                    this.userAvatarUrl = null;
+                }
+                this.venueId = rowCheckin.venue && rowCheckin.venue.id;
+                this.venueName = rowCheckin.venue && rowCheckin.venue.name;
+                this.venueUrl = rowCheckin.venue && ("https://foursquare.com/v/" + this.venueId);
+                this.lat = (rowCheckin.location && rowCheckin.location.lat) || (rowCheckin.venue && rowCheckin.venue.location && rowCheckin.venue.location.lat);
+                this.lng = (rowCheckin.location && rowCheckin.location.lng) || (rowCheckin.venue && rowCheckin.venue.location && rowCheckin.venue.location.lng);
+                if (rowCheckin.venue && rowCheckin.venue.categories && rowCheckin.venue.categories.length) {
+                    this.iconUrl = rowCheckin.venue.categories[0].icon.prefix + "32" + rowCheckin.venue.categories[0].icon.suffix;
+                    this.venueCategoryName = rowCheckin.venue.categories[0].name;
+                } else {
+                    this.iconUrl = null;
+                    this.venueCategoryName = null;
+                }
+                if (rowCheckin.photos.count) {
+                    this.thumbnailUrl = rowCheckin.photos.items[0].prefix + "100x100" + rowCheckin.photos.items[0].suffix;
+                } else {
+                    this.thumbnailUrl = null;
+                }
+            };
 
         ModelTweet.prototype._readGeocodeComputed = function () {
             var geocodeUnwrapped = this.geocodeObservable();
@@ -276,7 +317,7 @@ define(["ko", "gmaps", "underscore", "moment", "jquery"],
             return foursquareCheckinUnwrapped;
         };
 
-        ModelSelectedLocation.prototype.calcBounds = function () {
+        ModelSelection.prototype.calcBounds = function () {
             var centerUnwrapped = this.center(),
                 radiusUnwrapped = this.radius(),
                 middleWestPoint = gmaps.geometry.spherical.computeOffset(centerUnwrapped, radiusUnwrapped, -90),
@@ -286,14 +327,14 @@ define(["ko", "gmaps", "underscore", "moment", "jquery"],
                 result = new gmaps.LatLngBounds(southWestPoint, northEastPoint);
             return result;
         };
-        ModelSelectedLocation.prototype.getTwitterLocationsString = function () {
+        ModelSelection.prototype.getTwitterLocationsString = function () {
             var boundsUnwrapped = this.bounds(),
                 SWlatlng = boundsUnwrapped.getSouthWest(),
                 NElanlng = boundsUnwrapped.getNorthEast(),
                 result = SWlatlng.lng() + "," + SWlatlng.lat() + "," + NElanlng.lng() + "," + NElanlng.lat();
             return result;
         };
-        ModelSelectedLocation.prototype.getTwitterGeocodeString = function () {
+        ModelSelection.prototype.getTwitterGeocodeString = function () {
             var centerUnwrapped = this.center(),
                 radiusUnwrapped = this.radius(),
                 result = centerUnwrapped.lat() + ',' + centerUnwrapped.lng() + ',' + (radiusUnwrapped / 1000) + 'km';
@@ -301,7 +342,8 @@ define(["ko", "gmaps", "underscore", "moment", "jquery"],
         };
 
         return{
-            ModelSelectedLocation: ModelSelectedLocation,
-            ModelTweet: ModelTweet
+            ModelSelection: ModelSelection,
+            ModelTweet: ModelTweet,
+            ModelSetting: ModelSetting
         }
     });

@@ -221,6 +221,15 @@ var store = require('./store').store,
                 var targetUrl = url.parse(_requestUrl);
                 var request;
                 if (_requestMethod === "GET") {
+                    /*
+                    if(_requestParams.since_id){
+                        targetUrl.query = _requestParams;
+                        request = oa.get(targetUrl.format(), _accessToken, secret, function(){
+                            var foo=arguments;
+                            var l=foo.length;
+                        });
+                    }
+                    */
                     targetUrl.query = _requestParams;
                     request = oa.get(targetUrl.format(), _accessToken, secret, _onResponseCallback);
                 } else if (_requestMethod === "POST") {

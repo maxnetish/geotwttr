@@ -6,7 +6,7 @@ define(["dataservice", "underscore", "models"],
     function (dataservice, _, models) {
         var beginFilterStreamUpdates = function (filterModel, callback) {
                 var requestOptions;
-                if (filterModel instanceof models.ModelSelectedLocation) {
+                if (filterModel instanceof models.ModelSelection) {
                     requestOptions = {
                         requestUrl: "https://stream.twitter.com/1.1/statuses/filter.json",
                         requestMethod: "GET",
@@ -23,15 +23,16 @@ define(["dataservice", "underscore", "models"],
                 //return requestId
                 return dataservice.openRequest(requestOptions);
             },
-            requestSearchRestApi = function (searchModel, callback, maxId) {
+            requestSearchRestApi = function (searchModel, callback, maxId, minId) {
                 var requestOptions;
-                if (searchModel instanceof models.ModelSelectedLocation) {
+                if (searchModel instanceof models.ModelSelection) {
                     requestOptions = {
                         requestUrl: "https://api.twitter.com/1.1/search/tweets.json",
                         requestMethod: "GET",
                         requestParams: {
                             geocode: searchModel.getTwitterGeocodeString(),
                             max_id: maxId,
+                            since_id: minId,
                             count: 100,
                             result_type: 'recent' //'mixed', 'popular' or 'recent'
                         },
