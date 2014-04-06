@@ -29,13 +29,16 @@ define(["ko", "models", "statuses.set", "dataservice.stream-tweets", "jquery", "
 
             toggleControlPanel = function(){
                 controlPanelHide(!controlPanelHide());
+                _.delay(function(){
+                    $(window).trigger("resize");
+                }, 1500);
             },
 
             init = function () {
                 selectedLocationObservable = ko.observable(createLocationInstance());
                 listOfTweets = new statusesSet.StatusesSet(srcDataservice, $("#tweet-list"), document.getElementById("tweet-template").innerHTML);
 
-                listOfTweets.hidedStatusesCount.subscribe(function (count) {
+                listOfTweets.hidedCount.subscribe(function (count) {
                     if (count !== oldHidedCount) {
                         if (count > 0 && oldHidedCount === 0) {
                             needSetHeight.valueHasMutated();
@@ -77,8 +80,9 @@ define(["ko", "models", "statuses.set", "dataservice.stream-tweets", "jquery", "
             showTweetOnMap: function () {
                 return null;
             },
-            hidedIncomingCount: listOfTweets.hidedStatusesCount,
-            displayedCount: listOfTweets.visibleStatusesCount,
+            hidedIncomingCount: listOfTweets.hidedCount,
+            displayedCount: listOfTweets.visibleCount,
+            receivedCount: listOfTweets.receivedCount,
             showHidedStatuses: listOfTweets.makeAllVisible,
             needMore: needMore,
             startStreaming: listOfTweets.startStreaming,
@@ -89,6 +93,6 @@ define(["ko", "models", "statuses.set", "dataservice.stream-tweets", "jquery", "
             restLoadingNow: listOfTweets.restLoadingState,
             toggleControlPanel: toggleControlPanel,
             controlPanelHide: controlPanelHide,
-            settings: settings.settings
+            settings: settings.settingsArray
         };
     });

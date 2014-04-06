@@ -142,6 +142,13 @@ define(["ko", "gmaps", "underscore", "moment", "jquery"],
 
                 this.details = ko.observable(false);
                 this.visible = ko.observable(false);
+                this.matchFilter = ko.observable(true);
+                this.visibleCombined = ko.computed({
+                    read: function () {
+                        return this.visible() && this.matchFilter();
+                    },
+                    owner: this
+                });
                 this.srcApi = 0;
                 this.isRetweet = !!rowTweet.retweeted_status;
                 this.id_str = rowTweet.id_str;
@@ -213,37 +220,19 @@ define(["ko", "gmaps", "underscore", "moment", "jquery"],
                 this.value = ko.observable(plainSettings.value);
                 this.type = plainSettings.type || "text";
                 this.promptOrTitle = plainSettings.promptOrTitle || null;
-                this.id = plainSettings.ID || _.uniqueId("setting_");
+                this.id = plainSettings.id || _.uniqueId("setting_");
+                this.useForFilter = ko.observable(plainSettings.useForFilter || false);
+                this.filterCallback = plainSettings.filterCallback;
+                this.iconClass = plainSettings.iconClass || "icon-wrench";
+
                 this.checked = ko.computed({
-                    read: function () {
-                        if(this.type==="checkbox" || this.type==="radio"){
-                            return this.value();
-                        }else{
-                            return null;
-                        }
-                    },
-                    write: function (val) {
-                        if(this.type==="checkbox" || this.type==="radio"){
-                            this.value(val);
-                        }
-                    },
+                    read: this.readChecked,
+                    write: this.writeChecked,
                     owner: this
                 });
-                this.realValue=ko.computed({
-                    read: function(){
-                        if(this.type==="checkbox" || this.type==="radio"){
-                            return this.name;
-                        }else{
-                            return this.value();
-                        }
-                    },
-                    write: function(val){
-                        if(this.type==="checkbox" || this.type==="radio"){
-                            // nothing, wrong case
-                        }else{
-                            this.value(val);
-                        }
-                    },
+                this.realValue = ko.computed({
+                    read: this.readRealValue,
+                    write: this.writeRealValue,
                     owner: this
                 });
             },
@@ -286,7 +275,7 @@ define(["ko", "gmaps", "underscore", "moment", "jquery"],
                     if (result && result.length) {
                         this.geocodeObservable(result[0].formatted_address)
                     } else {
-                        this.geocodeObservable(_tweetCoordsToString(tweet));
+                        this.geocodeObservable(this._coordsToString(this.coordinates));
                     }
                 }, this));
                 return this._coordsToString(this.coordinates);
@@ -339,6 +328,33 @@ define(["ko", "gmaps", "underscore", "moment", "jquery"],
                 radiusUnwrapped = this.radius(),
                 result = centerUnwrapped.lat() + ',' + centerUnwrapped.lng() + ',' + (radiusUnwrapped / 1000) + 'km';
             return result;
+        };
+
+        ModelSetting.prototype.readChecked = function () {
+            if (this.type === "checkbox" || this.type === "radio") {
+                return this.value();
+            } else {
+                return null;
+            }
+        };
+        ModelSetting.prototype.writeChecked = function (val) {
+            if (this.type === "checkbox" || this.type === "radio") {
+                this.value(val);
+            }
+        };
+        ModelSetting.prototype.readRealValue = function () {
+            if (this.type === "checkbox" || this.type === "radio") {
+                return this.name;
+            } else {
+                return this.value();
+            }
+        };
+        ModelSetting.prototype.writeRealValue = function (val) {
+            if (this.type === "checkbox" || this.type === "radio") {
+                // nothing, wrong case
+            } else {
+                this.value(val);
+            }
         };
 
         return{

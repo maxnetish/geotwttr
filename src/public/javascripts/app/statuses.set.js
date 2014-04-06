@@ -1,8 +1,8 @@
 /**
  * Created by max on 05.01.14.
  */
-define(["ko", "underscore", "models", "jquery", "moment", "gmaps", "logger", "config"],
-    function (ko, _, models, $, moment, gmaps, logger, config) {
+define(["ko", "underscore", "models", "jquery", "moment", "gmaps", "logger", "settings", "config"],
+    function (ko, _, models, $, moment, gmaps, logger, settingsModule, config) {
         var StatusesSet = function (srcDataservice, $container, template) {
             var self = this,
                 _filterModel,
@@ -18,6 +18,8 @@ define(["ko", "underscore", "models", "jquery", "moment", "gmaps", "logger", "co
                     STREAM: 2
                 },
                 geocoder = new gmaps.Geocoder(),
+                settings = settingsModule.settings,
+                settingsArray = settingsModule.settingsArray,
 
                 _insertIntoList = function (statusToInsert) {
                     var indexToInsert = _.sortedIndex(_statusesArray, statusToInsert, function (oneStatus) {
@@ -50,14 +52,22 @@ define(["ko", "underscore", "models", "jquery", "moment", "gmaps", "logger", "co
                     }
 
                     _statusesArray.splice(indexToInsert, 0, statusToInsert);
-                    visible = _.isFunction(statusToInsert.visible) ? !!statusToInsert.visible() : true;
-                    if (visible) {
-                        statusesCountUnwrapped = self.visibleStatusesCount();
-                        self.visibleStatusesCount(statusesCountUnwrapped + 1);
-                    } else {
-                        statusesCountUnwrapped = self.hidedStatusesCount();
-                        self.hidedStatusesCount(statusesCountUnwrapped + 1);
+
+                    if (statusToInsert.visibleCombined()) {
+                        self.visibleCount(self.visibleCount() + 1);
+                    } else if (!statusToInsert.visible() && statusToInsert.matchFilter()) {
+                        self.hidedCount(self.hidedCount() + 1);
                     }
+                    self.receivedCount(self.receivedCount() + 1);
+                    //visible = _.isFunction(statusToInsert.visible) ? !!statusToInsert.visible() : true;
+                    //visible = visible && statusToInsert.matchFilter();
+                    //if (visible) {
+                    //    statusesCountUnwrapped = self.visibleStatusesCount();
+                    //    self.visibleStatusesCount(statusesCountUnwrapped + 1);
+                    //} else {
+                    //    statusesCountUnwrapped = self.hidedStatusesCount();
+                    //    self.hidedStatusesCount(statusesCountUnwrapped + 1);
+                    //}
                 },
 
                 _extractStatus = function (message) {
@@ -73,7 +83,20 @@ define(["ko", "underscore", "models", "jquery", "moment", "gmaps", "logger", "co
                     result.checkVisibility = _checkVisibility;
                     result.showOnMapCoord = _tweetWantsToShowCoord;
                     result.showOnMapPlace = _tweetWantsToShowPlace;
+                    _applyFilterToOneTweet(result);
                     return result;
+                },
+
+                _applyFilterToOneTweet = function (tweet) {
+                    var notMatch = _.find(settingsArray, function (setting) {
+                        if (setting.useForFilter()) {
+                            return !setting.filterCallback(tweet, setting);
+                        } else {
+                            return false;
+                        }
+                    });
+                    // console.log("[FILTER] tweet match: " + !notMatch);
+                    tweet.matchFilter(!notMatch);
                 },
 
                 _tweetWantsToShowCoord = function (data, event) {
@@ -106,8 +129,9 @@ define(["ko", "underscore", "models", "jquery", "moment", "gmaps", "logger", "co
                     });
                     _statusesArray.length = 0;
 
-                    self.hidedStatusesCount(0);
-                    self.visibleStatusesCount(0);
+                    self.visibleCount(0);
+                    self.hidedCount(0);
+                    self.receivedCount(0);
                     self.statusOnMap(null);
                 },
 
@@ -180,7 +204,28 @@ define(["ko", "underscore", "models", "jquery", "moment", "gmaps", "logger", "co
                     }
                 },
 
-                _checkVisibility = ko.observable(false),
+                _debouncedApplyChangedFilter = _.debounce(function () {
+                    var visibleCount = 0,
+                        hideCount = 0;
+
+                    _.each(_statusesArray, function (tweet) {
+                        _applyFilterToOneTweet(tweet);
+                        if (tweet.visibleCombined()) {
+                            visibleCount = visibleCount + 1;
+                        } else if (!tweet.visible() && tweet.matchFilter()) {
+                            hideCount = hideCount + 1;
+                        }
+                        // hideCount = self.receivedCount() - visibleCount;
+                    });
+                    console.log("[FILTER] update counters after apply visible: " + visibleCount + " hided: " + hideCount);
+                    self.visibleCount(visibleCount);
+                    self.hidedCount(hideCount);
+
+                    _.defer(_checkVisibility.valueHasMutated);
+
+                }, 1000);
+
+            _checkVisibility = ko.observable(false),
                 _debounceCheckVisibilityNeeded = _.debounce(function () {
                     _checkVisibility.valueHasMutated();
                 }, 500);
@@ -213,7 +258,9 @@ define(["ko", "underscore", "models", "jquery", "moment", "gmaps", "logger", "co
                         showImmediate: true,
                         src: statusSrc.REST
                     }));
-                    self.startStreaming();
+                    if (settings.useStreamApi.value()) {
+                        self.startStreaming();
+                    }
                     _startPollNewStatuses();
                     return _filterModel;
                 }
@@ -222,16 +269,19 @@ define(["ko", "underscore", "models", "jquery", "moment", "gmaps", "logger", "co
             this.startStreaming = _startStreaming;
             this.stopStreaming = _stopStreaming;
             this.streamActive = ko.observable(false);
-            this.visibleStatusesCount = ko.observable(0);
-            this.hidedStatusesCount = ko.observable(0);
+            this.visibleCount = ko.observable(0);
+            this.hidedCount = ko.observable(0);
+            this.receivedCount = ko.observable(0);
             this.statusOnMap = ko.observable(null);
             this.makeAllVisible = function () {
                 _.each(_statusesArray, function (oneStatus) {
                     if (_.isFunction(oneStatus.visible)) {
                         if (!oneStatus.visible()) {
                             oneStatus.visible(true);
-                            self.hidedStatusesCount(self.hidedStatusesCount() - 1);
-                            self.visibleStatusesCount(self.visibleStatusesCount() + 1);
+                            if (oneStatus.matchFilter()) {
+                                self.visibleCount(self.visibleCount() + 1);
+                                self.hidedCount(self.hidedCount() - 1);
+                            }
                         }
                     }
                 });
@@ -239,6 +289,21 @@ define(["ko", "underscore", "models", "jquery", "moment", "gmaps", "logger", "co
             };
             // this.setStreamedTweetsVisible = ko.observable(false);
             this.restLoadingState = _restLoadingState;
+
+            settings.useStreamApi.value.subscribe(function (newVal) {
+                if (newVal && _filterModel) {
+                    self.startStreaming();
+                }
+                if (!newVal) {
+                    self.stopStreaming();
+                }
+            });
+
+            _.each(settingsArray, function (setting) {
+                if (setting.useForFilter()) {
+                    setting.value.subscribe(_debouncedApplyChangedFilter);
+                }
+            });
         };
 
         return {

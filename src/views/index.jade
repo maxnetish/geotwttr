@@ -17,13 +17,20 @@ block content
             div.pane.control-column
                 div.controls(data-bind='setHeight: needSetHeight')
                     button.show-hide-controls(data-bind='click: toggleControlPanel')
-                        span.icon.icon-equalizer
+                        span.icon.icon-wrench
                     div.clear
                     div.control-table(data-bind='foreach: settings')
                         div.control-item
-                            label.control-label(data-bind='attr: {"for": id, title: promptOrTitle}, text: name', for='use-stream-api')
+                            div.control-label
+                                span.icon(data-bind='css: iconClass')
+                            div.control-label
+                                label(data-bind='attr: {"for": id, title: promptOrTitle}, text: name', for='use-stream-api')
                             div.control-element
-                                input.control-element(data-bind='attr: {"id": id, "type": type, placeholder: promptOrTitle}, value: realValue, checked: checked', type='text')
+                                input.control-element(data-bind='attr: {"id": id, "type": type, placeholder: promptOrTitle}, value: realValue, checked: checked, valueUpdate: "input"', type='text')
+                    p.control-item
+                        span(data-bind='text: displayedCount')
+                        span &nbsp;of&nbsp;
+                        span(data-bind='text: receivedCount')
         div.pane-right.pane
             ul#tweet-list.scroll(data-bind='setHeight: needSetHeight')
                 button.button-show-incoming(data-bind='visible: hidedIncomingCount()>0, click: showHidedStatuses', style='display: none;')
