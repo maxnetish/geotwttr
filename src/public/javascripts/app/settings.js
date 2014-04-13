@@ -15,7 +15,7 @@ define(["ko", "underscore", "models"],
                 settings.containsText = new models.ModelSetting({
                     name: "Contains text",
                     value: null,
-                    type: "text",
+                    type: "search",
                     promptOrTitle: "Text to search in tweets",
                     filterCallback: function (tweet, target) {
                         var T = target || this,
@@ -28,7 +28,7 @@ define(["ko", "underscore", "models"],
                         textValue = tweet.textUpper;
                         textToSearch = T.value();
                         if (textToSearch) {
-                            textToSearch=textToSearch.toUpperCase();
+                            textToSearch = textToSearch.toUpperCase();
                             return textValue.contains(textToSearch);
                         } else {
                             return true;
@@ -54,6 +54,97 @@ define(["ko", "underscore", "models"],
                     },
                     useForFilter: true,
                     iconClass: "icon-youtube-play"
+                });
+                settings.containsImages = new models.ModelSetting({
+                    name: "Contains images",
+                    value: false,
+                    type: "checkbox",
+                    promptOrTitle: "Show tweets with images",
+                    filterCallback: function (tweet, target) {
+                        var T = target || this,
+                            valueToSearch = !!T.value();
+                        if (valueToSearch) {
+                            return !!tweet.mediaList.length;
+                        } else {
+                            return true;
+                        }
+                    },
+                    useForFilter: true,
+                    iconClass: ""
+                });
+                settings.foursquare = new models.ModelSetting({
+                    name: "Foursquare checkins",
+                    value: false,
+                    type: "checkbox",
+                    promptOrTitle: "Show tweets with foursqaure checkins",
+                    filterCallback: function (tweet, target) {
+                        var T = target || this,
+                            valueToSearch = !!T.value();
+                        if (valueToSearch) {
+                            return !!tweet.foursquareCheckinComputed();
+                        } else {
+                            return true;
+                        }
+                    },
+                    useForFilter: true,
+                    iconClass: "icon-foursquare"
+                });
+                settings.geotagged = new models.ModelSetting({
+                    name: "Really geotagged",
+                    value: false,
+                    type: "checkbox",
+                    promptOrTitle: "Show geotagged tweets",
+                    filterCallback: function (tweet, target) {
+                        var T = target || this,
+                            valueToSearch = !!T.value();
+                        if (valueToSearch) {
+                            return !!tweet.coordinates;
+                        } else {
+                            return true;
+                        }
+                    },
+                    useForFilter: true,
+                    iconClass: "icon-map-marker"
+                });
+                settings.language = new models.ModelSetting({
+                    name: "Specific language",
+                    value: "",
+                    type: "text",
+                    promptOrTitle: "Language of tweet",
+                    filterCallback: function (tweet, target) {
+                        var T = target || this,
+                            langValue,
+                            langToSearch;
+
+                        langValue = tweet.lang || "und";
+                        langToSearch = T.value();
+                        if (langToSearch) {
+                            langToSearch = langToSearch.toLowerCase();
+                            return langValue === langToSearch;
+                        } else {
+                            return true;
+                        }
+                    },
+                    useForFilter: true,
+                    iconClass: "icon-keyboard-o",
+                    suggestList: ["en", "ru", "jp", "it"]
+                });
+                settings.specificArea = new models.ModelSetting({
+                    name: "Really in specified area",
+                    value: false,
+                    type: "checkbox",
+                    promptOrTitle: "Show tweets geotagged in specified area",
+                    filterCallback: function (tweet, target) {
+                        var T = target || this,
+                            valueToSearch = !!T.value();
+                        if (valueToSearch) {
+                            return !!tweet.isStreactlyInArea;
+                        } else {
+                            return true;
+                        }
+                    },
+                    useForFilter: true,
+                    iconClass: "icon-map-marker"
                 });
 
                 for (prop in settings) {

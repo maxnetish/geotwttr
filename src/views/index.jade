@@ -26,7 +26,9 @@ block content
                             div.control-label
                                 label(data-bind='attr: {"for": id, title: promptOrTitle}, text: name', for='use-stream-api')
                             div.control-element
-                                input.control-element(data-bind='attr: {"id": id, "type": type, placeholder: promptOrTitle}, value: realValue, checked: checked, valueUpdate: "input"', type='text')
+                                input(data-bind='attr: {"id": id, "type": type, placeholder: promptOrTitle, list: suggestListId}, value: realValue, checked: checked, valueUpdate: "input"', type='text')
+                                datalist(data-bind='attr: {"id": suggestListId}, foreach: suggestList')
+                                    option(data-bind='attr: {"value": $data}')
                     p.control-item
                         span(data-bind='text: displayedCount')
                         span &nbsp;of&nbsp;

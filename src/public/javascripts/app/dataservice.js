@@ -31,11 +31,11 @@ define(["underscore", "logger"],
                 };
                 webSocketConnection.onerror = function (event) {
                     logger.log("socket error", logger.severity.ERROR, moduleName);
-                    logger.dir(event);
+                    // logger.dir(event);
                 };
 
                 webSocketConnection.onclose = function () {
-                    logger.log("socket closed", logger.severity.INFO, moduleName);
+                    // logger.log("socket closed", logger.severity.INFO, moduleName);
                     // FIXME это неправильно - иногда могуь открыться два и более сокетов и со всех данные приходят
                     getSocketConnection(function (socketConnection) {
                         _.each(requests, function (oneRequest) {
@@ -46,7 +46,7 @@ define(["underscore", "logger"],
 
                 };
                 webSocketConnection.onopen = function (event) {
-                    logger.log("socket open, notify subscribers...", logger.severity.INFO, moduleName);
+                    // logger.log("socket open, notify subscribers...", logger.severity.INFO, moduleName);
                     _.each(socketOpenListeners, function (listener) {
                         if (_.isFunction(listener)) {
                             listener(event);
@@ -64,7 +64,7 @@ define(["underscore", "logger"],
                         callback(webSocketConnection);
                         break;
                     case webSocketConnection.CONNECTING: // 0
-                        logger.log("socket state is CONNECTING, wait for open", logger.severity.INFO, moduleName);
+                        // logger.log("socket state is CONNECTING, wait for open", logger.severity.INFO, moduleName);
                         socketOpenListeners.push(function () {
                             setTimeout(function () {
                                 callback(webSocketConnection);
@@ -81,7 +81,7 @@ define(["underscore", "logger"],
                         });
                         break;
                     default:
-                        logger.log("Socket unknown state", logger.severity.ERROR, moduleName);
+                        // logger.log("Socket unknown state", logger.severity.ERROR, moduleName);
                         callback(null);
                         break;
                 }
@@ -107,12 +107,12 @@ define(["underscore", "logger"],
                 newRequest = new ModelRequest(options);
 
                 requests[newRequest.requestId] = newRequest;
-                logger.log("wait for socket ready...", logger.severity.INFO, moduleName);
-                logger.dir(newRequest);
+                // logger.log("wait for socket ready...", logger.severity.INFO, moduleName);
+                // logger.dir(newRequest);
                 getSocketConnection(function (socketConnection) {
                     var messageToSend;
-                    logger.log("sending to socket...", logger.severity.INFO, moduleName);
-                    logger.dir(newRequest);
+                    // logger.log("sending to socket...", logger.severity.INFO, moduleName);
+                    // logger.dir(newRequest);
                     messageToSend = newRequest.messageToSend(false);
                     socketConnection.send(messageToSend);
                 });

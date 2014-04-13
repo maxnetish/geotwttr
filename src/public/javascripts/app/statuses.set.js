@@ -83,8 +83,19 @@ define(["ko", "underscore", "models", "jquery", "moment", "gmaps", "logger", "se
                     result.checkVisibility = _checkVisibility;
                     result.showOnMapCoord = _tweetWantsToShowCoord;
                     result.showOnMapPlace = _tweetWantsToShowPlace;
+                    result.isStreactlyInArea = _isInArea(result, self.filter());
                     _applyFilterToOneTweet(result);
                     return result;
+                },
+
+                _isInArea = function (tweet, location) {
+                    var gCoords, distance;
+                    if (tweet && tweet.coordinates && tweet.coordinates.coordinates) {
+                        gCoords = new gmaps.LatLng(tweet.coordinates.coordinates[1], tweet.coordinates.coordinates[0]);
+                        distance = gmaps.geometry.spherical.computeDistanceBetween(gCoords, location.center());
+                        return distance < location.radius();
+                    }
+                    return false;
                 },
 
                 _applyFilterToOneTweet = function (tweet) {

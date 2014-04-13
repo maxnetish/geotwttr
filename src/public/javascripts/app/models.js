@@ -186,6 +186,7 @@ define(["ko", "gmaps", "underscore", "moment", "jquery"],
                     owner: this
                 });
                 this.youtubeVideos = detectAndExtractYtIds(this);
+                this.isStreactlyInArea = undefined;
             },
             ModelSelection = function (center, radius) {
                 var self = this,
@@ -224,7 +225,9 @@ define(["ko", "gmaps", "underscore", "moment", "jquery"],
                 this.useForFilter = ko.observable(plainSettings.useForFilter || false);
                 this.filterCallback = plainSettings.filterCallback;
                 this.iconClass = plainSettings.iconClass || "icon-wrench";
+                this.suggestList = ko.observableArray(plainSettings.suggestList || []);
 
+                this.suggestListId = _.uniqueId("suggest_");
                 this.checked = ko.computed({
                     read: this.readChecked,
                     write: this.writeChecked,
