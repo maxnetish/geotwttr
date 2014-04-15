@@ -20,6 +20,9 @@ define(["ko", "underscore", "models", "jquery", "moment", "gmaps", "logger", "se
                 geocoder = new gmaps.Geocoder(),
                 settings = settingsModule.settings,
                 settingsArray = settingsModule.settingsArray,
+                speed = {
+                    startTimestamp: Date.now()
+                },
 
                 _insertIntoList = function (statusToInsert) {
                     var indexToInsert = _.sortedIndex(_statusesArray, statusToInsert, function (oneStatus) {
@@ -273,6 +276,7 @@ define(["ko", "underscore", "models", "jquery", "moment", "gmaps", "logger", "se
                         self.startStreaming();
                     }
                     _startPollNewStatuses();
+                    speed.startTimestamp = Date.now();
                     return _filterModel;
                 }
                 throw "Unknown filter model";
@@ -300,6 +304,23 @@ define(["ko", "underscore", "models", "jquery", "moment", "gmaps", "logger", "se
             };
             // this.setStreamedTweetsVisible = ko.observable(false);
             this.restLoadingState = _restLoadingState;
+            this.receiveSpeed = ko.computed({
+                read: function () {
+                    var nowCount = self.receivedCount(),
+                        nowTs = Date.now(),
+                        deltaTs = nowTs - speed.startTimestamp,
+                    // deltaCount = _statusesArray.length - speed.lastCount,
+                        result = 0;
+
+                    console.log("[SPEED] update speed deltaTs:" + deltaTs);
+
+                    if (deltaTs !== 0) {
+                        result = nowCount / (deltaTs / 60000 );
+                    }
+                    return result.toFixed(2);
+                }
+                // deferEvaluate: true
+            });
 
             settings.useStreamApi.value.subscribe(function (newVal) {
                 if (newVal && _filterModel) {

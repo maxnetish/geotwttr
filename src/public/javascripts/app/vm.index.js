@@ -93,6 +93,7 @@ define(["ko", "models", "statuses.set", "dataservice.stream-tweets", "jquery", "
             restLoadingNow: listOfTweets.restLoadingState,
             toggleControlPanel: toggleControlPanel,
             controlPanelHide: controlPanelHide,
-            settings: settings.settingsArray
+            settings: settings.settingsArray,
+            receiveSpeed: listOfTweets.receiveSpeed
         };
     });

@@ -15,24 +15,7 @@ block content
                 input.geo-autocomplete(data-bind="geoAutocomplete: '.gmap'", type="search")
                 div.gmap(data-bind='gmap: selectedLocation, statusOnMap: statusOnMap, setHeight: needSetHeight')
             div.pane.control-column
-                div.controls(data-bind='setHeight: needSetHeight')
-                    button.show-hide-controls(data-bind='click: toggleControlPanel')
-                        span.icon.icon-wrench
-                    div.clear
-                    div.control-table(data-bind='foreach: settings')
-                        div.control-item
-                            div.control-label
-                                span.icon(data-bind='css: iconClass')
-                            div.control-label
-                                label(data-bind='attr: {"for": id, title: promptOrTitle}, text: name', for='use-stream-api')
-                            div.control-element
-                                input(data-bind='attr: {"id": id, "type": type, placeholder: promptOrTitle, list: suggestListId}, value: realValue, checked: checked, valueUpdate: "input"', type='text')
-                                datalist(data-bind='attr: {"id": suggestListId}, foreach: suggestList')
-                                    option(data-bind='attr: {"value": $data}')
-                    p.control-item
-                        span(data-bind='text: displayedCount')
-                        span &nbsp;of&nbsp;
-                        span(data-bind='text: receivedCount')
+                include settings-panel
         div.pane-right.pane
             ul#tweet-list.scroll(data-bind='setHeight: needSetHeight')
                 button.button-show-incoming(data-bind='visible: hidedIncomingCount()>0, click: showHidedStatuses', style='display: none;')
@@ -41,7 +24,15 @@ block content
                 div.preloader(data-bind='visible: restLoadingNow')
                 button.button-request-previous(data-bind='click: needMore, visible: !restLoadingNow()', style='display: none;')
                     span Load more
-    a(href="https://twitter.com/maxnetish", class="twitter-follow-button", data-show-count="false", data-lang="#{langCode}") Follow me
+    footer
+        section.inner-info
+            span(data-bind='text: displayedCount')
+            span &nbsp;of&nbsp;
+            span(data-bind='text: receivedCount')
+        section.inner-info
+            span(data-bind='text: receiveSpeed')
+            span &nbsp;tw/min
+        a(href="https://twitter.com/maxnetish", class="twitter-follow-button", data-show-count="false", data-lang="#{langCode}") Follow me
     script#tweet-template(type='text/html')
         include tweet_template_mini
     script#tweet-template-details(type='text/html')
