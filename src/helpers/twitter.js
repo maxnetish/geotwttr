@@ -138,11 +138,20 @@ var store = require('./store').store,
                 _buffer += chunk.toString();
                 var rnPosition = _buffer.indexOf("\r\n");
                 var holeTweet;
+                var parsedTweet;
                 while (rnPosition !== -1) {
                     holeTweet = _buffer.substring(0, rnPosition);
                     _buffer = _buffer.substring(rnPosition + 2);
                     if (holeTweet.length) {
-                        _onTweetReceived(JSON.parse(holeTweet));
+                        try {
+                            parsedTweet = JSON.parse(holeTweet);
+                        }
+                        catch (ex) {
+                            console.log("Exception. Cannot parse string '" + holeTweet + "'");
+                        }
+                        if (parsedTweet) {
+                            _onTweetReceived(parsedTweet);
+                        }
                     }
                     rnPosition = _buffer.indexOf("\r\n");
                 }
@@ -222,14 +231,14 @@ var store = require('./store').store,
                 var request;
                 if (_requestMethod === "GET") {
                     /*
-                    if(_requestParams.since_id){
-                        targetUrl.query = _requestParams;
-                        request = oa.get(targetUrl.format(), _accessToken, secret, function(){
-                            var foo=arguments;
-                            var l=foo.length;
-                        });
-                    }
-                    */
+                     if(_requestParams.since_id){
+                     targetUrl.query = _requestParams;
+                     request = oa.get(targetUrl.format(), _accessToken, secret, function(){
+                     var foo=arguments;
+                     var l=foo.length;
+                     });
+                     }
+                     */
                     targetUrl.query = _requestParams;
                     request = oa.get(targetUrl.format(), _accessToken, secret, _onResponseCallback);
                 } else if (_requestMethod === "POST") {
