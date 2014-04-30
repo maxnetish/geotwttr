@@ -81,7 +81,7 @@ define(["ko", "underscore", "models"],
                         var T = target || this,
                             valueToSearch = !!T.value();
                         if (valueToSearch) {
-                            return !!tweet.foursquareCheckinComputed();
+                            return tweet.foursquareCheckinExists;
                         } else {
                             return true;
                         }

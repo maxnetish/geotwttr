@@ -3,7 +3,7 @@ div.controls(data-bind='setHeight: needSetHeight')
         span.icon.icon-wrench
     div.clear
     div.control-table(data-bind='foreach: settings')
-        div.control-item
+        div.control-item(data-bind='css: {"active": value}')
             div.control-label
                 span.icon(data-bind='css: iconClass')
             div.control-label

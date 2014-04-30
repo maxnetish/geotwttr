@@ -185,6 +185,7 @@ define(["ko", "gmaps", "underscore", "moment", "jquery"],
                     deferEvaluation: true,
                     owner: this
                 });
+                this.foursquareCheckinExists = !!getFoursquareUrlFrom(this);
                 this.youtubeVideos = detectAndExtractYtIds(this);
                 this.isStreactlyInArea = undefined;
             },
