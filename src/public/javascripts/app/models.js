@@ -310,14 +310,30 @@ define(["ko", "gmaps", "underscore", "moment", "jquery"],
             return foursquareCheckinUnwrapped;
         };
 
-        ModelSelection.prototype.calcBounds = function () {
-            var centerUnwrapped = this.center(),
-                radiusUnwrapped = this.radius(),
-                middleWestPoint = gmaps.geometry.spherical.computeOffset(centerUnwrapped, radiusUnwrapped, -90),
-                southWestPoint = gmaps.geometry.spherical.computeOffset(middleWestPoint, radiusUnwrapped, 180),
-                middleEastPoint = gmaps.geometry.spherical.computeOffset(centerUnwrapped, radiusUnwrapped, 90),
-                northEastPoint = gmaps.geometry.spherical.computeOffset(middleEastPoint, radiusUnwrapped, 0),
-                result = new gmaps.LatLngBounds(southWestPoint, northEastPoint);
+        ModelSelection.prototype.calcBounds = function (from) {
+            var centerUnwrapped,
+                radiusUnwrapped,
+                middleWestPoint,
+                southWestPoint,
+                middleEastPoint,
+                northEastPoint,
+                result;
+
+            if(from && from instanceof gmaps.Circle){
+                centerUnwrapped=from.getCenter();
+                radiusUnwrapped=from.getRadius();
+            }else{
+                centerUnwrapped = this.center();
+                radiusUnwrapped = this.radius();
+            }
+
+            middleWestPoint = gmaps.geometry.spherical.computeOffset(centerUnwrapped, radiusUnwrapped, -90);
+            southWestPoint = gmaps.geometry.spherical.computeOffset(middleWestPoint, radiusUnwrapped, 180);
+            middleEastPoint = gmaps.geometry.spherical.computeOffset(centerUnwrapped, radiusUnwrapped, 90);
+            northEastPoint = gmaps.geometry.spherical.computeOffset(middleEastPoint, radiusUnwrapped, 0);
+
+            result = new gmaps.LatLngBounds(southWestPoint, northEastPoint);
+
             return result;
         };
         ModelSelection.prototype.getTwitterLocationsString = function () {

@@ -75,11 +75,36 @@ define(["ko", "gmaps", "jquery", "logger", "underscore"],
                         polygon2Bounds = function (polygon) {
                             var bounds = new google.maps.LatLngBounds(),
                                 path = polygon.getPath();
-                            path.forEach(function(element){
+                            path.forEach(function (element) {
                                 bounds.extend(element);
                             });
                             return bounds;
                         };
+
+                    // add to circle proto
+                    if (!gmaps.Circle.prototype.getBounds) {
+                        gmaps.Circle.prototype.getBounds = function () {
+                            var centerUnwrapped,
+                                radiusUnwrapped,
+                                middleWestPoint,
+                                southWestPoint,
+                                middleEastPoint,
+                                northEastPoint,
+                                result;
+
+                            centerUnwrapped = this.getCenter();
+                            radiusUnwrapped = this.getRadius();
+
+                            middleWestPoint = gmaps.geometry.spherical.computeOffset(centerUnwrapped, radiusUnwrapped, -90);
+                            southWestPoint = gmaps.geometry.spherical.computeOffset(middleWestPoint, radiusUnwrapped, 180);
+                            middleEastPoint = gmaps.geometry.spherical.computeOffset(centerUnwrapped, radiusUnwrapped, 90);
+                            northEastPoint = gmaps.geometry.spherical.computeOffset(middleEastPoint, radiusUnwrapped, 0);
+
+                            result = new gmaps.LatLngBounds(southWestPoint, northEastPoint);
+
+                            return result;
+                        };
+                    }
 
                     $element.data("gmap", map);
                     $element.data("circle", circle);

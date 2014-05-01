@@ -25,10 +25,21 @@ define(["ko", "jquery", "underscore", "gmaps"],
 
                         //костыль для gmap:
                         if ($element.is(".gmap")) {
-                            var map = $element.data("gmap");
+                            var map = $element.data("gmap"),
+                                circle = $element.data("circle"),
+                                circleBounds,
+                                mapBounds;
                             if (map instanceof gmaps.Map) {
                                 gmaps.event.trigger(map, "resize");
+                                if (circle instanceof gmaps.Circle) {
+                                    circleBounds=circle.getBounds();
+                                    mapBounds=map.getBounds();
+                                    if(!mapBounds.contains(circleBounds.getNorthEast()) || !mapBounds.contains(circleBounds.getSouthWest())){
+                                        map.fitBounds(circleBounds);
+                                    }
+                                }
                             }
+
                         }
                     };
 
