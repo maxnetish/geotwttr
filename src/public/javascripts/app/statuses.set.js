@@ -109,7 +109,6 @@ define(["ko", "underscore", "models", "jquery", "moment", "gmaps", "logger", "se
                             return false;
                         }
                     });
-                    // console.log("[FILTER] tweet match: " + !notMatch);
                     tweet.matchFilter(!notMatch);
                 },
 
@@ -231,7 +230,6 @@ define(["ko", "underscore", "models", "jquery", "moment", "gmaps", "logger", "se
                         }
                         // hideCount = self.receivedCount() - visibleCount;
                     });
-                    console.log("[FILTER] update counters after apply visible: " + visibleCount + " hided: " + hideCount);
                     self.visibleCount(visibleCount);
                     self.hidedCount(hideCount);
 
@@ -309,17 +307,13 @@ define(["ko", "underscore", "models", "jquery", "moment", "gmaps", "logger", "se
                     var nowCount = self.receivedCount(),
                         nowTs = Date.now(),
                         deltaTs = nowTs - speed.startTimestamp,
-                    // deltaCount = _statusesArray.length - speed.lastCount,
                         result = 0;
-
-                    console.log("[SPEED] update speed deltaTs:" + deltaTs);
 
                     if (deltaTs !== 0) {
                         result = nowCount / (deltaTs / 60000 );
                     }
                     return result.toFixed(2);
                 }
-                // deferEvaluate: true
             });
 
             settings.useStreamApi.value.subscribe(function (newVal) {
