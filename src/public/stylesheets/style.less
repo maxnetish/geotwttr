@@ -54,6 +54,10 @@ button {
   float: left;
 }
 
+.relative{
+  position: relative;
+}
+
 .no-decoration {
   text-decoration: none;
 }
@@ -109,40 +113,47 @@ ul {
     vertical-align: top;
     margin: @marginSmall;
     transition: width 0.3s ease;
-    .pane{
-        margin: 0 @marginSmall 0 0;
+    .pane {
+      margin: 0 @marginSmall 0 0;
     }
     &.pane-left {
       width: calc(~"66.66% - 10px");
       .gmap-column {
-        width: calc(~"60% - 10px");
+        width: calc(~"100% - 10px");
       }
-      .control-column {
-        overflow: hidden;
-        width: calc(~"40% - 12px");
-        .controls {
-          .control-table {
-            display: table;
-            width: 100%;
-            .control-item {
-              display: table-row;
+      .settings-wrapper {
+        display: none;
+        opacity: 0;
+        position: absolute;
+        z-index: 10;
+        top: calc(~"100% + 28px");
+        right: 5px;
+        background: white;
+        border: solid 1px lightgray;
+        padding: 10px;
+        border-radius: 4px;
+        .transition-opacity();
+        .control-table {
+          display: table;
+          width: 100%;
+          .control-item {
+            display: table-row;
+            .transition-hover-background(bisque);
+            .control-label {
+              display: table-cell;
+              .icon {
+                margin: 0 5px;
+              }
+            }
+            &.active {
+              background-color: @colorBackgroundHover;
               .transition-hover-background(bisque);
-              .control-label {
-                display: table-cell;
-                .icon{
-                  margin: 0 5px;
-                }
-              }
-              &.active{
-                background-color: @colorBackgroundHover;
-                .transition-hover-background(bisque);
-              }
-              .control-element {
-                display: table-cell;
-                text-align: right;
-                & > *{
-                  text-align: initial;
-                }
+            }
+            .control-element {
+              display: table-cell;
+              text-align: right;
+              & > * {
+                text-align: initial;
               }
             }
           }
@@ -152,22 +163,7 @@ ul {
         float: right;
       }
     }
-    &.pane-left.control-hide {
-      .gmap-column {
-        width: calc(~"100% - 54px");
-      }
-      .control-column {
-        width: 32px;
-        .controls {
-          .control-item {
-            display: none;
-          }
-        }
-      }
-      .show-hide-controls {
 
-      }
-    }
     &.pane-right {
       width: calc(~"33.33% - 12px");
     }
@@ -184,7 +180,7 @@ ul {
 }
 
 .geo-autocomplete {
-  width: 100%;
+  width: calc(~"100% - 32px");
   padding-right: 0;
   margin-bottom: @marginSmall;
 }
@@ -369,8 +365,8 @@ ul {
   }
 }
 
-footer{
-  .inner-info{
+footer {
+  .inner-info {
     float: left;
     margin: 0 20px;
     background: #008000;

@@ -33,7 +33,8 @@
         'binding.gmap',
         'binding.geo-autocomplete',
         'binding.tweet-content',
-        'binding.size'
+        'binding.size',
+        'binding.settings'
     ], function () {
         //load ko custom bindings
     });

@@ -1,7 +1,4 @@
-div.controls(data-bind='setHeight: needSetHeight')
-    button.show-hide-controls(data-bind='click: toggleControlPanel')
-        span.icon.icon-wrench
-    div.clear
+div.settings-wrapper
     div.control-table(data-bind='foreach: settings')
         div.control-item(data-bind='css: {"active": value}')
             div.control-label

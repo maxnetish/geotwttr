@@ -10,7 +10,7 @@ define(["ko", "jquery", "underscore", "gmaps"],
                     var $element = $(element);
                     var needSetHeightListener = valueAccessor();
                     var $paneContainer = $element.parent(".pane");
-                    var $paneChildren = $element.siblings();
+                    var $paneChildren = $element.siblings(":visible");
                     var $window = $(window);
 
                     var setHeight = function () {

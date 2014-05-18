@@ -28,10 +28,10 @@ define(["ko", "models", "statuses.set", "dataservice.stream-tweets", "jquery", "
             },
 
             toggleControlPanel = function(){
-                controlPanelHide(!controlPanelHide());
-                _.delay(function(){
-                    $(window).trigger("resize");
-                }, 1500);
+                //controlPanelHide(!controlPanelHide());
+                //_.delay(function(){
+                //    $(window).trigger("resize");
+                //}, 1500);
             },
 
             init = function () {
@@ -92,7 +92,7 @@ define(["ko", "models", "statuses.set", "dataservice.stream-tweets", "jquery", "
             showTweetsImmediate: listOfTweets.setStreamedTweetsVisible,
             restLoadingNow: listOfTweets.restLoadingState,
             toggleControlPanel: toggleControlPanel,
-            controlPanelHide: controlPanelHide,
+            //controlPanelHide: controlPanelHide,
             settings: settings.settingsArray,
             receiveSpeed: listOfTweets.receiveSpeed
         };

@@ -10,12 +10,14 @@ block content
     h1.text-center= title
     div.view
         h2.text-center(data-bind='text: title')
-        div.pane-left.pane(data-bind='css: {"control-hide": controlPanelHide}')
+        div.pane-left.pane
             div.pane.gmap-column
-                input.geo-autocomplete(data-bind="geoAutocomplete: '.gmap'", type="search")
+                div.relative
+                    input.geo-autocomplete(data-bind="geoAutocomplete: '.gmap'", type="search")
+                    button.show-hide-controls(data-bind='toggleSettingsPanel: true')
+                        span.icon.icon-wrench
+                    include settings-panel
                 div.gmap(data-bind='gmap: selectedLocation, statusOnMap: statusOnMap, setHeight: needSetHeight')
-            div.pane.control-column
-                include settings-panel
         div.pane-right.pane
             ul#tweet-list.scroll(data-bind='setHeight: needSetHeight')
                 button.button-show-incoming(data-bind='visible: hidedIncomingCount()>0, click: showHidedStatuses', style='display: none;')
