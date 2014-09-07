@@ -1,0 +1,23 @@
+- // Created by Gordeev on 09.02.14.
+li.li-tweet(data-bind="visible: visibleCombined, tweetCustomEvents: $data")
+    article
+        section.tweet-left
+            a.no-decoration.notoggle(data-bind="attr: {href: profileUrl}", target="_blank")
+                img.avatar.hided(data-bind="lazyLoadingImage: {container: 'ul#tweet-list', src: avatarUrl, checkVisibility: checkVisibility}")
+        section.tweet-right
+            p.tweet-usernames
+                a.no-decoration.notoggle(data-bind="attr: {href: profileUrl}", target="_blank")
+                    span.full-name(data-bind="text: realFullName")
+                    span.screen-name(data-bind="text: realScreenName")
+            p.tweet-text(data-bind='renderTweetTextContent: $data')
+            include tweet_template_details
+            p.tweet-meta
+                a.no-decoration.notoggle(data-bind="attr: {href: statusUrl}", target="_blank")
+                    //span.tweet-date(data-bind='tweetDate: $data')
+                    time.tweet-date(data-bind='tweetDate: $data')
+                span.retweet-from(data-bind="if: isRetweet") RT from
+                a.no-decoration.notoggle(data-bind="attr: {href: profileOriginalUrl}, if: isRetweet", target="_blank")
+                    span.screen-name(data-bind="text: orginalScreenName")
+            p.tweet-meta(data-bind='if: !!nearPlace')
+                span Near&nbsp;
+                span(data-bind='text: nearPlace')
