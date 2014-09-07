@@ -2,12 +2,15 @@
  * GET home page.
  */
 
+var express = require('express');
+var router = express.Router();
+
 var vm = require('../vm/index.vm');
 var twitterHelper = require('../helpers/twitter').twitter;
 var tokens = require('../config/tokens');
 var mmdbreader = require('maxmind-db-reader');
 
-exports.index = function (req, res) {
+router.get('/', function (req, res, next) {
     var indexVm = new vm.indexVm(),
         langCode,
         accessToken;
@@ -37,6 +40,6 @@ exports.index = function (req, res) {
             res.render('login', indexVm);
         }
     });
+});
 
-
-};
+module.exports = router;

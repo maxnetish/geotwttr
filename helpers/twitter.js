@@ -6,7 +6,7 @@ var store = require('./store').store,
     OAuth = require('oauth').OAuth,
     tokens = require('../config/tokens'),
     url = require('url'),
-    _ = require('underscore'),
+    _ = require('lodash'),
     querystring = require('querystring'),
 
     oAuthConsumer = function () {

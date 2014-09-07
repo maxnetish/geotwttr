@@ -1,55 +1,97 @@
-/**
- * Module dependencies.
- */
-
 var express = require('express');
-var routes = require('./routes');
-var user = require('./routes/user');
-var authCallback = require('./routes/auth_callback');
-var auth = require('./routes/auth');
-var twttrProxy = require('./routes/twttr_proxy');
-var logout = require('./routes/logout');
-var fsProxy = require('./routes/fs_proxy');
 var http = require('http');
 var path = require('path');
-var WebSocket = require('ws');
+var logger = require('morgan');
+var cookieParser = require('cookie-parser');
+var bodyParser = require('body-parser');
+var responseTime = require('response-time');
+var cookieSecret = 'A12-dmcd=Asd365%bjldkloed(uhn';
+var routes = require('./routes/index');
 
 var app = express();
 
-// all environments
-app.set('port', process.env.PORT || 3000);
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
-app.set("trust proxy", true);
-app.use(express.favicon());
-app.use(express.logger('dev'));
-app.use(express.cookieParser('A12-dmcd=Asd365%bjldkloed(uhn'));
-app.use(express.bodyParser());
-app.use(express.methodOverride());
-app.use(app.router);
-//app.use(require('less-middleware')({ src: path.join(__dirname, 'public') }));
-app.use(require('less-middleware')(path.join(__dirname, '/public')));
-app.use(express.static(path.join(__dirname, 'public')));
+// show current mode in console
+console.log('Express mode: ' + app.get('env'));
 
-// development only
-if ('development' == app.get('env')) {
-    app.use(express.errorHandler());
+// setup logger
+if (app.get('env') === 'development') {
+    app.use(logger('dev'));
 }
 
-app.get('/', routes.index);
-app.get('/users', user.list);
-app.get('/auth_callback', authCallback.redirectFromAuth);
-app.get('/auth', auth.auth);
-app.get('/searchtweets', twttrProxy.searchTweets);
-app.get('/logout', logout.logout);
-app.get('/fscheckin', fsProxy.fsProxy);
+// to properly work behind nginx
+app.set("trust proxy", true);
 
-var httpServer = http.createServer(app);
-httpServer.listen(app.get('port'), '127.0.0.1', function () {
-    console.log('Express server listening on port ' + app.get('port'));
+// view engine setup
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'jade');
+
+// adds X-Response-Time header
+app.use(responseTime(1));
+
+// req parsers
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded());
+app.use(cookieParser(cookieSecret));
+
+// use directory for static (will be useful without nginx)
+app.use(express.static(path.join(__dirname, 'public')));
+
+// setup routes
+app.use('/', routes);
+
+// catch 404 and forward to error handler
+app.use(function (req, res, next) {
+    var err = new Error('Not Found');
+    err.status = 404;
+    next(err);
 });
 
-var wsServer = new WebSocket.Server({server: httpServer});
-wsServer.on('connection', function (ws) {
-    require('./routes/twttr_ws').webSocketServer(ws);
-});
+// error handler
+// development error handler
+// will print stacktrace
+if (app.get('env') === 'development') {
+    app.use('/api', function (err, req, res, next) {
+        var status = err.status || 500;
+        res.status(status);
+        res.send({
+            status: status,
+            message: err.message,
+            error: err,
+            stack: err.stack
+        });
+    });
+    app.use(function (err, req, res, next) {
+        var status = err.status || 500;
+        var responseVm = {
+            message: err.message,
+            error: err
+        };
+
+        res.status(status);
+
+        res.render('error', responseVm);
+    });
+} else {
+// production error handler
+// no stacktraces leaked to user
+    app.use('/api', function (err, req, res, next) {
+        var status = err.status || 500;
+        res.status(status);
+        res.send({
+            status: status,
+            message: err.message,
+            error: {}
+        });
+    });
+    app.use(function (err, req, res, next) {
+        res.status(err.status || 500);
+        var responseVm = {
+            message: err.message,
+            error: {}
+        };
+
+        res.render('error', responseVm);
+    });
+}
+
+module.exports = app;

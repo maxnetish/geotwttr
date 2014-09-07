@@ -1,8 +1,5 @@
-/**
- * Created by Gordeev on 07.09.2014.
- */
 #!/usr/bin/env node
-var debug = require('debug')('jellyblog');
+var debug = require('debug')('geotwttr');
 var app = require('../app');
 
 app.set('port', process.env.PORT || 3000);
