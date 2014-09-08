@@ -5,11 +5,9 @@
 exports.indexVm = function () {
     var self = this,
         title = "Geo statuses",
-        clientScripts = require("../config/client-script.json"),
         ipGeocode = null;
     return{
         title: title,
-        clientScripts: clientScripts,
         ipGeocode: ipGeocode
     };
 };

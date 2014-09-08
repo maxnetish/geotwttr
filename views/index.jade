@@ -1,7 +1,6 @@
 extends layout
 
 block content
-    div#testplayer
     div.account-card.text-center
         span Signed in as
         a.no-decoration(href= "https://twitter.com/"+userInfo.screen_name, target="_blank")
@@ -40,6 +39,9 @@ block content
     script#tweet-template-details(type='text/html')
         include tweet_template_details
     script window.langCode = "#{langCode}";
-    script(data-main="javascripts/app/main.js", src="javascripts/lib/require.js")
+    if deleopmentMode
+        script(src="js/app.js", async)
+    else
+        script(src="js/app.min.js", async)
     include backend_data_loader
     include twitter_follow_script

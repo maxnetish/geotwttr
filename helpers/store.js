@@ -3,25 +3,27 @@
  */
 
 var redis = require('redis'),
+    Q = require('q'),
     client = redis.createClient(),
+    _ = require('lodash');
 
-    getAccessTokenSecret = function (accessToken, callback) {
+    getAccessTokenSecret = function (accessToken, callback, context) {
         // console.log("We are get secret from store, accessToken=" + accessToken);
-        callback = callback || function () {
-        };
-        if (!accessToken) {
-            callback(null, null);
-            return;
-        }
+        var dfr = Q.defer();
+
         client.get(accessToken, function (err, reply) {
             // reply is null when the key is missing
             // console.log("Secret received from strore, secret=" + reply);
-            if (err) {
-                callback(err, null);
-                return;
+            if(_.isFunction(callback)){
+                callback.call(context, err, reply);
             }
-            callback(null, reply);
+            if (err) {
+                dfr.reject(err);
+            }else{
+                dfr.resolve(reply);
+            }
         });
+        return dfr.promise;
     },
 
     setAccessTokenSecret = function (accessToken, accessTokenSecret) {

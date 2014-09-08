@@ -7,6 +7,7 @@ var bodyParser = require('body-parser');
 var responseTime = require('response-time');
 var cookieSecret = 'A12-dmcd=Asd365%bjldkloed(uhn';
 var routes = require('./routes/index');
+var detectLang = require('./services/middleware/detectLang');
 
 var app = express();
 
@@ -32,6 +33,9 @@ app.use(responseTime(1));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded());
 app.use(cookieParser(cookieSecret));
+
+// detect lang code:
+app.use(detectLang);
 
 // use directory for static (will be useful without nginx)
 app.use(express.static(path.join(__dirname, 'public')));

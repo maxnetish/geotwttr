@@ -5,8 +5,8 @@ block content
     div.center-column
         //div.preloader
         h1.text-center= title
-        if authFailed
-            p.text-center Auth failed
+        if authError
+            p.text-center= authError
         if !authSuccess
             p.text-center
                 a(href='/auth') Login with twitter
