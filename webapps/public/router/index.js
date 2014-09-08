@@ -5,26 +5,44 @@
 var path = require('../libs').path;
 var _ = require('../libs')._;
 
-var serializeState = function(st){
-    var result = _.escape(JSON.stringify(st));
+var initialState = {
+    zoom: 8,
+    center: {
+        lat: -34.397,
+        lng: 150.644
+    }
+};
+
+var serializeState = function (st) {
+    var result = encodeURIComponent(JSON.stringify(st));
     return result;
 };
 
-var deserializeState = function(st){
-    var result = JSON.parse(_.unescape(st));
+var deSerializeState = function (st) {
+    var result = JSON.parse(decodeURIComponent(st));
     return result;
 };
 
-var onStateChange = function(){
-    var stateSerialized = this.params['stateSerialized'];
+var onStateChange = function () {
+    var stateSerialized = this.params['stateSerialized'],
+        state = deSerializeState(stateSerialized);
+    console.dir(state);
 };
 
-var run = function(){
+var run = function () {
 
     path.map('#!/app/:stateSerialized')
-        .enter(function(){})
+        .enter(function () {})
         .to(onStateChange)
-        .exit(function(){});
+        .exit(function () {});
+
+    path.root("#!/app/" + serializeState(initialState));
+
+    path.rescue(function(){
+        alert("404: Route Not Found");
+    });
+
+    path.listen();
 };
 
 module.exports = {

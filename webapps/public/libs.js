@@ -4,7 +4,7 @@
 var $ = require('jquery');
 var _ = require('lodash');
 var ko = require('knockout');
-var pathjs = require('pathjs');
+var pathjs = require('pathjs').pathjs;
 
 module.exports = {
     $: $,

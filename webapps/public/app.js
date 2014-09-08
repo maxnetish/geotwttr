@@ -1,5 +1,6 @@
-var libs = require('./libs'),
-    $ = libs.$;
+var router = require('./router');
+
+router.run();
 
 
 

@@ -39,9 +39,9 @@ block content
     script#tweet-template-details(type='text/html')
         include tweet_template_details
     script window.langCode = "#{langCode}";
-    if deleopmentMode
+    if developmentMode
         script(src="js/app.js", async)
     else
         script(src="js/app.min.js", async)
-    include backend_data_loader
+    // include backend_data_loader
     include twitter_follow_script
