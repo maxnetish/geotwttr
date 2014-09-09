@@ -16,7 +16,7 @@ block content
                     button.show-hide-controls(data-bind='toggleSettingsPanel: true')
                         span.icon.icon-wrench
                     include settings-panel
-                div.gmap(data-bind='gmap: selectedLocation, statusOnMap: statusOnMap, setHeight: needSetHeight')
+                div#gmap.gmap(data-bind='gmap: selectedLocation, statusOnMap: statusOnMap, setHeight: needSetHeight')
         div.pane-right.pane
             ul#tweet-list.scroll(data-bind='setHeight: needSetHeight')
                 button.button-show-incoming(data-bind='visible: hidedIncomingCount()>0, click: showHidedStatuses', style='display: none;')
