@@ -2,7 +2,7 @@ var router = require('./router');
 var map = require('./map');
 
 router.run();
-map.showMap();
+map.createMapIn(document.getElementById('gmap'));
 
 
 

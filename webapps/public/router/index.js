@@ -8,42 +8,52 @@ var libs = require('../libs'),
     ko = libs.ko,
     State = require('./state');
 
+var stateParamName = 'stateSerialized';
 var appState = new State();
 var appStateDefault = new State();
 
-var onStateChange = function(){
-    var row = this.params['stateSerialized'];
+var onUrlChange = _.throttle(function () {
+    var row = this.params[stateParamName];
     appState.updateFromSerialized(row);
+    console.log('url changed, set state:');
     console.dir(appState);
+}, 1000);
+
+var onStateChange = _.throttle(function () {
+    console.log('state change:');
+    console.dir(appState);
+}, 1000);
+
+var getCurrentStateUrl = function () {
+    var result;
+    result = '/#!/app/' + appState.serialize();
+    return result;
 };
 
 var run = function () {
 
-    path.map('#!/app/:stateSerialized')
+    path.map('#!/app(/:' + stateParamName + ')')
         .enter(function () {})
-        .to(onStateChange)
+        .to(onUrlChange)
         .exit(function () {});
 
-    path.root("#!/app/" + appStateDefault.serialize());
+    path.root('#!/app');
 
     path.rescue(function () {
-        alert("404: Route Not Found");
+        console.log('404: Route Not Found: ' + window.location.hash);
     });
 
     path.listen();
 };
 
-appState.center.subscribe(function(newVal){
-    console.log('chage center:');
-    console.dir(newVal);
+_.forOwn(appState, function (value, key) {
+    if (ko.isObservable(value)) {
+        value.subscribe(onStateChange);
+    }
 });
-
-appState.zoom.subscribe(function(newVal){
-    console.log('change zoom:');
-    console.dir(newVal);
-})
 
 module.exports = {
     run: run,
-    appState: appState
+    appState: appState,
+    getCurrentStateUrl: getCurrentStateUrl
 };

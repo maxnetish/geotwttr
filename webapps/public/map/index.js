@@ -4,54 +4,36 @@
 'use strict';
 
 var state = require('../router').appState,
-    googleConfig = require('../../../config/google'),
     libs = require('../libs'),
     ko = libs.ko,
     Q = libs.Q,
-    sizer = require('./sizer');
+    sizer = require('./sizer'),
+    libLoader = require('./loader'),
+    mapState = require('./map-state'),
+    mapSelection = require('./selection');
 
-var gMapInstance;
 
-var loadGoogleLibs = function (dfr) {
-    var script = document.createElement('script');
-    var callbackName = 'gmaps_initialize';
-    var onLoad = function () {
-        dfr.resolve(window.google.maps);
-        delete window[callbackName];
-    };
-
-    script.type = 'text/javascript';
-    window[callbackName] = onLoad;
-    script.src = 'https://maps.googleapis.com/maps/api/js?callback=' + callbackName + '&key=' + googleConfig.apiKey;
-
-    document.body.appendChild(script);
+var getGMaps = function(callback){
+    return libLoader.getGMaps(callback);
 };
 
-var promiseGoogleMaps = function () {
-    var dfr = Q.defer();
-
-    if (window.google && window.google.maps) {
-        dfr.resolve(window.google.maps);
-    } else {
-        loadGoogleLibs(dfr);
-    }
-
-    return dfr.promise;
-};
-
-var showMap = function () {
-    promiseGoogleMaps().then(function (gmaps) {
+var createMapIn = function (domContainer) {
+    var dfr = Q.defer(), map;
+    getGMaps().then(function (gmaps) {
         var mapOptions = {
             zoom: ko.unwrap(state.zoom),
             center: new gmaps.LatLng(ko.unwrap(state.center).lat, ko.unwrap(state.center).lng)
         };
         sizer.bind();
-
-        gMapInstance = new gmaps.Map(document.getElementById('gmap'), mapOptions);
+        map = new gmaps.Map(domContainer, mapOptions);
+        mapSelection.init(gmaps, map);
+        mapState.bind(gmaps, map, state);
+        dfr.resolve(mapInstance);
     });
+    return dfr;
 };
 
 module.exports = {
-    showMap: showMap,
-    promiseGmaps: promiseGoogleMaps
+    createMapIn: createMapIn,
+    getGMaps: getGMaps
 };

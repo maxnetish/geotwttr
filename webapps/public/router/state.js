@@ -11,13 +11,12 @@ var State = function () {
         lat: -34.397,
         lng: 150.644
     });
-//    this.selected = ko.observable({
-//        lat: -34.397,
-//        lng: 150.644,
-//        radius: 1000
-//    });
-    this.selected = ko.observable(null);
-    this.zoom = ko.observable(6);
+    this.selection = ko.observable({
+        lat: 0,
+        lng: 0,
+        radius: 0
+    });
+    this.zoom = ko.observable(12);
 };
 
 State.prototype.serialize = function () {
