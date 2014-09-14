@@ -16,7 +16,7 @@ block content
                     button.show-hide-controls(data-bind='toggleSettingsPanel: true')
                         span.icon.icon-wrench
                     include settings-panel
-                div#gmap.gmap(data-bind='gmap: selectedLocation, statusOnMap: statusOnMap, setHeight: needSetHeight')
+                div#gmap.gmap()
         div.pane-right.pane
             ul#tweet-list.scroll(data-bind='setHeight: needSetHeight')
                 button.button-show-incoming(data-bind='visible: hidedIncomingCount()>0, click: showHidedStatuses', style='display: none;')
@@ -38,10 +38,12 @@ block content
         include tweet_template_mini
     script#tweet-template-details(type='text/html')
         include tweet_template_details
-    script window.langCode = "#{langCode}";
+    script.
+        window.gt_config={};
+        window.gt_config.langCode = "#{langCode}";
+        window.gt_config.ipGeolocation = !{ipGeocode};
     if developmentMode
         script(src="js/app.js", async)
     else
         script(src="js/app.min.js", async)
-    // include backend_data_loader
     include twitter_follow_script

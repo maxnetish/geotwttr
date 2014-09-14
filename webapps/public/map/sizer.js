@@ -5,7 +5,7 @@ var libs = require('../libs');
 var $ = libs.$;
 var _ = libs._;
 
-var $mapContainer = $('#gmap');
+var $mapContainer;
 var $window = $(window);
 var $footer = $('footer');
 
@@ -14,7 +14,8 @@ var doSize = _.throttle(function(){
     $mapContainer.height(h);
 }, 1000);
 
-var bind = function(){
+var bind = function(container){
+   $mapContainer = $(container);
    $window.on('resize', doSize);
     doSize();
 };
