@@ -12,11 +12,12 @@ var state = require('../router').appState,
     libLoader = require('./loader'),
     mapState = require('./map-state'),
     mapSelection = require('./selection'),
-    homeLocation = require('./home-location');
+    homeLocation = require('./home-location'),
+    searchControl = require('./geosearch-control');
 
 
-var getGMaps = function (callback) {
-    return libLoader.getGMaps(callback);
+var getGMaps = function () {
+    return libLoader.promiseGMaps();
 };
 
 var createMapIn = function (domContainer) {
@@ -33,18 +34,30 @@ var createMapIn = function (domContainer) {
 
         mapOptions = {
             zoom: ko.unwrap(state.zoom),
-            center: new gmaps.LatLng(ko.unwrap(state.center).lat, ko.unwrap(state.center).lng)
+            center: new gmaps.LatLng(ko.unwrap(state.center).lat, ko.unwrap(state.center).lng),
+            streetViewControl: false
         };
-        sizer.bind(domContainer);
+        sizer.bind(domContainer, function () {
+            if (map) {
+                gmaps.event.trigger(map, 'resize');
+            }
+        });
         map = new gmaps.Map(domContainer, mapOptions);
         mapSelection.init(gmaps, map);
         mapState.bind(gmaps, map, state);
-        dfr.resolve(mapInstance);
+        dfr.resolve(map);
     });
-    return dfr;
+    return dfr.promise;
+};
+
+var createGeoSearchControl = function (domElement) {
+    getGMaps().then(function (gmaps) {
+        searchControl.bind(domElement, gmaps);
+    });
 };
 
 module.exports = {
     createMapIn: createMapIn,
-    getGMaps: getGMaps
+    promiseGMaps: getGMaps,
+    createGeoSearchControl: createGeoSearchControl
 };

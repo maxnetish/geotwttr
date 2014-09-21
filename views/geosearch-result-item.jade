@@ -1,0 +1,3 @@
+p(data-bind="text: item.formatted_address")
+p(data-bind="foreach: {data: item.types, as: 'oneType'}")
+    span(data-bind="text: oneType")

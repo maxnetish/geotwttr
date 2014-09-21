@@ -7,20 +7,15 @@ var googleConfig = require('../../../config/google'),
     libs = require('../libs'),
     Q = libs.Q;
 
+var gMapsDefer = Q.defer();
+
 var callbackName = 'gmaps_initialize',
 
-    onLibLoaded = function (gmap, dfr, callback) {
-        if (callback) {
-            callback(gmap);
-        }
-        dfr.resolve(gmap);
-    },
-
-    beginLoadGoogleLibs = function (dfr, callback) {
+    beginLoadGoogleLibs = function () {
         var script;
 
         window[callbackName] = function () {
-            onLibLoaded(window.google.maps, dfr, callback);
+            gMapsDefer.resolve(window.google.maps);
             delete window[callbackName];
         };
 
@@ -31,21 +26,18 @@ var callbackName = 'gmaps_initialize',
         document.body.appendChild(script);
     },
 
-    getGoogleMaps = function (callback) {
-        var dfr = Q.defer();
+    getGoogleMaps = function () {
 
-        if (window.google && window.google.maps) {
-            onLibLoaded(window.google.maps, dfr, callback);
-        } else {
-            beginLoadGoogleLibs(dfr, callback);
+        if (!(window.google && window.google.maps) && !window[callbackName]) {
+            beginLoadGoogleLibs();
         }
 
-        return dfr.promise;
+        return gMapsDefer.promise;
     };
 
 module.exports = {
     /**
      * returns google.maps namespace via callback or promise
      */
-    getGMaps: getGoogleMaps
+    promiseGMaps: getGoogleMaps
 };

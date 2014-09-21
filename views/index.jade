@@ -12,7 +12,12 @@ block content
         div.pane-left.pane
             div.pane.gmap-column
                 div.relative
-                    input.geo-autocomplete(data-bind="geoAutocomplete: '.gmap'", type="search")
+                    div#geo-search
+                        input.geo-autocomplete(type="text", data-bind="value: searchText, valueUpdate: 'input'")
+                        div.geo-autocomplete-dropdown
+                            ul(data-bind="foreach: { data: searchResults, as: 'item' }")
+                                li
+                                    geosearch-result-item(params="item: item")
                     button.show-hide-controls(data-bind='toggleSettingsPanel: true')
                         span.icon.icon-wrench
                     include settings-panel
@@ -38,6 +43,8 @@ block content
         include tweet_template_mini
     script#tweet-template-details(type='text/html')
         include tweet_template_details
+    script#geosearch-result-item(type=text/html)
+        include geosearch-result-item
     script.
         window.gt_config={};
         window.gt_config.langCode = "#{langCode}";

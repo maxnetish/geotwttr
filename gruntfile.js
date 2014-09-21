@@ -3,6 +3,8 @@ module.exports = function (grunt) {
     var publicJs = 'public/js';
     var publicCss = 'public/css';
     var publicFonts = 'public/fonts';
+    var nodeModules = 'node_modules';
+    var nodeModulesSelect2 = nodeModules + '/select2';
 
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
@@ -47,6 +49,15 @@ module.exports = function (grunt) {
                 // cleancss: true
             }
         },
+        concat: {
+            includeSelect2Css: {
+                src: [
+                        publicCss + '/app.css',
+                        nodeModulesSelect2 + '/select2.css'
+                ],
+                dest: publicCss + '/app.css'
+            }
+        },
         copy: {
             buildAll: {
                 files: [
@@ -58,10 +69,22 @@ module.exports = function (grunt) {
                         dest: publicFonts + '/'
                     }
                 ]
+            },
+            includeSelect2Resources: {
+                files: [
+                    {
+                        src: nodeModulesSelect2 + '/select2.png',
+                        dest: publicCss + '/select2.png'
+                    },
+                    {
+                        src: nodeModulesSelect2 + '/select2-spinner.gif',
+                        dest: publicCss + '/select2-spinner.gif'
+                    }
+                ]
             }
         }
     });
 
     require('load-grunt-tasks')(grunt);
-    grunt.registerTask('default', ['clean', 'browserify', 'uglify', 'less', 'copy']);
+    grunt.registerTask('default', ['clean', 'browserify', 'uglify', 'less', 'concat', 'copy']);
 };
