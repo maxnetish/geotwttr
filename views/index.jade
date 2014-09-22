@@ -8,43 +8,40 @@ block content
         a.logout(href="/logout") Sign-out
     h1.text-center= title
     div.view
-        h2.text-center(data-bind='text: title')
+        h2.text-center(data-old-bind='text: title')
         div.pane-left.pane
             div.pane.gmap-column
                 div.relative
-                    div#geo-search
-                        input.geo-autocomplete(type="text", data-bind="value: searchText, valueUpdate: 'input'")
-                        div.geo-autocomplete-dropdown
-                            ul(data-bind="foreach: { data: searchResults, as: 'item' }")
-                                li
-                                    geosearch-result-item(params="item: item")
-                    button.show-hide-controls(data-bind='toggleSettingsPanel: true')
+                    geosearch-control
+                    button.show-hide-controls(data-old-bind='toggleSettingsPanel: true')
                         span.icon.icon-wrench
                     include settings-panel
                 div#gmap.gmap()
         div.pane-right.pane
-            ul#tweet-list.scroll(data-bind='setHeight: needSetHeight')
-                button.button-show-incoming(data-bind='visible: hidedIncomingCount()>0, click: showHidedStatuses', style='display: none;')
+            ul#tweet-list.scroll(data-old-bind='setHeight: needSetHeight')
+                button.button-show-incoming(data-old-bind='visible: hidedIncomingCount()>0, click: showHidedStatuses', style='display: none;')
                     span New statuses:&nbsp;
-                    span(data-bind='text: hidedIncomingCount')
-                div.preloader(data-bind='visible: restLoadingNow')
-                button.button-request-previous(data-bind='click: needMore, visible: !restLoadingNow()', style='display: none;')
+                    span(data-old-bind='text: hidedIncomingCount')
+                div.preloader(data-old-bind='visible: restLoadingNow')
+                button.button-request-previous(data-old-bind='click: needMore, visible: !restLoadingNow()', style='display: none;')
                     span Load more
     footer
         section.inner-info
-            span(data-bind='text: displayedCount')
+            span(data-old-bind='text: displayedCount')
             span &nbsp;of&nbsp;
-            span(data-bind='text: receivedCount')
+            span(data-old-bind='text: receivedCount')
         section.inner-info
-            span(data-bind='text: receiveSpeed')
+            span(data-old-bind='text: receiveSpeed')
             span &nbsp;tw/min
         a(href="https://twitter.com/maxnetish", class="twitter-follow-button", data-show-count="false", data-lang="#{langCode}") Follow me
     script#tweet-template(type='text/html')
         include tweet_template_mini
-    script#tweet-template-details(type='text/html')
+    script#tweet-template-details(type="text/html")
         include tweet_template_details
-    script#geosearch-result-item(type=text/html)
-        include geosearch-result-item
+    script#geosearch-result-item(type="text/html")
+        include geosearch-result-item.tpl.jade
+    script#geosearch-control(type="text/html")
+        include geosearch-control.tpl.jade
     script.
         window.gt_config={};
         window.gt_config.langCode = "#{langCode}";

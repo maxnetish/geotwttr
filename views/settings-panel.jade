@@ -1,12 +1,12 @@
 div.settings-wrapper
-    div.control-table(data-bind='foreach: settings')
-        div.control-item(data-bind='css: {"active": value}')
+    div.control-table(data-old-bind='foreach: settings')
+        div.control-item(data-old-bind='css: {"active": value}')
             div.control-label
-                span.icon(data-bind='css: iconClass')
+                span.icon(data-old-bind='css: iconClass')
             div.control-label
-                label(data-bind='attr: {"for": id, title: promptOrTitle}, text: name', for='use-stream-api')
+                label(data-old-bind='attr: {"for": id, title: promptOrTitle}, text: name', for='use-stream-api')
             div.control-element
-                input(data-bind='attr: {"id": id, "type": type, placeholder: promptOrTitle, list: suggestListId}, value: realValue, checked: checked, valueUpdate: "input"', type='text')
-                datalist(data-bind='attr: {"id": suggestListId}, foreach: suggestList')
-                    option(data-bind='attr: {"value": $data}')
+                input(data-old-bind='attr: {"id": id, "type": type, placeholder: promptOrTitle, list: suggestListId}, value: realValue, checked: checked, valueUpdate: "input"', type='text')
+                datalist(data-old-bind='attr: {"id": suggestListId}, foreach: suggestList')
+                    option(data-old-bind='attr: {"value": $data}')
 

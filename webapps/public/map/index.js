@@ -12,9 +12,7 @@ var state = require('../router').appState,
     libLoader = require('./loader'),
     mapState = require('./map-state'),
     mapSelection = require('./selection'),
-    homeLocation = require('./home-location'),
-    searchControl = require('./geosearch-control');
-
+    homeLocation = require('./home-location');
 
 var getGMaps = function () {
     return libLoader.promiseGMaps();
@@ -50,14 +48,7 @@ var createMapIn = function (domContainer) {
     return dfr.promise;
 };
 
-var createGeoSearchControl = function (domElement) {
-    getGMaps().then(function (gmaps) {
-        searchControl.bind(domElement, gmaps);
-    });
-};
-
 module.exports = {
     createMapIn: createMapIn,
-    promiseGMaps: getGMaps,
-    createGeoSearchControl: createGeoSearchControl
+    promiseGMaps: getGMaps
 };
