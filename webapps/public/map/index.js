@@ -9,13 +9,12 @@ var state = require('../router').appState,
     Q = libs.Q,
     $ = libs.$,
     sizer = require('./sizer'),
-    libLoader = require('./loader'),
     mapState = require('./map-state'),
     mapSelection = require('./selection'),
     homeLocation = require('./home-location');
 
 var getGMaps = function () {
-    return libLoader.promiseGMaps();
+    return libs.promiseGmaps();
 };
 
 var createMapIn = function (domContainer) {

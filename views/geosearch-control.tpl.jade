@@ -1,5 +1,7 @@
-input.geo-autocomplete(type="text", data-bind="textInput: searchText")
-div.geo-autocomplete-dropdown
-    ul(data-bind="foreach: { data: searchResults, as: 'item' }")
-        li
-            geosearch-result-item(params="item: item")
+div.geosearch-control-wrapper
+    input.geo-autocomplete(type="search", data-bind="textInput: searchText", placeholder="Search place")
+    div.geo-autocomplete-dropdown-wrapper()
+        div.geo-autocomplete-dropdown()
+            ul(data-bind="foreach: { data: searchResults, as: 'item' }")
+                li
+                    geosearch-result-item(params="item: item")

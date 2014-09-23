@@ -3,11 +3,9 @@
  */
 
 // depends
-var googleConfig = require('../../../config/google'),
-    libs = require('../libs'),
-    Q = libs.Q;
+var googleConfig = require('../../config/google');
 
-var gMapsDefer = Q.defer();
+var gMapsDefer;
 
 var callbackName = 'gmaps_initialize',
 
@@ -26,18 +24,23 @@ var callbackName = 'gmaps_initialize',
         document.body.appendChild(script);
     },
 
-    getGoogleMaps = function () {
+    getGoogleMaps = function (Q) {
+        return function() {
+            if(!gMapsDefer){
+                gMapsDefer = Q.defer();
+            }
 
-        if (!(window.google && window.google.maps) && !window[callbackName]) {
-            beginLoadGoogleLibs();
-        }
+            if (!(window.google && window.google.maps) && !window[callbackName]) {
+                beginLoadGoogleLibs();
+            }
 
-        return gMapsDefer.promise;
+            return gMapsDefer.promise;
+        };
     };
 
 module.exports = {
     /**
      * returns google.maps namespace via callback or promise
      */
-    promiseGMaps: getGoogleMaps
+    getPromiseGMaps: getGoogleMaps
 };

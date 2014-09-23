@@ -6,11 +6,13 @@ var _ = require('lodash');
 var ko = require('knockout');
 var pathjs = require('pathjs').pathjs;
 var Q = require('q');
+var gmapsLoader = require('./gmaps-lib-loader');
 
 module.exports = {
     $: $,
     _: _,
     ko: ko,
     path: pathjs,
-    Q: Q
+    Q: Q,
+    promiseGmaps: gmapsLoader.getPromiseGMaps(Q)
 };

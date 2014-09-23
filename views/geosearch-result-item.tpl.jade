@@ -1,3 +1,13 @@
-p(data-bind="text: item.formatted_address")
-p(data-bind="foreach: {data: item.types, as: 'oneType'}")
-    span(data-bind="text: oneType")
+div.place-icon
+    span(data-bind="attr: {'class': 'icon '+icon}")
+div.place-description
+    p(data-bind="text: formatted_address")
+    p.place-coordinates(data-bind="if: preciseCoordinates")
+        span lat:&nbsp;
+        span(data-bind="text: preciseCoordinates.lat")
+        span &nbsp;lng:&nbsp;
+        span(data-bind="text: preciseCoordinates.lng")
+    p(data-bind="if: countryLabel")
+        span.label(data-bind="text: countryLabel")
+    p(data-bind="foreach: {data: types, as: 'oneType'}")
+        span.label(data-bind="text: oneType")

@@ -1,28 +1,7 @@
 @import "inc/icons.less";
+@import "inc/geosearch-control.less";
+@import "inc/mixin.less";
 
-/***   variables   ***/
-@marginSmall: 5px;
-@colorEntity: #0099B9;
-@colorGray: darkgray;
-@colorBackgroundHover: rgba(0, 153, 185, 0.1);
-@colorBackgroundSmallInfo: rgba(235, 200, 148, 1);
-@colorFoursquare: #1DAFEC;
-
-/***  mixins  ***/
-.fontText(@fontSize: 14px) {
-  font: @fontSize "Lucida Grande", Helvetica, Arial, sans-serif;
-}
-
-.transition-hover-background(@hoverBackground: @colorBackgroundHover) {
-  transition: background 0.3s ease;
-  &:hover {
-    background: @hoverBackground;
-  }
-}
-
-.transition-opacity(@duration: 0.3s) {
-  transition: opacity @duration ease;
-}
 
 body {
   padding: @marginSmall;
@@ -181,10 +160,11 @@ ul {
   height: 100%;
 }
 
-.geo-autocomplete {
+.geosearch-control-wrapper {
   width: calc(~"100% - 48px");
   padding-right: 0;
   margin-bottom: @marginSmall;
+  float: left;
 }
 
 .li-tweet {
