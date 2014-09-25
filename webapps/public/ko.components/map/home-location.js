@@ -1,4 +1,4 @@
-var libs = require('../libs'),
+var libs = require('../../libs'),
     Q = libs.Q;
 
 var geoApiAvailable = ('geolocation' in navigator),

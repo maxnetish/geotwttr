@@ -3,8 +3,9 @@
  */
 'use strict';
 
-var state = require('../router').appState,
-    libs = require('../libs'),
+var
+//    state = require('../router').appState,
+    libs = require('../../libs'),
     ko = libs.ko,
     Q = libs.Q,
     $ = libs.$,
@@ -17,7 +18,7 @@ var getGMaps = function () {
     return libs.promiseGmaps();
 };
 
-var createMapIn = function (domContainer) {
+var createMapIn = function (domContainer, state) {
     var dfr = Q.defer(), map;
     getGMaps().then(function (gmaps) {
         var homeCoords = homeLocation.getDefaultLocation(),
@@ -47,7 +48,22 @@ var createMapIn = function (domContainer) {
     return dfr.promise;
 };
 
+var createViewModel = function(params, componentInfo){
+    createMapIn($('#gmap', componentInfo.element).get(0), params.appState)
+        .then(function(createdMap){
+            params.mapInstance(createdMap);
+        });
+};
+
+var register = function(){
+    ko.components.register('gmap-control', {
+        template: '<div id="gmap" class="gmap"></div>',
+        viewModel: {
+            createViewModel: createViewModel
+        }
+    });
+};
+
 module.exports = {
-    createMapIn: createMapIn,
-    promiseGMaps: getGMaps
+    register: register
 };

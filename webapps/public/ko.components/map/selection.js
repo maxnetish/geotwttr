@@ -2,7 +2,7 @@
  * Created by mgordeev on 10.09.2014.
  */
 
-var libs = require('../libs'),
+var libs = require('../../libs'),
     _ = libs._;
 
 var namespace = 'geoTwttr';

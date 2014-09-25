@@ -12,11 +12,11 @@ block content
         div.pane-left.pane
             div.pane.gmap-column
                 div.relative
-                    geosearch-control
+                    geosearch-control(params="mapInstance: mapInstance, selectedResult: selectedGeosearchResult")
                     button.show-hide-controls(data-old-bind='toggleSettingsPanel: true')
                         span.icon.icon-wrench
                     include settings-panel
-                div#gmap.gmap()
+                gmap-control(params="mapInstance: mapInstance, appState: appState")
         div.pane-right.pane
             ul#tweet-list.scroll(data-old-bind='setHeight: needSetHeight')
                 button.button-show-incoming(data-old-bind='visible: hidedIncomingCount()>0, click: showHidedStatuses', style='display: none;')

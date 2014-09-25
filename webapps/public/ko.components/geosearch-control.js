@@ -8,20 +8,23 @@ var ko = libs.ko;
 var $ = libs.$;
 var _ = libs._;
 
-var GeosearchViewModel = function(params, componentInfo){
+var GeosearchViewModel = function (params, componentInfo) {
     var self = this,
-        $element = $(componentInfo.element);
+        $element = $(componentInfo.element),
+        mapWrapped = params.mapInstance,
+        selectedResult = params.selectedResult;
 
     var geocoderInstance;
 
     var onSearchTextUpdate = function (newText) {
         var thisContext = self,
             $dropdown = $('.geo-autocomplete-dropdown', $element),
-            $dropdownWrapper = $('.geo-autocomplete-dropdown-wrapper', $element);
+            $dropdownWrapper = $('.geo-autocomplete-dropdown-wrapper', $element),
+            mapUnwrapped = ko.unwrap(mapWrapped);
 
-        if(!newText){
+        if (!newText) {
             $dropdown.removeClass('expanded');
-            _.delay(function(){
+            _.delay(function () {
                 // we need delay to show css animation
                 $dropdownWrapper.removeClass('expanded');
                 thisContext.searchResults.removeAll();
@@ -30,14 +33,15 @@ var GeosearchViewModel = function(params, componentInfo){
         }
 
         $dropdownWrapper.addClass('expanded');
-        _.defer(function(){
+        _.defer(function () {
             // we need defer to show css animation
             $dropdown.addClass('expanded');
         });
 
         thisContext.promiseGeocoderInstance().then(function (geocoder) {
             geocoder.geocode({
-                address: newText
+                address: newText,
+                bounds: mapUnwrapped ? mapUnwrapped.getBounds() : undefined
             }, function (geoResults, status) {
                 console.dir(geoResults);
                 thisContext.searchResults(geoResults);
@@ -52,6 +56,21 @@ var GeosearchViewModel = function(params, componentInfo){
             method: "notifyWhenChangesStop"
         }
     });
+    this.onSelect = function(data){
+        var $dropdown = $('.geo-autocomplete-dropdown', $element),
+            $dropdownWrapper = $('.geo-autocomplete-dropdown-wrapper', $element);
+
+        self.searchText(data.formatted_address);
+        selectedResult(data);
+        console.dir(selectedResult());
+
+            $dropdown.removeClass('expanded');
+            _.delay(function () {
+                // we need delay to show css animation
+                $dropdownWrapper.removeClass('expanded');
+                self.searchResults.removeAll();
+            }, 500);
+    };
     this.promiseGeocoderInstance = function () {
         var dfr = Q.defer();
 

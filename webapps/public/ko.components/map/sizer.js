@@ -1,7 +1,7 @@
 /**
  * Created by mgordeev on 09.09.2014.
  */
-var libs = require('../libs');
+var libs = require('../../libs');
 var $ = libs.$;
 var _ = libs._;
 

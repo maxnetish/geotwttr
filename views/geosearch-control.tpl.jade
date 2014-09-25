@@ -3,5 +3,5 @@ div.geosearch-control-wrapper
     div.geo-autocomplete-dropdown-wrapper()
         div.geo-autocomplete-dropdown()
             ul(data-bind="foreach: { data: searchResults, as: 'item' }")
-                li
+                li(data-bind="click: $parent.onSelect")
                     geosearch-result-item(params="item: item")
