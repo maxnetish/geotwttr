@@ -10,7 +10,10 @@ var gMapsDefer;
 var callbackName = 'gmaps_initialize',
 
     beginLoadGoogleLibs = function () {
-        var script;
+        var script,
+            //langCode =  window.gt_config && window.gt_config.langCode
+            langCode =  'ru'
+            ;
 
         window[callbackName] = function () {
             gMapsDefer.resolve(window.google.maps);
@@ -19,7 +22,7 @@ var callbackName = 'gmaps_initialize',
 
         script = document.createElement('script');
         script.type = 'text/javascript';
-        script.src = 'https://maps.googleapis.com/maps/api/js?callback=' + callbackName + '&key=' + googleConfig.apiKey;
+        script.src = 'https://maps.googleapis.com/maps/api/js?callback=' + callbackName + '&key=' + googleConfig.apiKey+'&language='+langCode;
 
         document.body.appendChild(script);
     },

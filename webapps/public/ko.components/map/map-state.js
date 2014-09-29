@@ -7,7 +7,17 @@ var libs = require('../../libs'),
     ko = libs.ko,
     mapSelection = require('./selection');
 
-var gmapsNamespace;
+var gmapsNamespace,
+geocoderInstance;
+
+var reverseGeocode = function(latLng, observableToSet){
+     geocoderInstance.geocode({
+         location: latLng
+     }, function(geoResults, status){
+         console.log(geoResults);
+         observableToSet(geoResults);
+     });
+};
 
 var bindCenterPosition = function (map, state) {
     state.center.subscribe(function (newCenter) {
@@ -78,6 +88,8 @@ var bindSelection = function (map, state) {
 
         circle.setCenter(new gmapsNamespace.LatLng(newSelection.lat, newSelection.lng));
         circle.setRadius(newSelection.radius);
+
+        reverseGeocode(circle.getCenter(), state.selectionGeocode);
     });
     gmapsNamespace.event.addListener(circle, 'center_changed', function () {
         var circleCenter = circle.getCenter(),
@@ -93,6 +105,8 @@ var bindSelection = function (map, state) {
             lng: circleCenter.lng(),
             radius: circle.getRadius()
         });
+
+        reverseGeocode(circleCenter, state.selectionGeocode);
     });
     gmapsNamespace.event.addListener(circle, 'radius_changed', function () {
         var circleRadius = circle.getRadius(),
@@ -114,6 +128,7 @@ var bindSelection = function (map, state) {
 
 var bind = function (gmaps, map, state) {
     gmapsNamespace = gmaps;
+    geocoderInstance = new gmaps.Geocoder();
     bindCenterPosition(map, state);
     bindZoom(map, state);
     bindSelection(map, state);

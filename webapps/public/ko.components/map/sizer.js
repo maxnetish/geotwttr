@@ -22,7 +22,7 @@ var bind = function (container, callback) {
     $mapContainer = $(container);
     afterResizeCallback = callback;
     $window.on('resize', doSize);
-    doSize();
+    _.delay(doSize, 2000);
 };
 
 module.exports = {

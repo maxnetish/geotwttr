@@ -8,7 +8,6 @@ block content
         a.logout(href="/logout") Sign-out
     h1.text-center= title
     div.view
-        h2.text-center(data-old-bind='text: title')
         div.pane-left.pane
             div.pane.gmap-column
                 div.relative
@@ -16,8 +15,10 @@ block content
                     button.show-hide-controls(data-old-bind='toggleSettingsPanel: true')
                         span.icon.icon-wrench
                     include settings-panel
-                gmap-control(params="mapInstance: mapInstance, appState: appState")
+                gmap-control(params="mapInstance: mapInstance, appState: appState, selectedGeosearchResult: selectedGeosearchResult")
         div.pane-right.pane
+            div.selection-details(data-bind="foreach: appState.selectionGeocode")
+                p(data-bind="text: $data.formatted_address")
             ul#tweet-list.scroll(data-old-bind='setHeight: needSetHeight')
                 button.button-show-incoming(data-old-bind='visible: hidedIncomingCount()>0, click: showHidedStatuses', style='display: none;')
                     span New statuses:&nbsp;

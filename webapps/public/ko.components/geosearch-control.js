@@ -56,20 +56,29 @@ var GeosearchViewModel = function (params, componentInfo) {
             method: "notifyWhenChangesStop"
         }
     });
-    this.onSelect = function(data){
+    this.onSelect = function (data) {
         var $dropdown = $('.geo-autocomplete-dropdown', $element),
-            $dropdownWrapper = $('.geo-autocomplete-dropdown-wrapper', $element);
+            $dropdownWrapper = $('.geo-autocomplete-dropdown-wrapper', $element),
+            mapUnwrapped = ko.unwrap(mapWrapped);
 
         self.searchText(data.formatted_address);
         selectedResult(data);
         console.dir(selectedResult());
 
-            $dropdown.removeClass('expanded');
-            _.delay(function () {
-                // we need delay to show css animation
-                $dropdownWrapper.removeClass('expanded');
-                self.searchResults.removeAll();
-            }, 500);
+        if (mapUnwrapped) {
+            if (data.geometry && data.geometry.viewport) {
+                mapUnwrapped.fitBounds(data.geometry.viewport);
+            } else if (data.geometry && data.geometry.location) {
+                mapUnwrapped.setCenter(data.geometry.location);
+            }
+        }
+
+        $dropdown.removeClass('expanded');
+        _.delay(function () {
+            // we need delay to show css animation
+            $dropdownWrapper.removeClass('expanded');
+            self.searchResults.removeAll();
+        }, 500);
     };
     this.promiseGeocoderInstance = function () {
         var dfr = Q.defer();

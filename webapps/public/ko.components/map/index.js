@@ -48,14 +48,15 @@ var createMapIn = function (domContainer, state) {
     return dfr.promise;
 };
 
-var createViewModel = function(params, componentInfo){
+var createViewModel = function (params, componentInfo) {
     createMapIn($('#gmap', componentInfo.element).get(0), params.appState)
-        .then(function(createdMap){
+        .then(function (createdMap) {
             params.mapInstance(createdMap);
         });
+
 };
 
-var register = function(){
+var register = function () {
     ko.components.register('gmap-control', {
         template: '<div id="gmap" class="gmap"></div>',
         viewModel: {
