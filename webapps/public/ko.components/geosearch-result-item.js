@@ -57,7 +57,7 @@ module.exports = {
     register: function () {
         ko.components.register('geosearch-result-item', {
             template: {
-                element: 'geosearch-result-item'
+                element: 'geosearch-result-item-tpl'
             },
             viewModel: GeocoderResult
         });

@@ -105,7 +105,7 @@ var createGeosearchViewModel = function (params, componentInfo) {
 var register = function () {
     ko.components.register('geosearch-control', {
         template: {
-            element: 'geosearch-control'
+            element: 'geosearch-control-tpl'
         },
         viewModel: {
             createViewModel: createGeosearchViewModel

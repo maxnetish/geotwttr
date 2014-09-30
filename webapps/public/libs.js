@@ -14,5 +14,6 @@ module.exports = {
     ko: ko,
     path: pathjs,
     Q: Q,
-    promiseGmaps: gmapsLoader.getPromiseGMaps(Q)
+    promiseGmaps: gmapsLoader.getPromiseGMaps(Q),
+    promiseGeocoder: gmapsLoader.getPromiseGeocoder(Q)
 };

@@ -1,0 +1,18 @@
+div#selection-details
+    div
+        p
+            button.details-expand(data-bind="click: expandToggle")
+                span.icon(data-bind="css: {'icon-plus-square': !expanded(), 'icon-minus-square': expanded()}")
+            a(href="javascript:void 0", data-bind="with: geocoderFirstResult")
+                span(data-bind="text: formatted_address")
+            // ko foreach: geocoderRestResult
+            span.icon.icon-long-arrow-right
+            a(href="javascript:void 0")
+                span(data-bind="text: formatted_address")
+            // /ko
+
+        p
+            label(for="selection-radius", type="numeric") Radius
+            input(id="selection-radius", data-bind="value: radius")
+
+

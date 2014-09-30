@@ -17,8 +17,7 @@ block content
                     include settings-panel
                 gmap-control(params="mapInstance: mapInstance, appState: appState, selectedGeosearchResult: selectedGeosearchResult")
         div.pane-right.pane
-            div.selection-details(data-bind="foreach: appState.selectionGeocode")
-                p(data-bind="text: $data.formatted_address")
+            selection-details-control(params="appState: appState")
             ul#tweet-list.scroll(data-old-bind='setHeight: needSetHeight')
                 button.button-show-incoming(data-old-bind='visible: hidedIncomingCount()>0, click: showHidedStatuses', style='display: none;')
                     span New statuses:&nbsp;
@@ -35,14 +34,16 @@ block content
             span(data-old-bind='text: receiveSpeed')
             span &nbsp;tw/min
         a(href="https://twitter.com/maxnetish", class="twitter-follow-button", data-show-count="false", data-lang="#{langCode}") Follow me
-    script#tweet-template(type='text/html')
+    //script#tweet-template(type='text/html')
         include tweet_template_mini
-    script#tweet-template-details(type="text/html")
+    //script#tweet-template-details(type="text/html")
         include tweet_template_details
-    script#geosearch-result-item(type="text/html")
-        include geosearch-result-item.tpl.jade
-    script#geosearch-control(type="text/html")
-        include geosearch-control.tpl.jade
+    script#geosearch-result-item-tpl(type="text/html")
+        include templates/geosearch-result-item.tpl.jade
+    script#geosearch-control-tpl(type="text/html")
+        include templates/geosearch-control.tpl.jade
+    script#selection-details-tpl(type="text/html")
+        include templates/selection-details-control.tpl.jade
     script.
         window.gt_config={};
         window.gt_config.langCode = "#{langCode}";

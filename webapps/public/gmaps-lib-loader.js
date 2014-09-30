@@ -5,7 +5,9 @@
 // depends
 var googleConfig = require('../../config/google');
 
-var gMapsDefer;
+var gMapsDefer,
+    geocoderDefer,
+    geocoderInstance;
 
 var callbackName = 'gmaps_initialize',
 
@@ -39,11 +41,28 @@ var callbackName = 'gmaps_initialize',
 
             return gMapsDefer.promise;
         };
+    },
+    getGoogleGeocoder = function(Q){
+        return function(){
+            if(!geocoderDefer){
+                geocoderDefer = Q.defer();
+            }
+
+            if(!geocoderInstance) {
+                getGoogleMaps(Q)().then(function (gmaps) {
+                    geocoderInstance = new gmaps.Geocoder();
+                    geocoderDefer.resolve(geocoderInstance);
+                });
+            }
+
+            return geocoderDefer.promise;
+        };
     };
 
 module.exports = {
     /**
      * returns google.maps namespace via callback or promise
      */
-    getPromiseGMaps: getGoogleMaps
+    getPromiseGMaps: getGoogleMaps,
+    getPromiseGeocoder: getGoogleGeocoder
 };

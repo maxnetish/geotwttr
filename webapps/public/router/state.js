@@ -17,7 +17,6 @@ var State = function () {
         radius: 0
     });
     this.zoom = ko.observable(12);
-    this.selectionGeocode = ko.observable([]);
 };
 
 State.prototype.serialize = function () {
