@@ -9,10 +9,11 @@ var _ = libs._;
 var Viewmodel = function (params) {
     var self = this,
         appState = ko.unwrap(params.appState),
-        lastLocation = {
-            lat: null,
-            lng: null
-        };
+        mapInstanceWrapped = params.mapInstance;
+    lastLocation = {
+        lat: null,
+        lng: null
+    };
 
     this.expanded = ko.observable(false);
     this.geocoderResults = ko.observableArray();
@@ -25,8 +26,12 @@ var Viewmodel = function (params) {
         deferEvaluation: true
     });
     this.geocoderRestResult = ko.computed({
-        read: function(){
-            return _.rest(ko.unwrap(this.geocoderResults)) || [];
+        read: function () {
+            var expandedUnwrapped = ko.unwrap(this.expanded);
+            if(expandedUnwrapped) {
+                return _.rest(ko.unwrap(this.geocoderResults)) || [];
+            }
+            return [];
         },
         owner: this,
         pure: true,
@@ -47,27 +52,40 @@ var Viewmodel = function (params) {
     this.radius = ko.computed({
         read: function () {
             var selectionUnwrapped = ko.unwrap(appState.selection),
-                radius = selectionUnwrapped.radius;
+                radius = selectionUnwrapped.radius.toFixed(0);
             return radius;
         },
         owner: this,
         pure: true,
         deferEvaluation: true,
         write: function (newValue) {
-            var selectionUnwrapped = ko.unwrap(appState.selection);
+            var newValueNum = parseFloat(newValue),
+                selectionUnwrapped;
+            if (isNaN(newValueNum) || !newValueNum || newValueNum < 0) {
+                return;
+            }
+            selectionUnwrapped = ko.unwrap(appState.selection);
             appState.selection({
                 lat: selectionUnwrapped.lat,
                 lng: selectionUnwrapped.lng,
-                radius: parseFloat(newValue)
+                radius: newValueNum
             });
         }
     });
+
+    this.positionTo = function (searchResult) {
+        var map = ko.unwrap(mapInstanceWrapped);
+        if (!(map && searchResult)) {
+            return;
+        }
+        map.fitBounds(searchResult.geometry.viewport);
+    };
 
     this.location.subscribe(function (newLocation) {
         if (_.isEqual(lastLocation, newLocation)) {
             return;
         }
-
+        lastLocation = _.clone(newLocation);
         services.geocoder.promiseReverseGeocode(newLocation).then(function (result) {
             self.geocoderResults(result);
         });

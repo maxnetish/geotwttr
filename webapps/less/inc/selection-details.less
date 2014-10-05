@@ -1,0 +1,31 @@
+@import "mixin.less";
+
+#selection-details{
+  .address{
+    margin: 0 1em;
+  }
+
+  .details-expand{
+    border: none;
+    background: none;
+    padding: 0;
+    cursor: pointer;
+    color: gray;
+    .transition-hover-color(gray);
+  }
+
+  .selection-details-wrapper{
+    border: solid 1px gray;
+    padding: 5px;
+  }
+
+  .tree-mark{
+    color: gray;
+  }
+
+  .radius-block{
+    & > *{
+      margin-right: 5px;
+    }
+  }
+}

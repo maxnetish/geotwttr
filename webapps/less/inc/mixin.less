@@ -18,6 +18,13 @@
   }
 }
 
+.transition-hover-color(@hoverColor: gray) {
+  transition: background 0.3s ease;
+  &:hover{
+    color: darken(@hoverColor, 30%);
+  }
+}
+
 .transition-opacity(@duration: 0.3s) {
   transition: opacity @duration ease;
 }

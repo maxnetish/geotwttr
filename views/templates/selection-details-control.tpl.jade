@@ -1,18 +1,19 @@
-div#selection-details
-    div
+div#selection-details(data-bind="if: geocoderResults().length")
+    div.selection-details-wrapper
         p
             button.details-expand(data-bind="click: expandToggle")
                 span.icon(data-bind="css: {'icon-plus-square': !expanded(), 'icon-minus-square': expanded()}")
-            a(href="javascript:void 0", data-bind="with: geocoderFirstResult")
+            a(class="address", href="javascript:void 0", data-bind="with: geocoderFirstResult, click: function(){positionTo(geocoderFirstResult());}")
                 span(data-bind="text: formatted_address")
             // ko foreach: geocoderRestResult
-            span.icon.icon-long-arrow-right
-            a(href="javascript:void 0")
+            span.tree-mark.icon.icon-chevron-left
+            a(class="address", href="javascript:void 0", data-bind="click: $parent.positionTo")
                 span(data-bind="text: formatted_address")
             // /ko
 
-        p
-            label(for="selection-radius", type="numeric") Radius
-            input(id="selection-radius", data-bind="value: radius")
+        p.radius-block
+            label(for="selection-radius") Radius
+            input(type="number", min="1", id="selection-radius", data-bind="textInput: radius")
+            span m
 
 
