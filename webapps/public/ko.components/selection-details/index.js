@@ -5,15 +5,16 @@ var libs = require('../../libs');
 var services = require('../../services');
 var ko = libs.ko;
 var _ = libs._;
+var addressParser = require('./address-parser');
 
 var Viewmodel = function (params) {
     var self = this,
         appState = ko.unwrap(params.appState),
-        mapInstanceWrapped = params.mapInstance;
-    lastLocation = {
-        lat: null,
-        lng: null
-    };
+        mapInstanceWrapped = params.mapInstance,
+        lastLocation = {
+            lat: null,
+            lng: null
+        };
 
     this.expanded = ko.observable(false);
     this.geocoderResults = ko.observableArray();
@@ -28,7 +29,7 @@ var Viewmodel = function (params) {
     this.geocoderRestResult = ko.computed({
         read: function () {
             var expandedUnwrapped = ko.unwrap(this.expanded);
-            if(expandedUnwrapped) {
+            if (expandedUnwrapped) {
                 return _.rest(ko.unwrap(this.geocoderResults)) || [];
             }
             return [];
@@ -75,7 +76,7 @@ var Viewmodel = function (params) {
 
     this.positionTo = function (searchResult) {
         var map = ko.unwrap(mapInstanceWrapped);
-        if (!(map && searchResult)) {
+        if (!(map && searchResult && searchResult.geometry)) {
             return;
         }
         map.fitBounds(searchResult.geometry.viewport);
@@ -87,7 +88,16 @@ var Viewmodel = function (params) {
         }
         lastLocation = _.clone(newLocation);
         services.geocoder.promiseReverseGeocode(newLocation).then(function (result) {
+            _.each(result, function (resultItem) {
+                resultItem.parsedAddress = addressParser.parse(resultItem);
+            });
+            if (!result || result.length === 0) {
+                result.push({
+                    parsedAddress: 'lat:' + newLocation.lat + ' lng:' + newLocation.lng
+                });
+            }
             self.geocoderResults(result);
+            console.log(result);
         });
     });
 };
