@@ -5,12 +5,18 @@ var rootViewModel = function(){
     var mapInstance = ko.observable();
     var selectionGeocode = ko.observable([]);
     var appState = require('../router').appState;
+    var settingsVisible = ko.observable(false);
+    var toggleSettings = function(){
+        settingsVisible(!settingsVisible());
+    };
 
     return {
         selectedGeosearchResult: selectedGeosearchResult,
         mapInstance: mapInstance,
         appState: appState,
-        selectionGeocode: selectionGeocode
+        selectionGeocode: selectionGeocode,
+        settingsVisible: settingsVisible,
+        toggleSettings: toggleSettings
     };
 };
 
@@ -20,6 +26,7 @@ module.exports = {
         require('./geosearch-result-item').register();
         require('./geosearch-control').register();
         require('./selection-details').register();
+        require('./settings-panel').register();
     },
     registerApp: function(domRoot){
         ko.applyBindings(rootViewModel(), domRoot);
