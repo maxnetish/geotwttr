@@ -9,13 +9,13 @@ block content
     h1.text-center= title
     div.view
         div.pane-left.pane
-            div.pane.gmap-column
+            div.pane.gmap-column.relative
                 div.relative
                     geosearch-control(params="mapInstance: mapInstance, selectedResult: selectedGeosearchResult")
                     button.show-hide-controls(data-bind='click: toggleSettings')
                         span.icon.icon-wrench
                     //include settings-panel
-                settings-panel(params="visible: settingsVisible")
+                settings-panel.relative(params="visible: settingsVisible")
                 gmap-control(params="mapInstance: mapInstance, appState: appState, selectedGeosearchResult: selectedGeosearchResult")
         div.pane-right.pane
             selection-details-control(params="appState: appState, mapInstance: mapInstance")
