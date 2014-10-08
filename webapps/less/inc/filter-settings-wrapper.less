@@ -1,0 +1,40 @@
+@import "mixin.less";
+
+.settings-wrapper {
+  display: block;
+  opacity: 1;
+  position: absolute;
+  z-index: 10;
+  top: 60px;
+  right: 5px;
+  background: white;
+  border: solid 1px lightgray;
+  padding: 10px;
+  .transition-opacity();
+
+  .control-table {
+    display: table;
+    width: 100%;
+    .control-item {
+      display: table-row;
+      .transition-hover-background(bisque);
+      .control-label {
+        display: table-cell;
+        .icon {
+          margin: 0 5px;
+        }
+      }
+      &.active {
+        background-color: @colorBackgroundHover;
+        .transition-hover-background(bisque);
+      }
+      .control-element {
+        display: table-cell;
+        text-align: right;
+        & > * {
+          text-align: initial;
+        }
+      }
+    }
+  }
+}

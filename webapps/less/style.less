@@ -1,6 +1,7 @@
 @import "inc/icons.less";
 @import "inc/geosearch-control.less";
 @import "inc/selection-details.less";
+@import "inc/filter-settings-wrapper";
 @import "inc/mixin.less";
 
 
@@ -102,44 +103,6 @@ ul {
       width: calc(~"66.66% - 10px");
       .gmap-column {
         width: calc(~"100% - 10px");
-      }
-      .settings-wrapper {
-        display: block;
-        opacity: 0;
-        position: absolute;
-        z-index: 10;
-        top: calc(~"100% + 28px");
-        right: 5px;
-        background: white;
-        border: solid 1px lightgray;
-        padding: 10px;
-        border-radius: 4px;
-        .transition-opacity();
-        .control-table {
-          display: table;
-          width: 100%;
-          .control-item {
-            display: table-row;
-            .transition-hover-background(bisque);
-            .control-label {
-              display: table-cell;
-              .icon {
-                margin: 0 5px;
-              }
-            }
-            &.active {
-              background-color: @colorBackgroundHover;
-              .transition-hover-background(bisque);
-            }
-            .control-element {
-              display: table-cell;
-              text-align: right;
-              & > * {
-                text-align: initial;
-              }
-            }
-          }
-        }
       }
       .show-hide-controls {
         float: right;

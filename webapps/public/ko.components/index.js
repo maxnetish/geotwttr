@@ -5,9 +5,9 @@ var rootViewModel = function(){
     var mapInstance = ko.observable();
     var selectionGeocode = ko.observable([]);
     var appState = require('../router').appState;
-    var settingsVisible = ko.observable(false);
-    var toggleSettings = function(){
-        settingsVisible(!settingsVisible());
+    var filterSettingsVisible = ko.observable(false);
+    var toggleFilterSettings = function(){
+        filterSettingsVisible(!filterSettingsVisible());
     };
 
     return {
@@ -15,8 +15,8 @@ var rootViewModel = function(){
         mapInstance: mapInstance,
         appState: appState,
         selectionGeocode: selectionGeocode,
-        settingsVisible: settingsVisible,
-        toggleSettings: toggleSettings
+        filterSettingsVisible: filterSettingsVisible,
+        toggleFilterSettings: toggleFilterSettings
     };
 };
 
@@ -26,7 +26,7 @@ module.exports = {
         require('./geosearch-result-item').register();
         require('./geosearch-control').register();
         require('./selection-details').register();
-        require('./settings-panel').register();
+        require('./filter-settings-panel').register();
     },
     registerApp: function(domRoot){
         ko.applyBindings(rootViewModel(), domRoot);

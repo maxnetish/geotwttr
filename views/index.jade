@@ -12,10 +12,9 @@ block content
             div.pane.gmap-column.relative
                 div.relative
                     geosearch-control(params="mapInstance: mapInstance, selectedResult: selectedGeosearchResult")
-                    button.show-hide-controls(data-bind='click: toggleSettings')
+                    button.show-hide-controls(data-bind='click: toggleFilterSettings')
                         span.icon.icon-wrench
-                    //include settings-panel
-                settings-panel.relative(params="visible: settingsVisible")
+                div.settings-wrapper(data-bind="component: {name: 'filter-settings-panel', params: {}}, visible: filterSettingsVisible")
                 gmap-control(params="mapInstance: mapInstance, appState: appState, selectedGeosearchResult: selectedGeosearchResult")
         div.pane-right.pane
             selection-details-control(params="appState: appState, mapInstance: mapInstance")
@@ -45,8 +44,8 @@ block content
         include templates/geosearch-control.tpl.jade
     script#selection-details-tpl(type="text/html")
         include templates/selection-details-control.tpl.jade
-    script#settings-panel-tpl(type="text/html")
-        include templates/settings-panel.tpl.jade
+    script#filter-settings-panel-tpl(type="text/html")
+        include templates/filter-settings-panel.tpl.jade
     script.
         window.gt_config={};
         window.gt_config.langCode = "#{langCode}";
