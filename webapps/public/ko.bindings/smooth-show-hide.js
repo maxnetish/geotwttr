@@ -38,7 +38,12 @@ var register = function () {
             setTransition($(element));
         },
         update: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
-
+            var visibleValue = ko.unwrap(valueAccessor());
+            if(visibleValue){
+                show($(element));
+            }else{
+                hide($(element));
+            }
         }
     };
 };
