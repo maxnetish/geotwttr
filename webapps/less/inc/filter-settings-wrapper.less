@@ -9,7 +9,7 @@
   right: 5px;
   background: white;
   border: solid 1px lightgray;
-  padding: 10px;
+  padding: 5px 0;
   .transition-opacity();
 
   .control-table {
@@ -33,6 +33,12 @@
         text-align: right;
         & > * {
           text-align: initial;
+        }
+      }
+      & > * {
+        padding-left: 10px;
+        &:last-child {
+          padding-right: 10px;
         }
       }
     }

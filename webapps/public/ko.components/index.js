@@ -9,6 +9,7 @@ var rootViewModel = function(){
     var toggleFilterSettings = function(){
         filterSettingsVisible(!filterSettingsVisible());
     };
+    var filters = require('../services/filters');
 
     return {
         selectedGeosearchResult: selectedGeosearchResult,
@@ -16,7 +17,8 @@ var rootViewModel = function(){
         appState: appState,
         selectionGeocode: selectionGeocode,
         filterSettingsVisible: filterSettingsVisible,
-        toggleFilterSettings: toggleFilterSettings
+        toggleFilterSettings: toggleFilterSettings,
+        filters: filters
     };
 };
 

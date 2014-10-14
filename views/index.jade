@@ -14,7 +14,7 @@ block content
                     geosearch-control(params="mapInstance: mapInstance, selectedResult: selectedGeosearchResult")
                     button.show-hide-controls(data-bind='click: toggleFilterSettings')
                         span.icon.icon-wrench
-                div.settings-wrapper(data-bind="component: {name: 'filter-settings-panel', params: {}}, smoothShowHide: filterSettingsVisible")
+                div.settings-wrapper(data-bind="component: {name: 'filter-settings-panel', params: {filters: filters}}, smoothShowHide: filterSettingsVisible")
                 gmap-control(params="mapInstance: mapInstance, appState: appState, selectedGeosearchResult: selectedGeosearchResult")
         div.pane-right.pane
             selection-details-control(params="appState: appState, mapInstance: mapInstance")

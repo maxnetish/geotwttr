@@ -1,12 +1,18 @@
 //div.settings-wrapper(data-bind="visible: visible")
-div.control-table(data-old-bind='foreach: settings')
-    div.control-item(data-old-bind='css: {"active": value}')
+div.control-table
+    div.control-item(data-bind="css: {'active': containsText.value}")
         div.control-label
-            span.icon(data-old-bind='css: iconClass')
+            span.icon.icon-terminal
         div.control-label
-            label(data-old-bind='attr: {"for": id, title: promptOrTitle}, text: name', for='use-stream-api')
+            label(for="contains-text") Contains text
         div.control-element
-            input(data-old-bind='attr: {"id": id, "type": type, placeholder: promptOrTitle, list: suggestListId}, value: realValue, checked: checked, valueUpdate: "input"', type='text')
-            datalist(data-old-bind='attr: {"id": suggestListId}, foreach: suggestList')
-                option(data-old-bind='attr: {"value": $data}')
+            input(id="contains-text", type="text",  data-bind="textInput: containsText.value")
+    div.control-item(data-bind="css: {'active': geotagged.value}")
+        div.control-label
+            span.icon.icon-map-marker
+        div.control-label
+            label(for="really-geotagged") Really geotagged
+        div.control-element
+            input(id="really-geotagged", type="checkbox",  data-bind="checked: geotagged.value")
+
 

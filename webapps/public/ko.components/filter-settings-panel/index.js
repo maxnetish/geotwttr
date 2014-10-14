@@ -2,12 +2,14 @@ var libs = require('../../libs'),
     ko = libs.ko;
 
 var Viewmodel = function (params) {
-    var filters = params.filters;
 
+
+    this.filters = params.filters;
 };
 
 var createViewModel = function (params, componentInfo) {
-    return new Viewmodel(params);
+    //return new Viewmodel(params);
+    return params.filters;
 };
 
 var register = function () {
