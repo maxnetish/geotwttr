@@ -35,6 +35,7 @@ router.get('/', function (req, res) {
         if(userInfo) {
             vmFilled.setUserInfo(userInfo).setGoogleAPiToken();
             return res.render('index', vmFilled);
+
         }
         // no user info - show login page with message
         vm.setAuthError('Something wrong... when get account info from twitter. Try again.');

@@ -13,6 +13,7 @@ koBindings.register();
 koComponents.registerComponents();
 koComponents.registerApp();
 
+require('./services/ws-client').connectTo();
 
 
 
