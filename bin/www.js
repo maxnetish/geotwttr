@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 var debug = require('debug')('geotwttr');
 var app = require('../app');
-var wsServer = require('../services/ws-server');
+var wsServer = require('../services/ws');
 
 app.set('port', process.env.PORT || 3000);
 
