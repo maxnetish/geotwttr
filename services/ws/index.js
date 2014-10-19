@@ -4,6 +4,7 @@ var cookieParser = require('cookie-parser');
 var twitterAuthService = require('./../twitter/auth');
 var protocol = require('./protocol');
 var _ = require('lodash');
+var Connection = require('q-connection');
 
 var customClientVerify,
     receivers = {},
@@ -34,20 +35,21 @@ var verifyClientDefault = function (info, cb) {
     });
 };
 
-var onMessage = function(data, flags){
+var onMessage = function (data, flags) {
     // context will be WebSocket instance
-    var parsed = protocol.restore(data);
-    if (parsed && receivers.hasOwnProperty(parsed.meta.cmd)) {
-        receivers[parsed.meta.cmd](parsed, this, wsServerInstance);
-    }
+//    var parsed = protocol.restore(data);
+//    if (parsed && receivers.hasOwnProperty(parsed.meta.cmd)) {
+//        receivers[parsed.meta.cmd](parsed, this, wsServerInstance);
+//    }
+    console.log('receive: ' + data);
 };
 
-var onSocketError = function(err){
+var onSocketError = function (err) {
     // context will be probably WebSocket instance
-    if(this.readyState === this.OPEN){
+    if (this.readyState === this.OPEN) {
         // gracefully close
         this.close('Socket error');
-    }else{
+    } else {
         // socket not open
         // kill socket
         this.terminate();
@@ -55,12 +57,31 @@ var onSocketError = function(err){
 };
 
 var onConnection = function (socket) {
-    protocol.extendWebSocket(socket);
+    var localApi = {
+        subscribeState: function () {
+            var h = setInterval(function () {
+                console.log('exec interval callback');
+                if (socket.readyState === socket.OPEN) {
+                    remote.invoke('serverState', process.memoryUsage()).then(function (res) {
+                        console.log(res);
+                    }, function (err) {
+                        console.log(err);
+                    });
+                } else {
+                    clearInterval(h);
+                }
+            }, 5000);
+            return h;
+        }
+    };
+    var remote = Connection(socket, localApi);
+
+//    protocol.extendWebSocket(socket);
     socket.on('error', onSocketError)
     socket.on('message', onMessage);
 };
 
-var onServerError = function(err){
+var onServerError = function (err) {
     // underlying protocol error
     console.log(err);
     wsServerInstance.close();
@@ -68,7 +89,7 @@ var onServerError = function(err){
 };
 
 var createServer = function (httpServerInstance) {
-    if(wsServerInstance){
+    if (wsServerInstance) {
         wsServerInstance.close();
     }
     wsServerInstance = new WebSocketServer({

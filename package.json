@@ -20,7 +20,8 @@
     "maxmind-db-reader": "~0.2.0",
     "redis": "~0.12.1",
     "oauth": "~0.9.12",
-    "select2": "~3.5.1-browserify-fix"
+    "select2": "~3.5.1-browserify-fix",
+    "q-connection": "~0.6.1"
   },
   "devDependencies": {
     "grunt": "~0.4.5",
