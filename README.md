@@ -6,4 +6,4 @@ Single page web application based on:
 * browserify
 * knockout
 
-	
+http://do.gordeev.me
