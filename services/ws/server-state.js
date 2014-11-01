@@ -1,23 +1,28 @@
-var protocol = require('./protocol');
-var _ = require('lodash');
+var interval;
 
-var ctrl = function (data, socket, server) {
-    var intervalHandler = setInterval(function () {
-        if (socket.readyState === socket.OPEN) {
-            socket.extend.promiseSendData({
-                memory: process.memoryUsage(),
-                clients: server.clients.length
-            }).then(_.noop(), function(err){
-                // stop sending if socket error
-                clearInterval(intervalHandler);
+var subscribeState = function(socket, remote){
+    clearInterval(interval);
+    interval = setInterval(function () {
+        console.log('exec interval callback');
+        if (socket && socket.readyState === socket.OPEN) {
+            remote.invoke('serverState', process.memoryUsage()).then(function (res) {
+                console.log(res);
+            }, function (err) {
+                console.log(err);
             });
         } else {
-            // stop sending if socket not open
-            clearInterval(intervalHandler);
+            clearInterval(interval);
         }
-    }, 15000);
+    }, 5000);
+    return true;
+};
+
+var unsubscribeState = function(socket, remote){
+    clearInterval(interval);
+    return true;
 };
 
 module.exports = {
-    controller: ctrl
+    subscribe: subscribeState,
+    unsubscribe: unsubscribeState
 };
