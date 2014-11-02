@@ -23,6 +23,7 @@ var verifyClientDefault = function (info, cb) {
 
     // check auth
     twitterAuthService.verifyCredentials(accessToken).then(function (userInfo) {
+        info.req.user = userInfo;
         if (userInfo) {
             cb(true);
         } else {

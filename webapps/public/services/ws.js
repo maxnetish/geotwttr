@@ -6,7 +6,8 @@ var Q = require('q');
 var _ = require('lodash');
 var ko = require('knockout');
 var Connection = require('q-connection');
-var localApi = require('./local-rpc').api;
+
+var localApi = {};
 
 var remote;
 

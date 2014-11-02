@@ -13,33 +13,53 @@ koBindings.register();
 koComponents.registerComponents();
 koComponents.registerApp();
 
+// ws demo
 var ws = require('./services/ws');
-var localObservables = require('./services/local-rpc').observables;
 
-localObservables.serverState.subscribe(function(val){
-    console.log(val);
-});
-
-ws.getRemote().invoke('subscribeState').then(function (handler) {
-    console.log(handler);
+console.log('invoke subscribe');
+ws.getRemote().invoke('subscribeState', 'stateResp').then(function (response) {
+    console.log('subscribe response:');
+    console.log(response);
 }, function (err) {
     console.log(err);
 });
 
-setTimeout(function(){
-    ws.getRemote().invoke('unsubscribeState');
-}, 20000);
-
-ws.getRemote().invoke('subscribeState2', 'state2Resp').then(function (handler) {
-    console.log(handler);
-}, function (err) {
-    console.log(err);
-});
-
-ws.localApi.state2Resp = function(arg){
-    console.log('state2Resp: '+arg);
-    return 'Принято динамически'
+ws.localApi.stateResp = function (arg) {
+    console.log('stateResp:');
+    console.log(arg);
+    return 'Принято динамически';
 };
+
+setTimeout(function () {
+    console.log('invoke unsubscribe');
+    ws.getRemote().invoke('unsubscribeState').then(function (response) {
+        delete ws.localApi.stateResp;
+        console.log('unsuscribe response:');
+        console.log(response);
+        return true;
+    });
+}, 30000);
+
+ws.getRemote().invoke('subscribeTwitterStream', {
+    notify: 'streamResp',
+    reqMethod: 'GET',
+    reqUrl: 'https://stream.twitter.com/1.1/statuses/filter.json',
+    reqData: {
+        locations: '16.542346660240696,49.1439480630349,16.679794605628445,49.23377959144685',
+        stall_warnings: 'true'
+    }
+}).then(function (resp) {
+    console.log('subscribe id:');
+    console.log(resp);
+}, function (err) {
+    console.log(err);
+});
+
+ws.localApi.streamResp = function (resp) {
+    console.log(resp);
+    return 'Принято';
+};
+
 
 
 

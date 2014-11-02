@@ -2,17 +2,13 @@ var _ = require('lodash');
 var Connection = require('q-connection');
 
 var serverStateService = require('./server-state');
+var twitterStreamService = require('./twttr-stream');
 
 var localServices = {
     subscribeState: serverStateService.subscribe,
     unsubscribeState: serverStateService.unsubscribe,
-    subscribeState2: function(socket, remote, arg){
-        var destName = arg;
-        setTimeout(function(){
-           remote.invoke(destName, 'Динамический ОТвет');
-        }, 6000);
-        return true;
-    }
+    subscribeTwitterStream: twitterStreamService.subscribe,
+    unsubscribeTwitterStream: twitterStreamService.unsubscribe
 };
 
 var LocalApi = function (socket) {
@@ -24,8 +20,9 @@ var LocalApi = function (socket) {
 };
 
 _.each(localServices, function (service, name) {
-    LocalApi.prototype[name] = function (arg) {
-        return service(this.socket, this.remote, arg);
+    LocalApi.prototype[name] = function () {
+        var argsToApply = [this.socket, this.remote].concat(_.toArray(arguments));
+        return service.apply(this, argsToApply);
     };
 });
 

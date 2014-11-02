@@ -1,25 +1,61 @@
-var interval;
+var _ = require('lodash');
 
-var subscribeState = function(socket, remote){
-    clearInterval(interval);
-    interval = setInterval(function () {
-        console.log('exec interval callback');
-        if (socket && socket.readyState === socket.OPEN) {
-            remote.invoke('serverState', process.memoryUsage()).then(function (res) {
-                console.log(res);
-            }, function (err) {
-                console.log(err);
-            });
-        } else {
-            clearInterval(interval);
+var interval;
+var subscribers = [];
+
+var onInterval = function(){
+    var servState = process.memoryUsage(),
+        subscribersToRemove = [];
+
+    _.each(subscribers, function(subscriber){
+        if(subscriber.socket && subscriber.socket.readyState === subscriber.socket.OPEN){
+            subscriber.remote.invoke(subscriber.remoteMethodName, servState)
+                .then(null, function(err){
+                    console.log(err);
+                });
+        }else{
+            subscribersToRemove.push(subscriber);
         }
-    }, 5000);
+    });
+
+    if(subscribersToRemove.length>0) {
+        _.remove(subscribers, function (subscriber) {
+            return _.some(subscribersToRemove, function (itemToRemove) {
+                return subscriber === itemToRemove;
+            });
+        });
+        if(subscribers.length === 0){
+            stopStateUpdate();
+        }
+    }
+};
+
+var beginStateUpdate = function(){
+    clearInterval(interval);
+    interval = setInterval(onInterval, 5000);
+};
+
+var stopStateUpdate = function(){
+    clearInterval(interval);
+};
+
+var subscribeState = function(socket, remote, remoteMethodName){
+    if(subscribers.length === 0){
+          beginStateUpdate();
+    }
+    subscribers.push({
+        socket: socket,
+        remote: remote,
+        remoteMethodName: remoteMethodName
+    });
     return true;
 };
 
 var unsubscribeState = function(socket, remote){
-    clearInterval(interval);
-    return true;
+    removed = _.remove(subscribers, function(subscriber){
+        return subscriber.socket === socket;
+    });
+    return (removed && removed.length);
 };
 
 module.exports = {
