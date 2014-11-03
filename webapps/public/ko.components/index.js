@@ -42,7 +42,7 @@ var rootViewModel = function(){
             .then(function (res) {
                 console.log('unsubscribe response: ' + res);
             });
-    }, 600000);
+    }, 60000);
 
     return {
         selectedGeosearchResult: selectedGeosearchResult,

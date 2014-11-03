@@ -194,6 +194,9 @@ ul {
   .entity {
     color: @colorEntity;
     text-decoration: none;
+    &:after {
+      content: ' ';
+    }
   }
   .user-mention:before {
     content: '@';
