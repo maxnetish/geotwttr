@@ -21,7 +21,7 @@ var rootViewModel = function(){
         reqMethod: 'GET',
         reqUrl: 'https://stream.twitter.com/1.1/statuses/filter.json',
         reqData: {
-            locations: '16.542346660240696,49.1439480630349,16.679794605628445,49.23377959144685',
+            locations: '0.38219015604818196,49.1021507144911,4.623455595904943,51.80228882919188',
             stall_warnings: 'true'
         }
     }).then(function (resp) {
@@ -42,7 +42,7 @@ var rootViewModel = function(){
             .then(function (res) {
                 console.log('unsubscribe response: ' + res);
             });
-    }, 60000);
+    }, 600000);
 
     return {
         selectedGeosearchResult: selectedGeosearchResult,

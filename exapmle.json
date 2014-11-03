@@ -268,3 +268,5 @@
     ]
   }
 ]
+
+{"requestUrl":"https://stream.twitter.com/1.1/statuses/filter.json","requestMethod":"GET","requestParams":{"locations":"0.38219015604818196,49.1021507144911,4.623455595904943,51.80228882919188","stall_warnings":"true"},"requestStream":true,"requestClose":false,"requestId":"wsrequest_326"}

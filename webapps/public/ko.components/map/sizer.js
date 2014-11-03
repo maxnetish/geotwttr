@@ -11,9 +11,10 @@ var $footer = $('footer');
 var afterResizeCallback;
 
 var doSize = _.throttle(function () {
-    var h = $window.height() - $mapContainer.offset().top - $footer.height() - 20;
-    $mapContainer.height(h);
-    if(_.isFunction(afterResizeCallback)){
+    // console.log('$window.height:' + $window.height() + ' $mapContainer.offset().top:' + $mapContainer.offset().top + ' $footer.outerHeight:' + $footer.outerHeight());
+    // var h = $window.height() - $mapContainer.offset().top - $footer.outerHeight(true);
+    // $mapContainer.height(h);
+    if (_.isFunction(afterResizeCallback)) {
         afterResizeCallback();
     }
 }, 1000);
