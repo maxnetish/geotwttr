@@ -1,0 +1,20 @@
+article
+    section.tweet-left
+        a.no-decoration.notoggle(data-bind="attr: {href: 'https://twitter.com/' +  tweet.user.screen_name}", target="_blank")
+            img.avatar(data-bind="attr: {src: tweet.user.profile_image_url}", data-old-bind="lazyLoadingImage: {container: 'ul#tweet-list', src: avatarUrl, checkVisibility: checkVisibility}")
+    section.tweet-right
+        p.tweet-usernames
+            a.no-decoration.notoggle(data-bind="attr: {href: 'https://twitter.com/' +  tweet.user.screen_name}", target="_blank")
+                span.full-name(data-bind="text: tweet.user.name")
+                span.screen-name(data-bind="text: tweet.user.screen_name")
+        p.tweet-text(data-bind='text: tweet.text')
+        p.tweet-meta
+            a.no-decoration.notoggle(data-bind="attr: {href: 'https://twitter.com/' + tweet.user.screen_name + '/' + tweet.id_str}", target="_blank")
+                //span.tweet-date(data-old-bind='tweetDate: $data')
+                time.tweet-date(data-bind='text: tweet.created_at')
+            //span.retweet-from(data-old-bind="if: isRetweet") RT from
+            //a.no-decoration.notoggle(data-old-bind="attr: {href: profileOriginalUrl}, if: isRetweet", target="_blank")
+                span.screen-name(data-old-bind="text: orginalScreenName")
+        p.tweet-meta(data-bind='if: !!tweet.place')
+            span Near&nbsp;
+            span(data-bind='text: tweet.place.full_name')

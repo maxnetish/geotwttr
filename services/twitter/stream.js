@@ -36,6 +36,13 @@ var StreamRequest = function (opts) {
     this._deferred = Q.defer();
     this.promise = this._deferred.promise;
     this.id = _.uniqueId();
+    this.request = null;
+    this.response = null;
+    this.dispose = function () {
+        if (this.request) {
+            this.request.abort();
+        }
+    };
 };
 
 StreamRequest.prototype._onDataChunkReceived = function (dataChunk) {

@@ -5,9 +5,11 @@ var streams = [];
 
 var onStreamResolve = function (socket, remote, stream, notify) {
     return function (e) {
+        console.log('resolve stream, socket state: '+socket.readyState);
         if (socket && socket.readyState === socket.OPEN) {
             remote.invoke(notify, {closed: 1});
         }
+        stream.dispose();
         _.remove(streams, function (item) {
             return item === stream;
         });
@@ -16,10 +18,11 @@ var onStreamResolve = function (socket, remote, stream, notify) {
 
 var onStreamError = function (socket, remote, stream, notify) {
     return function (err) {
+        console.log('error, socket state: '+socket.readyState);
         if (socket && socket.readyState === socket.OPEN) {
             remote.invoke(notify, {error: err.message});
         } else {
-            stream.response.destroy();
+            stream.dispose();
             _.remove(streams, function (item) {
                 return item === stream;
             });
@@ -29,10 +32,11 @@ var onStreamError = function (socket, remote, stream, notify) {
 
 var onStreamProgress = function (socket, remote, stream, notify) {
     return function (tweet) {
+        console.log('progress, socket state: '+socket.readyState);
         if (socket && socket.readyState === socket.OPEN) {
             remote.invoke(notify, {tweet: tweet});
         } else {
-            stream.response.destroy();
+            stream.dispose();
             _.remove(streams, function (item) {
                 return item === stream;
             });
@@ -70,7 +74,7 @@ var unsubscribe = function (socket, remote, subscriptionId) {
         len = stream.length;
     if (len) {
         stream = stream[0];
-        stream.response.destroy();
+        stream.dispose();
     }
     return len;
 };

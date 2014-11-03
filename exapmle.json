@@ -1,0 +1,270 @@
+[
+  {
+    "type": "send",
+    "to": "",
+    "from": "C5351488-6C80-44C1-1FA5654246FB",
+    "op": "post",
+    "args": [
+      "streamResp",
+      [
+        {
+          "tweet": {
+            "created_at": "Sun Nov 02 21:05:43 +0000 2014",
+            "id": 529016527052603400,
+            "id_str": "529016527052603392",
+            "text": "Stuzkovak je pry party, tak to potom si jeste nebyla na party",
+            "source": "<a href=\"http://twitter.com/download/android\" rel=\"nofollow\">Twitter for Android</a>",
+            "truncated": false,
+            "in_reply_to_status_id": null,
+            "in_reply_to_status_id_str": null,
+            "in_reply_to_user_id": null,
+            "in_reply_to_user_id_str": null,
+            "in_reply_to_screen_name": null,
+            "user": {
+              "id": 281942433,
+              "id_str": "281942433",
+              "name": "Barbora NovÃ¡kovÃ¡",
+              "screen_name": "Bareniiis",
+              "location": "Czech Republic, Ostrava",
+              "url": null,
+              "description": "addicted to singing, exercising, eating, playing the clarinet, Sex and the city and tea... and hey #staypossitive and keep your head up",
+              "protected": false,
+              "verified": false,
+              "followers_count": 81,
+              "friends_count": 67,
+              "listed_count": 1,
+              "favourites_count": 2258,
+              "statuses_count": 2273,
+              "created_at": "Thu Apr 14 08:30:22 +0000 2011",
+              "utc_offset": 3600,
+              "time_zone": "Prague",
+              "geo_enabled": true,
+              "lang": "en",
+              "contributors_enabled": false,
+              "is_translator": false,
+              "profile_background_color": "FFFFFF",
+              "profile_background_image_url": "http://pbs.twimg.com/profile_background_images/820403516/cc94781ec1f8f8690fd837cb035c2a6d.jpeg",
+              "profile_background_image_url_https": "https://pbs.twimg.com/profile_background_images/820403516/cc94781ec1f8f8690fd837cb035c2a6d.jpeg",
+              "profile_background_tile": true,
+              "profile_link_color": "000000",
+              "profile_sidebar_border_color": "000000",
+              "profile_sidebar_fill_color": "DBD9B7",
+              "profile_text_color": "C1C9C8",
+              "profile_use_background_image": true,
+              "profile_image_url": "http://pbs.twimg.com/profile_images/514407576252186624/XLtqs-e8_normal.jpeg",
+              "profile_image_url_https": "https://pbs.twimg.com/profile_images/514407576252186624/XLtqs-e8_normal.jpeg",
+              "profile_banner_url": "https://pbs.twimg.com/profile_banners/281942433/1373461481",
+              "default_profile": false,
+              "default_profile_image": false,
+              "following": null,
+              "follow_request_sent": null,
+              "notifications": null
+            },
+            "geo": {
+              "type": "Point",
+              "coordinates": [
+                49.830061,
+                18.259666
+              ]
+            },
+            "coordinates": {
+              "type": "Point",
+              "coordinates": [
+                18.259666,
+                49.830061
+              ]
+            },
+            "place": {
+              "id": "6b5d375c346e3be9",
+              "url": "https://api.twitter.com/1.1/geo/id/6b5d375c346e3be9.json",
+              "place_type": "country",
+              "name": "Czech Republic",
+              "full_name": "Czech Republic",
+              "country_code": "CZ",
+              "country": "Czech Republic",
+              "bounding_box": {
+                "type": "Polygon",
+                "coordinates": [
+                  [
+                    [
+                      12.0761409910001,
+                      48.557915752
+                    ],
+                    [
+                      12.0761409910001,
+                      51.0400123090001
+                    ],
+                    [
+                      18.8374337160002,
+                      51.0400123090001
+                    ],
+                    [
+                      18.8374337160002,
+                      48.557915752
+                    ]
+                  ]
+                ]
+              },
+              "attributes": {}
+            },
+            "contributors": null,
+            "retweet_count": 0,
+            "favorite_count": 0,
+            "entities": {
+              "hashtags": [],
+              "trends": [],
+              "urls": [],
+              "user_mentions": [],
+              "symbols": []
+            },
+            "favorited": false,
+            "retweeted": false,
+            "possibly_sensitive": false,
+            "filter_level": "medium",
+            "lang": "sk",
+            "timestamp_ms": "1414962343364"
+          }
+        }
+      ]
+    ]
+  }
+
+  {
+    "type": "send",
+    "to": "",
+    "from": "850C6042-FE69-4A28-B5BF80AF4E27",
+    "op": "post",
+    "args": [
+      "streamResp",
+      [
+        {
+          "tweet": {
+            "created_at": "Sun Nov 02 21:47:35 +0000 2014",
+            "id": 529027063596867600,
+            "id_str": "529027063596867586",
+            "text": "Who is reading books?\nI have many beautiful bookmarks!) I will present!)â¦ http://t.co/ySVdYD6Hxy",
+            "source": "<a href=\"http://instagram.com\" rel=\"nofollow\">Instagram</a>",
+            "truncated": false,
+            "in_reply_to_status_id": null,
+            "in_reply_to_status_id_str": null,
+            "in_reply_to_user_id": null,
+            "in_reply_to_user_id_str": null,
+            "in_reply_to_screen_name": null,
+            "user": {
+              "id": 246912553,
+              "id_str": "246912553",
+              "name": "ÐÐ¸ÐºÑÐ¾ÑÐ¸Ñ",
+              "screen_name": "vika9615",
+              "location": "",
+              "url": null,
+              "description": null,
+              "protected": false,
+              "verified": false,
+              "followers_count": 10,
+              "friends_count": 22,
+              "listed_count": 0,
+              "favourites_count": 3,
+              "statuses_count": 1082,
+              "created_at": "Thu Feb 03 18:28:40 +0000 2011",
+              "utc_offset": null,
+              "time_zone": null,
+              "geo_enabled": true,
+              "lang": "en",
+              "contributors_enabled": false,
+              "is_translator": false,
+              "profile_background_color": "C0DEED",
+              "profile_background_image_url": "http://abs.twimg.com/images/themes/theme1/bg.png",
+              "profile_background_image_url_https": "https://abs.twimg.com/images/themes/theme1/bg.png",
+              "profile_background_tile": false,
+              "profile_link_color": "0084B4",
+              "profile_sidebar_border_color": "C0DEED",
+              "profile_sidebar_fill_color": "DDEEF6",
+              "profile_text_color": "333333",
+              "profile_use_background_image": true,
+              "profile_image_url": "http://pbs.twimg.com/profile_images/378800000394181877/34dcfe58a41eb58cd7f6b7d5cc917fae_normal.jpeg",
+              "profile_image_url_https": "https://pbs.twimg.com/profile_images/378800000394181877/34dcfe58a41eb58cd7f6b7d5cc917fae_normal.jpeg",
+              "default_profile": true,
+              "default_profile_image": false,
+              "following": null,
+              "follow_request_sent": null,
+              "notifications": null
+            },
+            "geo": {
+              "type": "Point",
+              "coordinates": [
+                50.076255,
+                14.427901
+              ]
+            },
+            "coordinates": {
+              "type": "Point",
+              "coordinates": [
+                14.427901,
+                50.076255
+              ]
+            },
+            "place": {
+              "id": "6b5d375c346e3be9",
+              "url": "https://api.twitter.com/1.1/geo/id/6b5d375c346e3be9.json",
+              "place_type": "country",
+              "name": "Czech Republic",
+              "full_name": "Czech Republic",
+              "country_code": "CZ",
+              "country": "Czech Republic",
+              "bounding_box": {
+                "type": "Polygon",
+                "coordinates": [
+                  [
+                    [
+                      12.0761409910001,
+                      48.557915752
+                    ],
+                    [
+                      12.0761409910001,
+                      51.0400123090001
+                    ],
+                    [
+                      18.8374337160002,
+                      51.0400123090001
+                    ],
+                    [
+                      18.8374337160002,
+                      48.557915752
+                    ]
+                  ]
+                ]
+              },
+              "attributes": {}
+            },
+            "contributors": null,
+            "retweet_count": 0,
+            "favorite_count": 0,
+            "entities": {
+              "hashtags": [],
+              "trends": [],
+              "urls": [
+                {
+                  "url": "http://t.co/ySVdYD6Hxy",
+                  "expanded_url": "http://instagram.com/p/u6bhQdKE2d/",
+                  "display_url": "instagram.com/p/u6bhQdKE2d/",
+                  "indices": [
+                    74,
+                    96
+                  ]
+                }
+              ],
+              "user_mentions": [],
+              "symbols": []
+            },
+            "favorited": false,
+            "retweeted": false,
+            "possibly_sensitive": false,
+            "filter_level": "medium",
+            "lang": "en",
+            "timestamp_ms": "1414964855471"
+          }
+        }
+      ]
+    ]
+  }
+]

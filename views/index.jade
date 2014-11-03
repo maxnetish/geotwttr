@@ -22,6 +22,9 @@ block content
                 button.button-show-incoming(data-old-bind='visible: hidedIncomingCount()>0, click: showHidedStatuses', style='display: none;')
                     span New statuses:&nbsp;
                     span(data-old-bind='text: hidedIncomingCount')
+                // ko foreach: {data: tweetList, as: 'item'}
+                li.li-tweet(data-bind="component: {name: 'tweet-ui-mini', params: {tweet: item}}")
+                // /ko
                 div.preloader(data-old-bind='visible: restLoadingNow')
                 button.button-request-previous(data-old-bind='click: needMore, visible: !restLoadingNow()', style='display: none;')
                     span Load more
@@ -46,6 +49,8 @@ block content
         include templates/selection-details-control.tpl.jade
     script#filter-settings-panel-tpl(type="text/html")
         include templates/filter-settings-panel.tpl.jade
+    script#tweet-ui-mini-tpl(type="text/html")
+        include templates/tweet-ui-mini.tpl.jade
     script.
         window.gt_config={};
         window.gt_config.langCode = "#{langCode}";
