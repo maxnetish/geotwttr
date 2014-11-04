@@ -56,7 +56,7 @@ block content
         window.gt_config.langCode = "#{langCode}";
         window.gt_config.ipGeolocation = !{ipGeocode};
     if developmentMode
-        script(src="js/app.js", async)
+        script(src="js/app.js", defer)
     else
-        script(src="js/app.min.js", async)
+        script(src="js/app.min.js", defer)
     include twitter_follow_script
