@@ -122,14 +122,14 @@ var createFragment = {
 
 var initFn = function (element, valueAccessor, allBindings, viewModel, bindingContext) {
     var $element = $(element),
-        tweet = ko.unwrap(valueAccessor()),
-        ents = normalizeEntities(tweet.text, tweet.entities);
+        value = ko.unwrap(valueAccessor()),
+        ents = normalizeEntities(value.text, value.entities);
 
     _.each(ents, function (entity) {
         var actualEntityType = entity.type,
             fragment;
         actualEntityType = createFragment.hasOwnProperty(actualEntityType) ? actualEntityType : 'default';
-        fragment = createFragment[actualEntityType](tweet.text, entity);
+        fragment = createFragment[actualEntityType](value.text, entity);
         $element.append(fragment);
     });
 };

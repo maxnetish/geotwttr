@@ -18,7 +18,7 @@ block content
             gmap-control(params="mapInstance: mapInstance, appState: appState, selectedGeosearchResult: selectedGeosearchResult")
     div.pane-right.pane
         selection-details-control(params="appState: appState, mapInstance: mapInstance")
-        ul#tweet-list.scroll(data-old-bind='setHeight: needSetHeight')
+        ul#tweet-list.scroll
             button.button-show-incoming(data-old-bind='visible: hidedIncomingCount()>0, click: showHidedStatuses', style='display: none;')
                 span New statuses:&nbsp;
                 span(data-old-bind='text: hidedIncomingCount')
