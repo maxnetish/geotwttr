@@ -1,5 +1,8 @@
-var ko = require('../libs').ko;
-var ws = require('../services/ws');
+var libs = require('../libs');
+var ko = libs.ko;
+var services = require('../services');
+var ws = services.ws;
+var utils = services.utils;
 
 var rootViewModel = function(){
     var selectedGeosearchResult = ko.observable();
@@ -15,7 +18,43 @@ var rootViewModel = function(){
     var tweetList = ko.observableArray();
 
     // tweets demo
+    var gmaps = null;
+    libs.promiseGmaps().then(function(gmapsNamespace){
+       gmaps =  gmapsNamespace;
+    });
     var reqId;
+
+    appState.selection.subscribe(function(newSelection){
+        var twitterBounds = utils.boundsToTwitterString(utils.centerRadiusToBounds(newSelection.lat, newSelection.lng, newSelection.radius, gmaps));
+
+
+        if(reqId){
+            ws.getRemote().invoke('unsubscribeTwitterStream', reqId)
+                .then(function (res) {
+                    console.log('unsubscribe response: ' + res);
+                });
+        }
+
+        // вычислить bounds из newSelection
+        ws.getRemote().invoke('subscribeTwitterStream', {
+            notify: 'streamResp',
+            reqMethod: 'GET',
+            reqUrl: 'https://stream.twitter.com/1.1/statuses/filter.json',
+            reqData: {
+                locations: twitterBounds,
+                stall_warnings: 'true'
+            }
+        }).then(function (resp) {
+            console.log('subscribe id:');
+            console.log(resp);
+            reqId = resp;
+            tweetList.removeAll();
+        }, function (err) {
+            console.log(err);
+        });
+    });
+
+    /*
     ws.getRemote().invoke('subscribeTwitterStream', {
         notify: 'streamResp',
         reqMethod: 'GET',
@@ -31,18 +70,21 @@ var rootViewModel = function(){
     }, function (err) {
         console.log(err);
     });
+*/
 
     ws.localApi.streamResp = function (resp) {
         tweetList.unshift(resp.tweet);
         return 'Принято';
     };
 
+    /*
     setTimeout(function () {
         ws.getRemote().invoke('unsubscribeTwitterStream', reqId)
             .then(function (res) {
                 console.log('unsubscribe response: ' + res);
             });
     }, 60000);
+    */
 
     return {
         selectedGeosearchResult: selectedGeosearchResult,

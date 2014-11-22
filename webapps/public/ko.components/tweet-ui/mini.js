@@ -12,7 +12,7 @@ var transform = function (tweet) {
         userOriginalScreenName: originalTweet.user.screen_name,
         textOriginal: originalTweet.text,
         entitiesOriginal: originalTweet.entities,
-        tweetUrl: 'https://twitter.com/' + tweet.user.screen_name + '/' + tweet.id_str,
+        tweetUrl: 'https://twitter.com/' + tweet.user.screen_name + '/status/' + tweet.id_str,
         createdAtOriginal: originalTweet.created_at,
         place: tweet.place,
         profileSenderUrl: 'https://twitter.com/' + tweet.user.screen_name,
