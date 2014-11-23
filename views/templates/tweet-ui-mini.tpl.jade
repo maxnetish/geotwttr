@@ -7,7 +7,7 @@ article
             a.no-decoration.notoggle(data-bind="attr: {href: profileOriginalUrl}", target="_blank")
                 span.full-name(data-bind="text: userOriginalName")
                 span.screen-name(data-bind="text: userOriginalScreenName")
-        p.tweet-text(data-bind='tweetText: {text: textOriginal, entities: entitiesOriginal}')
+        p.tweet-text(data-bind="tweetText: {text: textOriginal, entities: entitiesOriginal}, css: {'text-rtl': useRtl}")
         p.tweet-meta
             a.no-decoration.notoggle(data-bind="attr: {href: tweetUrl}", target="_blank")
                 time.tweet-date(data-bind='datetimeText: createdAtOriginal')

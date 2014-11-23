@@ -18,11 +18,9 @@ block content
             gmap-control(params="mapInstance: mapInstance, appState: appState, selectedGeosearchResult: selectedGeosearchResult")
     div.pane-right.pane
         selection-details-control(params="appState: appState, mapInstance: mapInstance")
+        tweet-feed-control(params="showImmediate: showImmediate, hidedCount: tweetList.hidedCount, showHided: showHidedTweets")
         ul#tweet-list.scroll
-            button.button-show-incoming(data-old-bind='visible: hidedIncomingCount()>0, click: showHidedStatuses', style='display: none;')
-                span New statuses:&nbsp;
-                span(data-old-bind='text: hidedIncomingCount')
-            // ko foreach: {data: tweetList, as: 'item'}
+            // ko foreach: {data: tweetList.visible, as: 'item'}
             li.li-tweet(data-bind="component: {name: 'tweet-ui-mini', params: {tweet: item}}")
             // /ko
             div.preloader(data-old-bind='visible: restLoadingNow')
@@ -30,11 +28,9 @@ block content
                 span Load more
     footer
         section.inner-info
-            span(data-old-bind='text: displayedCount')
-            span &nbsp;of&nbsp;
-            span(data-old-bind='text: receivedCount')
+            span(data-bind='text: tweetList.visibleCount')
         section.inner-info
-            span(data-old-bind='text: receiveSpeed')
+            span(data-bind='text: tweetList.addingRate')
             span &nbsp;tw/min
         a(href="https://twitter.com/maxnetish", class="twitter-follow-button", data-show-count="false", data-lang="#{langCode}") Follow me
     //script#tweet-template(type='text/html')
@@ -51,6 +47,8 @@ block content
         include templates/filter-settings-panel.tpl.jade
     script#tweet-ui-mini-tpl(type="text/html")
         include templates/tweet-ui-mini.tpl.jade
+    script#tweet-feed-control-tpl(type="text/html")
+        include templates/tweet-feed-control.tpl.jade
     script.
         window.gt_config={};
         window.gt_config.langCode = "#{langCode}";

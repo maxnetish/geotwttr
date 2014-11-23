@@ -2,10 +2,11 @@
 @import "inc/geosearch-control.less";
 @import "inc/selection-details.less";
 @import "inc/filter-settings-wrapper";
+@import "inc/tweet-feed-control";
 @import "inc/mixin.less";
 
 body {
-  padding:0;
+  padding: 0;
   margin: 0;
   .fontText();
 }
@@ -17,8 +18,6 @@ header {
   height: @headerHeight;
 }
 
-
-
 iframe.twitter-follow-button {
   display: block;
   margin-left: auto;
@@ -29,13 +28,24 @@ button {
   border: solid 1px darkgray;
   border-radius: 3px;
   background: lightgray;
+  cursor: pointer;
   .transition-hover-background(bisque);
-  span {
-    margin-right: 1em;
-  }
+  //  span {
+  //    margin-right: 1em;
+  //  }
   span:last-child {
     margin-right: 0;
   }
+}
+
+label {
+  cursor: pointer;
+}
+
+input[type="checkbox"],
+input[type="radio"],
+input[type="button"] {
+  cursor: pointer;
 }
 
 .clear {
@@ -105,7 +115,7 @@ ul {
   //    display: inline-block;
   text-align: left;
   vertical-align: top;
-//  margin: @marginSmall;
+  //  margin: @marginSmall;
   transition: width 0.3s ease;
   &.pane-left {
     position: fixed;
@@ -152,6 +162,12 @@ ul {
   min-height: 50px;
   cursor: pointer;
   .transition-hover-background();
+  .text-rtl {
+    padding-right: 5px;
+    text-align: right;
+    direction: rtl;
+    unicode-bidi: embed;
+  }
   .tweet-right {
     margin-left: 58px;
     overflow: hidden;

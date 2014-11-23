@@ -2,9 +2,9 @@ var global = (function () {
     return this;
 })();
 var WebSocket = global.WebSocket || global.MozWebSocket;
-var Q = require('q');
-var _ = require('lodash');
-var ko = require('knockout');
+//var Q = require('q');
+//var _ = require('lodash');
+//var ko = require('knockout');
 var Connection = require('q-connection');
 
 var localApi = {};

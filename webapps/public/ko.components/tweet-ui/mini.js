@@ -1,5 +1,7 @@
 var ko = require('knockout');
 
+var rtlRegex = /^(ar|he|iw|ur)/;
+
 var transform = function (tweet) {
     var isRetweet = !!tweet.retweeted_status;
     var originalTweet = isRetweet ? tweet.retweeted_status : tweet;
@@ -16,8 +18,23 @@ var transform = function (tweet) {
         createdAtOriginal: originalTweet.created_at,
         place: tweet.place,
         profileSenderUrl: 'https://twitter.com/' + tweet.user.screen_name,
-        senderScreenName: tweet.user.screen_name
+        senderScreenName: tweet.user.screen_name,
+        useRtl: detectRtl(tweet)
     };
+};
+
+var detectRtl = function (tweet) {
+    var lang = tweet.lang;
+
+    if (!lang || lang === 'und') {
+        return false;
+    }
+
+    if (rtlRegex.test(lang)) {
+        return true;
+    }
+
+    return false;
 };
 
 var createViewModel = function (params, componentInfo) {

@@ -3,6 +3,7 @@ var ko = libs.ko;
 var services = require('../services');
 var ws = services.ws;
 var utils = services.utils;
+var TweetList = services.tweetList;
 
 var rootViewModel = function(){
     var selectedGeosearchResult = ko.observable();
@@ -15,7 +16,10 @@ var rootViewModel = function(){
     };
     var filters = require('../services/filters');
 
-    var tweetList = ko.observableArray();
+    var showImmediate = ko.observable(true);
+    var showHidedTweets = ko.observable();
+
+    var tweetList = new TweetList(showImmediate, showHidedTweets);
 
     // tweets demo
     var gmaps = null;
@@ -48,7 +52,7 @@ var rootViewModel = function(){
             console.log('subscribe id:');
             console.log(resp);
             reqId = resp;
-            tweetList.removeAll();
+            tweetList.reset();
         }, function (err) {
             console.log(err);
         });
@@ -73,7 +77,7 @@ var rootViewModel = function(){
 */
 
     ws.localApi.streamResp = function (resp) {
-        tweetList.unshift(resp.tweet);
+        tweetList.addItem(resp.tweet);
         return 'Принято';
     };
 
@@ -94,7 +98,9 @@ var rootViewModel = function(){
         filterSettingsVisible: filterSettingsVisible,
         toggleFilterSettings: toggleFilterSettings,
         filters: filters,
-        tweetList: tweetList
+        tweetList: tweetList,
+        showImmediate: showImmediate,
+        showHidedTweets: showHidedTweets
     };
 };
 
@@ -106,6 +112,7 @@ module.exports = {
         require('./selection-details').register();
         require('./filter-settings-panel').register();
         require('./tweet-ui/mini').register();
+        require('./tweet-feed-control').register();
     },
     registerApp: function(domRoot){
         ko.applyBindings(rootViewModel(), domRoot);
