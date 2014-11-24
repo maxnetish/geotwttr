@@ -1,7 +1,7 @@
 var store = require('../../helpers/store').store,
     OAuth = require('oauth').OAuth,
     config = require('../../config'),
-    tokens = require('../../config/tokens'),
+    //tokens = require('../../config/tokens'),
     url = require('url'),
     _ = require('lodash'),
     Q = require('q');
@@ -87,8 +87,8 @@ StreamRequest.prototype._init = function (requestMethod, requestUrl, requestData
     var oauth = new OAuth(
         config.twitter.requestTokenUrl,
         config.twitter.accessTokenUrl,
-        tokens.twitter.consumerKey,
-        tokens.twitter.consumerSecret,
+        config.twitter.consumerKey,
+        config.twitter.consumerSecret,
         config.twitter.oauthVersion,
         null,
         config.twitter.oauthDigest);

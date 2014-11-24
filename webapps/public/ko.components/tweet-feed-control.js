@@ -3,6 +3,7 @@
  *      showImmediate: observable (bool)
  *      hidedCount: observable (numeric)
  *      showHided: observable (toggle)
+ *      reset: function()
  * @type {exports}
  */
 
@@ -20,11 +21,19 @@ var FeedControlViewModel = function(params, componentInfo){
         pure: true
     });
 
+    this.showResetButton = ko.computed({
+        read: function(){
+            return true;
+        },
+        pure: true
+    });
+
     this.showHidedTweets = function(){
         params.showHided(!params.showHided());
     };
 
     this.countOfHidedTweets = params.hidedCount;
+    this.reset = params.reset;
 };
 
 var createFeedControlViewModel = function (params, componentInfo) {

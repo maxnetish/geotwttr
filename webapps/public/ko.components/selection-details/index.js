@@ -20,7 +20,7 @@ var Viewmodel = function (params) {
     this.geocoderResults = ko.observableArray();
     this.geocoderFirstResult = ko.computed({
         read: function () {
-            return _.first(ko.unwrap(this.geocoderResults));
+            return _.first(ko.unwrap(this.geocoderResults)) || {};
         },
         owner: this,
         pure: true,

@@ -16,6 +16,22 @@ var rootViewModel = function(){
     };
     var filters = require('../services/filters');
 
+    var mapNotYetLoaded = ko.computed({
+        read: function(){
+            return !mapInstance();
+        },
+        pure: true,
+        deferEvaluation: true
+    });
+
+    var showAppTooltip = ko.computed({
+        read: function(){
+            return mapInstance() && !appState.selection().lat;
+        },
+        pure: true,
+        deferEvaluation: true
+    });
+
     var showImmediate = ko.observable(true);
     var showHidedTweets = ko.observable();
 
@@ -29,6 +45,11 @@ var rootViewModel = function(){
     var reqId;
 
     appState.selection.subscribe(function(newSelection){
+
+        if(!newSelection){
+            return;
+        }
+
         var twitterBounds = utils.boundsToTwitterString(utils.centerRadiusToBounds(newSelection.lat, newSelection.lng, newSelection.radius, gmaps));
 
 
@@ -100,7 +121,9 @@ var rootViewModel = function(){
         filters: filters,
         tweetList: tweetList,
         showImmediate: showImmediate,
-        showHidedTweets: showHidedTweets
+        showHidedTweets: showHidedTweets,
+        mapNotYetLoaded: mapNotYetLoaded,
+        showAppTooltip: showAppTooltip
     };
 };
 

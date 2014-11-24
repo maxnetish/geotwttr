@@ -8,3 +8,6 @@ div.tweet-feed-control-wrapper
             span &nbsp;
             span(data-bind="text: countOfHidedTweets")
             span &nbsp;new tweets
+        button(type="button", data-bind="enable: showResetButton, click: reset")
+            span.icon.icon-rocket
+            span &nbsp;Clear

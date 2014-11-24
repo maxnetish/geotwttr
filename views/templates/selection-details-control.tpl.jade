@@ -1,4 +1,4 @@
-div#selection-details(data-bind="if: geocoderResults().length")
+div#selection-details(data-bind="smoothShowHide: geocoderResults().length")
     div.selection-details-wrapper
         p
             button.details-expand(data-bind="click: expandToggle, visible: geocoderResults().length>1")

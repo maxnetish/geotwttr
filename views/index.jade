@@ -18,7 +18,9 @@ block content
             gmap-control(params="mapInstance: mapInstance, appState: appState, selectedGeosearchResult: selectedGeosearchResult")
     div.pane-right.pane
         selection-details-control(params="appState: appState, mapInstance: mapInstance")
-        tweet-feed-control(params="showImmediate: showImmediate, hidedCount: tweetList.hidedCount, showHided: showHidedTweets")
+        tweet-feed-control(params="showImmediate: showImmediate, hidedCount: tweetList.hidedCount, showHided: showHidedTweets, reset: tweetList.reset", data-bind="smoothShowHide: appState.selection().lat")
+        p.loading-map(data-bind="visible: mapNotYetLoaded") Loading map...
+        div.app-tooltip(data-bind="smoothShowHide: showAppTooltip") Click some area in map and see realtime feed of tweets.
         ul#tweet-list.scroll
             // ko foreach: {data: tweetList.visible, as: 'item'}
             li.li-tweet(data-bind="component: {name: 'tweet-ui-mini', params: {tweet: item}}")
