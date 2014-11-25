@@ -25,10 +25,13 @@ var createMapIn = function (domContainer, state) {
             mapOptions;
 
         // correct state using real location (default or ip)
-        state.center({
-            lat: homeCoords.latitude,
-            lng: homeCoords.longitude
-        });
+        // (if it is not restored from storage - router/state.js)
+        if(!state.center().lat && !state.center().lng) {
+            state.center({
+                lat: homeCoords.latitude,
+                lng: homeCoords.longitude
+            });
+        }
 
         mapOptions = {
             zoom: ko.unwrap(state.zoom),

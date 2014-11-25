@@ -4,8 +4,9 @@ var libs = require('../../libs'),
 var geoApiAvailable = ('geolocation' in navigator),
     ipGeolocation,
     defaultLocation = {
-        latitude: -34.397,
-        longitude: 150.644
+        // google office Mountain View
+        latitude: 37.419,
+        longitude: -122.080
     };
 
 var getDefaultLocation = function(){

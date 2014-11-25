@@ -6,7 +6,8 @@ var libs = require('../libs'),
     path = libs.path,
     _ = libs._,
     ko = libs.ko,
-    State = require('./state');
+    State = require('./state'),
+    services = require('../services');
 
 var stateParamName = 'stateSerialized';
 var appState = new State();
@@ -51,6 +52,9 @@ _.forOwn(appState, function (value, key) {
         value.subscribe(onStateChange);
     }
 });
+
+services.localStorage.registerPermanentObservable(services.localStorage.keys.CENTER, appState.center, appState.center());
+services.localStorage.registerPermanentObservable(services.localStorage.keys.ZOOM, appState.zoom, appState.zoom());
 
 module.exports = {
     run: run,

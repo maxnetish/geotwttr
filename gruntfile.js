@@ -28,8 +28,6 @@ module.exports = function (grunt) {
                 }
             },
             options: {
-                //sourceMap: true,
-                //sourceMapIn: targetJsConcatAdmin + '.map',
                 compress: {
                     drop_console: true
                 }
@@ -46,10 +44,11 @@ module.exports = function (grunt) {
             },
             options: {
                 // sourceMap: true
-                // cleancss: true
+                cleancss: true
             }
         },
         concat: {
+            // не надо
             includeSelect2Css: {
                 src: [
                         publicCss + '/app.css',
@@ -86,5 +85,5 @@ module.exports = function (grunt) {
     });
 
     require('load-grunt-tasks')(grunt);
-    grunt.registerTask('default', ['clean', 'browserify', 'uglify', 'less', 'concat', 'copy']);
+    grunt.registerTask('default', ['clean', 'browserify', 'uglify', 'less', 'copy']);
 };

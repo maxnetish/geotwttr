@@ -59,6 +59,9 @@ StreamRequest.prototype._onDataChunkReceived = function (dataChunk) {
             }
             catch (err) {
                 console.log('Cannot parse "' + holeTweet + '"');
+                tweet = {
+                    message: holeTweet
+                }
             }
             if (tweet) {
                 this._deferred.notify(tweet);
