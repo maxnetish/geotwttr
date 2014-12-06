@@ -1,8 +1,25 @@
-var ko = require('knockout');
+var libs = require('../../libs');
+var ko = libs.ko;
+var _ = libs._;
 
 var rtlRegex = /^(ar|he|iw|ur)/;
 
-var transform = function (tweet) {
+var applyFilters = function (tweet, filters) {
+    return function () {
+        return _.all(filters, function (filter) {
+            return filter.predicate(tweet);
+        });
+    };
+};
+
+var createVisibleComputedDefinition = function (tweet, filters) {
+    return {
+        read: applyFilters(tweet, filters),
+        deferEvaluation: true
+    };
+};
+
+var transform = function (tweet, filters) {
     var isRetweet = !!tweet.retweeted_status;
     var originalTweet = isRetweet ? tweet.retweeted_status : tweet;
 
@@ -19,7 +36,8 @@ var transform = function (tweet) {
         place: tweet.place,
         profileSenderUrl: 'https://twitter.com/' + tweet.user.screen_name,
         senderScreenName: tweet.user.screen_name,
-        useRtl: detectRtl(tweet)
+        useRtl: detectRtl(tweet),
+        shouldVisible: ko.computed(createVisibleComputedDefinition(tweet, filters))
     };
 };
 
@@ -39,7 +57,7 @@ var detectRtl = function (tweet) {
 
 var createViewModel = function (params, componentInfo) {
     //return new Viewmodel(params);
-    return transform(params.tweet);
+    return transform(params.tweet, params.filters);
 };
 
 var register = function () {
@@ -56,4 +74,6 @@ var register = function () {
 module.exports = {
     register: register
 };
+
+// #3128
 

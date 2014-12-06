@@ -1,21 +1,29 @@
 var libs = require('../../libs'),
     ko = libs.ko;
 
-var filter = function(){
-    this.value = ko.observable().extend({
-        rateLimit: {
-            timeout: 500,
-            method: "notifyWhenChangesStop"
-        }
-    });
-};
+var knownLanguages = [
+    'en', 'ru', 'it', 'es'
+];
 
-filter.prototype.predicate = function(tweet){
+var filterPredicate = function(tweet){
+    var filterValueUnwrapped = filterValue();
+    if(filterValueUnwrapped){
+        return tweet && tweet.lang === filterValueUnwrapped;
+    }
     return true;
 };
 
-filter.prototype.knownLanguages = [
-    'en', 'ru', 'it', 'es'
-];
+var filterValue = ko.observable().extend({
+    rateLimit: {
+        timeout: 500,
+        method: "notifyWhenChangesStop"
+    }
+});
+
+var filter = {
+    knownLanguages: knownLanguages,
+    predicate: filterPredicate,
+    value: filterValue
+};
 
 module.exports = filter;

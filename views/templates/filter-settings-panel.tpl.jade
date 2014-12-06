@@ -7,12 +7,14 @@ div.control-table
             label(for="contains-text") Contains text
         div.control-element
             input(id="contains-text", type="text",  data-bind="textInput: containsText.value")
-    div.control-item(data-bind="css: {'active': geotagged.value}")
+    div.control-item(data-bind="css: {'active': language.value}")
         div.control-label
-            span.icon.icon-map-marker
+            span.icon.icon-language
         div.control-label
-            label(for="really-geotagged") Really geotagged
+            label(for="tweet-language") Specific language
         div.control-element
-            input(id="really-geotagged", type="checkbox",  data-bind="checked: geotagged.value")
+            input(list="tweet-language-list", id="tweet-language", type="text", data-bind="textInput: language.value")
+            datalist(id="tweet-language-list", data-bind="foreach: {data: language.knownLanguages, as: 'lang'}")
+                option(data-bind="text: lang")
 
 

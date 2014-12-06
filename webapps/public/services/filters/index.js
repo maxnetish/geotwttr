@@ -1,5 +1,5 @@
 module.exports = {
-    geotagged: new (require('./really-geotagged'))(),
-    language: new (require('./specific-language'))(),
-    containsText: new (require('./contains-text'))()
+    //geotagged: require('./really-geotagged'),
+    language: require('./specific-language'),
+    containsText: require('./contains-text')
 };

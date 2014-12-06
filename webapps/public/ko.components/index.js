@@ -19,18 +19,14 @@ var rootViewModel = function () {
     var mapNotYetLoaded = ko.computed({
         read: function () {
             return !mapInstance();
-        },
-        pure: true,
-        deferEvaluation: true
+        }
     });
 
     var showAppTooltip = ko.computed({
         read: function () {
             var result = !!mapInstance() && !appState.selection().lat;
             return result;
-        },
-        pure: true,
-        deferEvaluation: true
+        }
     });
 
     var showImmediate = ko.observable(true);
@@ -126,7 +122,8 @@ var rootViewModel = function () {
         showImmediate: showImmediate,
         showHidedTweets: showHidedTweets,
         mapNotYetLoaded: mapNotYetLoaded,
-        showAppTooltip: showAppTooltip
+        showAppTooltip: showAppTooltip,
+        viewModelNotReady: false
     };
 };
 

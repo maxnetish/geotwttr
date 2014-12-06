@@ -9,7 +9,7 @@ div#selection-details(data-bind="smoothShowHide: geocoderResults().length")
                 span(data-bind="text: geocoderFirstResult().parsedAddress")
             // ko foreach: geocoderRestResult
             span.details-text-block(data-bind="visible: parsedAddress")
-                span.tree-mark.icon.icon-chevron-left
+                span.tree-mark.icon.icon-angle-left
                 a(class="address", href="javascript:void 0", data-bind="click: $parent.positionTo")
                     span(data-bind="text: parsedAddress")
             // /ko

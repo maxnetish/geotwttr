@@ -16,14 +16,14 @@ block content
                     span.icon.icon-wrench
             div.settings-wrapper(data-bind="component: {name: 'filter-settings-panel', params: {filters: filters}}, smoothShowHide: filterSettingsVisible")
             gmap-control(params="mapInstance: mapInstance, appState: appState, selectedGeosearchResult: selectedGeosearchResult")
-    div.pane-right.pane
+    div.pane-right.pane.hide-initial(data-bind="css: {'hide-initial': viewModelNotReady}")
         selection-details-control(params="appState: appState, mapInstance: mapInstance")
-        tweet-feed-control(params="showImmediate: showImmediate, hidedCount: tweetList.hidedCount, showHided: showHidedTweets, reset: tweetList.reset", data-bind="smoothShowHide: appState.selection().lat")
+        tweet-feed-control(params="showImmediate: showImmediate, hidedCount: tweetList.hidedCount, showHided: showHidedTweets, reset: tweetList.reset", data-bind="visible: appState.selection().lat")
         p.loading-map(data-bind="visible: mapNotYetLoaded") Loading map...
         div.app-tooltip(data-bind="visible: showAppTooltip") Click some area in map and see realtime feed of tweets.
         ul#tweet-list.scroll
             // ko foreach: {data: tweetList.visible, as: 'item'}
-            li.li-tweet(data-bind="component: {name: 'tweet-ui-mini', params: {tweet: item}}")
+            li(data-bind="component: {name: 'tweet-ui-mini', params: {tweet: item, filters: $parent.filters}}")
             // /ko
             button.button-request-previous(data-old-bind="click: needMore, visible: !restLoadingNow()", style="display: none;")
                 span Load more
