@@ -16,6 +16,8 @@ var rootViewModel = function () {
     };
     var filters = require('../services/filters');
 
+    var addToast = ko.observable();
+
     var mapNotYetLoaded = ko.computed({
         read: function () {
             return !mapInstance();
@@ -75,6 +77,22 @@ var rootViewModel = function () {
         });
     });
 
+    //setTimeout(function () {
+    //    addToast({
+    //        title: 'Cлучилось что-то страшное',
+    //        content: 'In Unicode encoding, all non-punctuation characters are stored in writing order. This means that the writing direction of characters',
+    //        'class': 'toast-warning'
+    //    });
+    //}, 2000);
+    //
+    //setTimeout(function () {
+    //    addToast({
+    //        title: 'Что-то случилось',
+    //        content: 'Но неизвестно что именно',
+    //        'class': 'toast-info'
+    //    });
+    //}, 4000);
+
     /*
      ws.getRemote().invoke('subscribeTwitterStream', {
      notify: 'streamResp',
@@ -97,6 +115,18 @@ var rootViewModel = function () {
         if (resp.tweet && resp.tweet.id) {
             // tweet really
             tweetList.addItem(resp.tweet);
+        } else if (resp.tweet && resp.tweet.message) {
+            addToast({
+                title: 'Twitter said:',
+                content: resp.tweet.message,
+                'class': 'toast-warning'
+            });
+        } else {
+            addToast({
+                title: 'Uknown response',
+                content: JSON.stringify(resp)
+            });
+            console.log(resp);
         }
         return 'OK';
     };
@@ -123,7 +153,8 @@ var rootViewModel = function () {
         showHidedTweets: showHidedTweets,
         mapNotYetLoaded: mapNotYetLoaded,
         showAppTooltip: showAppTooltip,
-        viewModelNotReady: false
+        viewModelNotReady: false,
+        addToast: addToast
     };
 };
 
@@ -136,6 +167,7 @@ module.exports = {
         require('./filter-settings-panel').register();
         require('./tweet-ui/mini').register();
         require('./tweet-feed-control').register();
+        require('./toast-logger').register();
     },
     registerApp: function (domRoot) {
         ko.applyBindings(rootViewModel(), domRoot);

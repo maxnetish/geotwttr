@@ -34,6 +34,8 @@ block content
             span(data-bind='text: tweetList.addingRate')
             span &nbsp;tw/min
         a(href="https://twitter.com/maxnetish", class="twitter-follow-button", data-show-count="false", data-lang="#{langCode}") Follow me
+    div.absolute-blocks
+        toast-logger(params="notify: addToast")
     //script#tweet-template(type='text/html')
         include tweet_template_mini
     //script#tweet-template-details(type="text/html")
@@ -50,6 +52,8 @@ block content
         include templates/tweet-ui-mini.tpl.jade
     script#tweet-feed-control-tpl(type="text/html")
         include templates/tweet-feed-control.tpl.jade
+    script#toast-logger-tpl(type="text/html")
+        include templates/toast-logger.tpl.jade
     script.
         window.gt_config={};
         window.gt_config.langCode = "#{langCode}";

@@ -3,6 +3,7 @@
 @import "inc/selection-details.less";
 @import "inc/filter-settings-wrapper";
 @import "inc/tweet-feed-control";
+@import "inc/toast-logger";
 @import "inc/mixin.less";
 
 body {
@@ -149,7 +150,7 @@ ul {
       font-size: large;
       text-align: center;
       padding: 20px;
-//      display: none;
+      //      display: none;
     }
 
     .app-tooltip {
@@ -160,7 +161,7 @@ ul {
       font-size: large;
       text-align: center;
       padding: 20px;
-//      display: none;
+      //      display: none;
     }
   }
 }
@@ -384,5 +385,13 @@ footer {
     color: white;
     border-radius: 10px;
     padding: 0 10px;
+  }
+}
+
+.absolute-blocks {
+  position: relative;
+  > * {
+    display: block;
+    position: absolute;
   }
 }
