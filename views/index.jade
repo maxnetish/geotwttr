@@ -23,7 +23,7 @@ block content
         div.app-tooltip(data-bind="visible: showAppTooltip") Click some area in map and see realtime feed of tweets.
         ul#tweet-list.scroll
             // ko foreach: {data: tweetList.visible, as: 'item'}
-            li(data-bind="component: {name: 'tweet-ui-mini', params: {tweet: item, filters: $parent.filters}}")
+            li(data-bind="component: {name: 'tweet-ui-mini', params: {tweet: item, filters: $parent.filters, handlers: $parent.tweetHandlers}}")
             // /ko
             button.button-request-previous(data-old-bind="click: needMore, visible: !restLoadingNow()", style="display: none;")
                 span Load more

@@ -112,6 +112,16 @@ var bindSelection = function (map, state) {
     });
 };
 
+var bindSelectedPlace = function (map, selectedPlaceObservable) {
+    if (!ko.isObservable(selectedPlaceObservable)) {
+        return;
+    }
+
+    selectedPlaceObservable.subscribe(function (newSelectedPlace) {
+
+    });
+};
+
 var bind = function (gmaps, map, state) {
     gmapsNamespace = gmaps;
     geocoderInstance = new gmaps.Geocoder();

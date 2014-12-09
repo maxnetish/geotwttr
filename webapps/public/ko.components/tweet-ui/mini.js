@@ -19,9 +19,28 @@ var createVisibleComputedDefinition = function (tweet, filters) {
     };
 };
 
-var transform = function (tweet, filters) {
+var humanizeCoordinates = function (coordinates) {
+    var result, lat, lng;
+    if (!coordinates) {
+        return result;
+    }
+    if (!_.isArray(coordinates.coordinates)) {
+        return result;
+    }
+
+    lat = coordinates.coordinates[1].toFixed(3);
+    lng = coordinates.coordinates[0].toFixed(3);
+
+    result = ['lat: ', lat, '; lng: ', lng].join('');
+
+    return result;
+};
+
+var transform = function (tweet, filters, handlers) {
     var isRetweet = !!tweet.retweeted_status;
     var originalTweet = isRetweet ? tweet.retweeted_status : tweet;
+
+    handlers = handlers || {};
 
     return {
         isRetweet: isRetweet,
@@ -37,7 +56,10 @@ var transform = function (tweet, filters) {
         profileSenderUrl: 'https://twitter.com/' + tweet.user.screen_name,
         senderScreenName: tweet.user.screen_name,
         useRtl: detectRtl(tweet),
-        shouldVisible: ko.computed(createVisibleComputedDefinition(tweet, filters))
+        shouldVisible: ko.computed(createVisibleComputedDefinition(tweet, filters)),
+        coordinates: tweet.coordinates,
+        coordinatesH: humanizeCoordinates(tweet.coordinates),
+        onClickCoordinates: handlers.onClickCoordinates ? handlers.onClickCoordinates : _.noop
     };
 };
 
@@ -57,7 +79,7 @@ var detectRtl = function (tweet) {
 
 var createViewModel = function (params, componentInfo) {
     //return new Viewmodel(params);
-    return transform(params.tweet, params.filters);
+    return transform(params.tweet, params.filters, params.handlers);
 };
 
 var register = function () {

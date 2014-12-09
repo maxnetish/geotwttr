@@ -34,6 +34,10 @@ var rootViewModel = function () {
     var showImmediate = ko.observable(true);
     var showHidedTweets = ko.observable();
 
+    var onTweetClickCoordinates = function(data){
+
+    };
+
     var tweetList = new TweetList(showImmediate, showHidedTweets);
 
     // tweets demo
@@ -154,7 +158,10 @@ var rootViewModel = function () {
         mapNotYetLoaded: mapNotYetLoaded,
         showAppTooltip: showAppTooltip,
         viewModelNotReady: false,
-        addToast: addToast
+        addToast: addToast,
+        tweetHandlers: {
+            onClickCoordinates: onTweetClickCoordinates
+        }
     };
 };
 
