@@ -24,11 +24,11 @@ var mergeSelection = function(gmaps, map){
         clickable: false,
         draggable: false,
         editable: true,
-        fillColor: '#26AAE1',
+        fillColor: 'blue',
         fillOpacity: 0.1,
         map: map,
         radius: 1000,
-        // strokeColor: ''
+        strokeColor: 'blue',
         strokeOpacity: 0.2,
         strokeWeight: 1,
         visible: false

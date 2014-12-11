@@ -34,9 +34,7 @@ var rootViewModel = function () {
     var showImmediate = ko.observable(true);
     var showHidedTweets = ko.observable();
 
-    var onTweetClickCoordinates = function(data){
-
-    };
+    var selectedTweet = ko.observable();
 
     var tweetList = new TweetList(showImmediate, showHidedTweets);
 
@@ -76,6 +74,7 @@ var rootViewModel = function () {
             console.log(resp);
             reqId = resp;
             tweetList.reset();
+            selectedTweet(null);
         }, function (err) {
             console.log(err);
         });
@@ -159,9 +158,7 @@ var rootViewModel = function () {
         showAppTooltip: showAppTooltip,
         viewModelNotReady: false,
         addToast: addToast,
-        tweetHandlers: {
-            onClickCoordinates: onTweetClickCoordinates
-        }
+        selectedTweet: selectedTweet
     };
 };
 

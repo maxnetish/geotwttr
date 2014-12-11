@@ -15,9 +15,10 @@ article.li-tweet(data-bind="visible: shouldVisible")
             a.no-decoration.notoggle(data-bind="attr: {href: profileSenderUrl}, if: isRetweet", target="_blank")
                 span.screen-name(data-bind="text: senderScreenName")
         p.tweet-meta(data-bind="if: !!place")
-            span Near&nbsp;
-            span(data-bind="text: place.full_name")
+            a.no-decoration.notoggle(href="javascript:void 0", data-bind="click: onSelect")
+                span Near&nbsp;
+                span(data-bind="text: place.full_name")
         p.tweet-meta(data-bind="if: !!coordinates")
-            a.no-decoration.notoggle(href="javascript:void 0", data-bind="click: onClickCoordinates")
+            a.no-decoration.notoggle(href="javascript:void 0", data-bind="click: onSelect")
                 span.icon.icon-map-marker &nbsp;
                 span(data-bind="text: coordinatesH")

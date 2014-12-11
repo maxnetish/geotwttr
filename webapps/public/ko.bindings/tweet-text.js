@@ -94,7 +94,7 @@ var createFragment = {
             .addClass('entity hashtag notoggle')
             .text(entity.text);
     },
-    'photo': function(originalTweetText, entity){
+    'photo': function (originalTweetText, entity) {
         return $("<a>")
             .attr({
                 target: '_blank',
@@ -111,6 +111,11 @@ var createFragment = {
             })
             .addClass('entity url notoggle')
             .text(entity.display_url);
+    },
+    'symbols': function (originalTweetText, entity) {
+        return $("<span>")
+            .addClass('entity symbol notoggle')
+            .text(entity.text);
     },
     'default': function (originalTweetText, entity) {
         console.log(entity);

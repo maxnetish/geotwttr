@@ -36,11 +36,15 @@ var humanizeCoordinates = function (coordinates) {
     return result;
 };
 
-var transform = function (tweet, filters, handlers) {
+var onSelectTweet = function(orignalTweet, selectedTweetObservable){
+    if(ko.isObservable(selectedTweetObservable)){
+        selectedTweetObservable(orignalTweet);
+    }
+};
+
+var transform = function (tweet, filters, selectedTweet) {
     var isRetweet = !!tweet.retweeted_status;
     var originalTweet = isRetweet ? tweet.retweeted_status : tweet;
-
-    handlers = handlers || {};
 
     return {
         isRetweet: isRetweet,
@@ -59,7 +63,9 @@ var transform = function (tweet, filters, handlers) {
         shouldVisible: ko.computed(createVisibleComputedDefinition(tweet, filters)),
         coordinates: tweet.coordinates,
         coordinatesH: humanizeCoordinates(tweet.coordinates),
-        onClickCoordinates: handlers.onClickCoordinates ? handlers.onClickCoordinates : _.noop
+        onSelect: function(){
+            onSelectTweet(tweet, selectedTweet);
+        }
     };
 };
 
@@ -79,7 +85,7 @@ var detectRtl = function (tweet) {
 
 var createViewModel = function (params, componentInfo) {
     //return new Viewmodel(params);
-    return transform(params.tweet, params.filters, params.handlers);
+    return transform(params.tweet, params.filters, params.selectedTweet);
 };
 
 var register = function () {

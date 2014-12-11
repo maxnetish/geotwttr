@@ -15,6 +15,11 @@ var State = function () {
         lat: 0,
         lng: 0,
         radius: 0
+    }).extend({
+        rateLimit: {
+            timeout: 500,
+            method: 'notifyWhenChangesStop'
+        }
     });
     this.zoom = ko.observable(12);
 };

@@ -12,13 +12,15 @@ var
     sizer = require('./sizer'),
     mapState = require('./map-state'),
     mapSelection = require('./selection'),
-    homeLocation = require('./home-location');
+    homeLocation = require('./home-location'),
+    selectedTweetPlace = require('./selected-tweet-place');
+
 
 var getGMaps = function () {
     return libs.promiseGmaps();
 };
 
-var createMapIn = function (domContainer, state) {
+var createMapIn = function (domContainer, state, selectedTweet) {
     var dfr = Q.defer(), map;
     getGMaps().then(function (gmaps) {
         var homeCoords = homeLocation.getDefaultLocation(),
@@ -46,13 +48,14 @@ var createMapIn = function (domContainer, state) {
         map = new gmaps.Map(domContainer, mapOptions);
         mapSelection.init(gmaps, map);
         mapState.bind(gmaps, map, state);
+        selectedTweetPlace.init(map, gmaps, selectedTweet);
         dfr.resolve(map);
     });
     return dfr.promise;
 };
 
 var createViewModel = function (params, componentInfo) {
-    createMapIn($('#gmap', componentInfo.element).get(0), params.appState)
+    createMapIn($('#gmap', componentInfo.element).get(0), params.appState, params.selectedTweet)
         .then(function (createdMap) {
             params.mapInstance(createdMap);
         });
