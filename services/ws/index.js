@@ -35,7 +35,7 @@ var verifyClientDefault = function (info, cb) {
 };
 
 var onMessage = function (data, flags) {
-    console.log('receive: ' + data);
+    //console.log('receive: ' + data);
 };
 
 var onSocketError = function (err) {

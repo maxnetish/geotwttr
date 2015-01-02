@@ -23,6 +23,7 @@ var redis = require('redis'),
                 dfr.resolve(reply);
             }
         });
+
         return dfr.promise;
     },
 

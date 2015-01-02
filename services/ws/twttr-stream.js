@@ -32,10 +32,10 @@ var onStreamError = function (socket, remote, stream, notify) {
 
 var onStreamProgress = function (socket, remote, stream, notify) {
     return function (tweet) {
-        console.log('progress, socket state: '+socket.readyState);
         if (socket && socket.readyState === socket.OPEN) {
             remote.invoke(notify, {tweet: tweet});
         } else {
+            console.log('progress, socket state: '+socket.readyState);
             stream.dispose();
             _.remove(streams, function (item) {
                 return item === stream;

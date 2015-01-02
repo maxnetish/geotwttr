@@ -13,6 +13,7 @@ var show = function ($element) {
             opacity: ''
         });
     });
+
 };
 
 var hide = function ($element) {
@@ -38,10 +39,22 @@ var register = function () {
             setTransition($(element));
         },
         update: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
-            var visibleValue = ko.unwrap(valueAccessor());
-            if(visibleValue){
+            var visibleValue = ko.unwrap(valueAccessor()),
+                hideOnAnyClick = !!allBindings().hideOnAnyClick;
+            if (visibleValue) {
                 show($(element));
-            }else{
+                if (hideOnAnyClick) {
+                    // defer - to skip current event
+                    _.defer(function(){
+                        $(document).on('click.' + bindingName, function (event) {
+                            if ($(event.target).parents().index(element) == -1) {
+                                valueAccessor()(false);
+                            }
+                        });
+                    });
+                }
+            } else {
+                $(document).off('.' + bindingName);
                 hide($(element));
             }
         }
