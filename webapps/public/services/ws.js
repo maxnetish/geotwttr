@@ -13,6 +13,12 @@ var remote;
 
 var createSocket = function () {
     var socketInstance = new WebSocket('ws://' + global.document.location.host.replace(/:.*/, '') + (global.document.location.port ? ':' + window.document.location.port : ''));
+    socketInstance.addEventListener('close', function(){
+        console.log('websocket is down, try to reconnect in 15 sec...');
+        setTimeout(function(){
+            remote = Connection(createSocket(), localApi, {max: 4096});
+        }, 15000);
+    });
     return socketInstance;
 };
 
