@@ -10,7 +10,7 @@ var Vm = require('../services/vm');
 var Q = require('q');
 
 router.get('/', function (req, res) {
-    var vm = new Vm(),
+    var vm = new Vm(req.query),
         accessToken,
         deferreds = [];
 

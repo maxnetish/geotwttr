@@ -20,7 +20,9 @@ var getMmdbReaderInstance = function (cb) {
     });
 };
 
-var Vm = function () {
+var Vm = function (query) {
+    query = query || {};
+
     this.title = 'Geo statuses';
     this.ipGeocode = null;
     this.langCode = 'en';
@@ -28,7 +30,7 @@ var Vm = function () {
     this.googleAPiToken = null;
     this.authSuccess = false;
     this.authError = null;
-    this.developmentMode = express().get('env') === 'development';
+    this.developmentMode = !!query.debug || express().get('env') === 'development';
 };
 
 Vm.prototype.setTitle = function (title) {
