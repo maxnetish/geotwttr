@@ -3,17 +3,15 @@
  */
 var $ = require('jquery');
 var _ = require('lodash');
-var ko = require('knockout');
-var pathjs = require('pathjs').pathjs;
 var Q = require('q');
+var React = require('react');
 var gmapsLoader = require('./gmaps-lib-loader');
 
 module.exports = {
     $: $,
     _: _,
-    ko: ko,
-    path: pathjs,
     Q: Q,
+    React: React,
     promiseGmaps: gmapsLoader.getPromiseGMaps(Q),
     promiseGeocoder: gmapsLoader.getPromiseGeocoder(Q)
 };

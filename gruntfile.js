@@ -6,6 +6,8 @@ module.exports = function (grunt) {
     var nodeModules = 'node_modules';
     var nodeModulesSelect2 = nodeModules + '/select2';
 
+    //var gruntReact = require('grunt-react');
+
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
         clean: [
@@ -15,6 +17,7 @@ module.exports = function (grunt) {
         ],
         browserify: {
             options: {
+                transform: ['reactify'],
                 browserifyOptions: {
                     debug: true
                 }

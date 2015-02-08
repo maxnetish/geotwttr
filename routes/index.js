@@ -29,18 +29,23 @@ router.get('/', function (req, res) {
     deferreds.push(vm.promiseSetIpGeocode(req.ip));
 
     // wait while deferreds done...
-    Q.all(deferreds).then(function(allResult){
+    Q.all(deferreds).then(function (allResult) {
         var userInfo = allResult[0],
             vmFilled = allResult[1];
-        if(userInfo) {
+        if (userInfo) {
             vmFilled.setUserInfo(userInfo).setGoogleAPiToken();
+            vmFilled.prerendered = require('../webapps/public/components/index.jsx').renderInNode({
+                userInfo: vmFilled.userInfo,
+                title: vmFilled.title,
+                langCode: vmFilled.langCode
+            });
             return res.render('index', vmFilled);
 
         }
         // no user info - show login page with message
         vm.setAuthError('Something wrong... when get account info from twitter. Try again.');
         return res.render('login', vm);
-    }).then(null, function(err){
+    }).then(null, function (err) {
         // err in auth stack:
         vm.setAuthError(err.message);
         return res.render('login', vm);
@@ -48,7 +53,7 @@ router.get('/', function (req, res) {
 });
 
 router.get('/logout', function (req, res) {
-    res.cookie('at', null, { expires: new Date(Date.now() - 90000000), httpOnly: true, signed: true });
+    res.cookie('at', null, {expires: new Date(Date.now() - 90000000), httpOnly: true, signed: true});
     res.redirect('/');
 });
 
@@ -74,9 +79,13 @@ router.get('/auth_callback', function (req, res, next) {
     if (req.query.oauth_token && req.query.oauth_verifier) {
         twitterAuthService.getAccessToken(req.query.oauth_token, req.query.oauth_token_secret, req.query.oauth_verifier)
             .then(function (result) {
-                res.cookie('at', result.authToken, { expires: new Date(Date.now() + 900000000), httpOnly: true, signed: true });
+                res.cookie('at', result.authToken, {
+                    expires: new Date(Date.now() + 900000000),
+                    httpOnly: true,
+                    signed: true
+                });
                 store.setSecret(result.authToken, result.authTokenSecret);
-                console.log('We receive accessToken: '+result.authToken+', secret: '+result.authTokenSecret);
+                console.log('We receive accessToken: ' + result.authToken + ', secret: ' + result.authTokenSecret);
                 return res.redirect('/');
             }).then(null, function (err) {
                 vm.setAuthError(err.message);

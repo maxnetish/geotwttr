@@ -3,7 +3,8 @@
  */
 
 // depends
-var googleConfig = require('../../config/google');
+var googleConfig = require('../../config/google.json');
+//var googleConfig = {};
 
 var gMapsDefer,
     geocoderDefer,

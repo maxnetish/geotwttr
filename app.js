@@ -11,6 +11,8 @@ var detectLang = require('./services/middleware/detectLang');
 
 var app = express();
 
+require('node-jsx').install({extension: '.jsx'});
+
 // show current mode in console
 console.log('Express mode: ' + app.get('env'));
 

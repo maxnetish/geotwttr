@@ -1,5 +1,0 @@
-div.toast-area(data-bind="foreach: {data: messages, as: 'message', afterRender: afterRenderToast, beforeRemove: beforeRemoveToast}")
-    div.toast-item.before-show(data-bind="css: message.class")
-        a(data-bind="click: $parent.onToastTitleClick", href="javascript:void 0")
-            h4(data-bind="text: message.title")
-        p(data-bind="html: message.content")
