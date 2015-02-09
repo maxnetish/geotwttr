@@ -63,19 +63,8 @@ var read = function (key, defaultValue) {
     return result;
 };
 
-var registerPermanentObservable = function(key, observ, defaultObservValue){
-    var initialValue = read(key, defaultObservValue);
-
-    observ(initialValue);
-
-    observ.subscribe(function(newValue){
-        write(key, newValue);
-    });
-};
-
 module.exports = {
     read: read,
     write: write,
-    registerPermanentObservable: registerPermanentObservable,
     keys: keys
 };

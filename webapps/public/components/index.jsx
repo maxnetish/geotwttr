@@ -1,4 +1,5 @@
 var libs = require('./../libs'),
+    services = require('../services'),
     React = libs.React,
     _ = libs._;
 
@@ -6,16 +7,27 @@ var GoogleMapComponent = require('./google-map.jsx').MapControl;
 var HeaderAccountCardComponent = require('./header-account-card.jsx').Control;
 var IndicatorComponent = require('./indicator.jsx').Control;
 
-var rootElementInstance, appConfig;
+var rootElementInstance, appConfig, callSetState;
 
 var RootElement = React.createClass({
     getInitialState: function () {
-        return appConfig;
+        var storedCenter = services.localStorage.read(services.localStorage.keys.CENTER, {
+                lat: 37.419,
+                lng: -122.080
+            }),
+            storedZoom = services.localStorage.read(services.localStorage.keys.ZOOM, 6);
+
+        return _.assign(appConfig, {
+            mapCenter: storedCenter,
+            mapZoom: storedZoom
+        });
     },
     render: function () {
         console.log('render root element');
         console.log(this.state);
-        var callSetState = _.bind(this.setState, this);
+        if (!callSetState) {
+            callSetState = _.bind(this.setState, this);
+        }
         return <div>
             <header>
                 <HeaderAccountCardComponent userInfo={this.state.userInfo}/>
@@ -23,7 +35,7 @@ var RootElement = React.createClass({
             </header>
             <div className="pane-left pane">
                 <div className="relative full-height">
-                    <GoogleMapComponent selection={this.state.mapSelection} setState={callSetState}/>
+                    <GoogleMapComponent selection={this.state.mapSelection} mapCenter={this.state.mapCenter} mapZoom={this.state.mapZoom} setState={callSetState}/>
                 </div>
             </div>
             <div className="pane-right pane"></div>
@@ -33,6 +45,12 @@ var RootElement = React.createClass({
                 <a href="https://twitter.com/maxnetish" className="twitter-follow-button" data-show-count="false" data-lang={this.state.langCode}>Follow me</a>
             </footer>
         </div>;
+    },
+    shouldComponentUpdate: function (nextProps, nextState) {
+        // store params:
+        storeMapParams(nextState.mapCenter, nextState.mapZoom);
+
+        return true;
     }
 });
 
@@ -41,7 +59,7 @@ var initInBrowser = function (rootNode, config) {
     rootElementInstance = React.render(<RootElement />, rootNode);
 };
 
-var renderInNode = function(config){
+var renderInNode = function (config) {
     appConfig = config || {};
     return React.renderToString(<RootElement />);
 };
@@ -53,9 +71,18 @@ var setState = function (partialState, callback) {
     return false;
 };
 
-var getState = function(){
+var getState = function () {
     return rootElementInstance.state;
 };
+
+var storeMapParams = _.debounce(function (center, zoom) {
+    if (center) {
+        services.localStorage.write(services.localStorage.keys.CENTER, center);
+    }
+    if (zoom) {
+        services.localStorage.write(services.localStorage.keys.ZOOM, zoom);
+    }
+}, 500);
 
 module.exports = {
     initInBrowser: initInBrowser,
