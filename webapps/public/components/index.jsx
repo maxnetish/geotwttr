@@ -6,6 +6,7 @@ var libs = require('./../libs'),
 var GoogleMapComponent = require('./google-map.jsx').MapControl;
 var HeaderAccountCardComponent = require('./header-account-card.jsx').Control;
 var IndicatorComponent = require('./indicator.jsx').Control;
+var AppTooltipComponent = require('./app-tooltip.jsx').Control;
 
 var rootElementInstance, appConfig, callSetState;
 
@@ -19,7 +20,8 @@ var RootElement = React.createClass({
 
         return _.assign(appConfig, {
             mapCenter: storedCenter,
-            mapZoom: storedZoom
+            mapZoom: storedZoom,
+            mapLoaded: false
         });
     },
     render: function () {
@@ -38,7 +40,9 @@ var RootElement = React.createClass({
                     <GoogleMapComponent selection={this.state.mapSelection} mapCenter={this.state.mapCenter} mapZoom={this.state.mapZoom} setState={callSetState}/>
                 </div>
             </div>
-            <div className="pane-right pane"></div>
+            <div className="pane-right pane">
+                <AppTooltipComponent mapLoaded={this.state.mapLoaded} />
+            </div>
             <footer>
                 <IndicatorComponent value={this.state.visibleCount} />
                 <IndicatorComponent value={this.state.addingRate} unit="tw/min" />

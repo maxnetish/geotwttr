@@ -197,6 +197,11 @@ var MapControl = React.createClass({
         updateMapCenterAndZoom(this.props.mapCenter, this.props.mapZoom);
         updateSelectionCircle(this.props.selection);
         setStateFn = this.props.setState;
+        if (_.isFunction(setStateFn)) {
+            setStateFn({
+                mapLoaded: true
+            });
+        }
     },
     shouldComponentUpdate: function (nextProps, nextState) {
         updateMapCenterAndZoom(nextProps.mapCenter, nextProps.mapZoom);
