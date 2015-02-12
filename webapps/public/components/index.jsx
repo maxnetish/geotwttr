@@ -8,28 +8,17 @@ var HeaderAccountCardComponent = require('./header-account-card.jsx').Control;
 var IndicatorComponent = require('./indicator.jsx').Control;
 var AppTooltipComponent = require('./app-tooltip.jsx').Control;
 
-var rootElementInstance, appConfig, callSetState;
+var rootElementInstance, appConfig;
 
 var RootElement = React.createClass({
     getInitialState: function () {
-        var storedCenter = services.localStorage.read(services.localStorage.keys.CENTER, {
-                lat: 37.419,
-                lng: -122.080
-            }),
-            storedZoom = services.localStorage.read(services.localStorage.keys.ZOOM, 6);
-
         return _.assign(appConfig, {
-            mapCenter: storedCenter,
-            mapZoom: storedZoom,
             mapLoaded: false
         });
     },
     render: function () {
         console.log('render root element');
         console.log(this.state);
-        if (!callSetState) {
-            callSetState = _.bind(this.setState, this);
-        }
         return <div>
             <header>
                 <HeaderAccountCardComponent userInfo={this.state.userInfo}/>
@@ -37,7 +26,7 @@ var RootElement = React.createClass({
             </header>
             <div className="pane-left pane">
                 <div className="relative full-height">
-                    <GoogleMapComponent selection={this.state.mapSelection} mapCenter={this.state.mapCenter} mapZoom={this.state.mapZoom} setState={callSetState}/>
+                    <GoogleMapComponent />
                 </div>
             </div>
             <div className="pane-right pane">
@@ -51,9 +40,6 @@ var RootElement = React.createClass({
         </div>;
     },
     shouldComponentUpdate: function (nextProps, nextState) {
-        // store params:
-        storeMapParams(nextState.mapCenter, nextState.mapZoom);
-
         return true;
     }
 });
@@ -78,15 +64,6 @@ var setState = function (partialState, callback) {
 var getState = function () {
     return rootElementInstance.state;
 };
-
-var storeMapParams = _.debounce(function (center, zoom) {
-    if (center) {
-        services.localStorage.write(services.localStorage.keys.CENTER, center);
-    }
-    if (zoom) {
-        services.localStorage.write(services.localStorage.keys.ZOOM, zoom);
-    }
-}, 500);
 
 module.exports = {
     initInBrowser: initInBrowser,

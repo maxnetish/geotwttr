@@ -1,6 +1,8 @@
 var libs = require('../libs'),
     React = libs.React,
-    _ = libs._;
+    _ = libs._,
+    actions = require('../actions'),
+    mapStore = require('../stores').mapStore;
 
 var map, selectionCircle, gmaps, setStateFn;
 
@@ -18,8 +20,8 @@ var selectionCircleOptionsInitial = {
 };
 
 var mapOptionsInitial = {
-    centerUnwrapped: {lat: 37.419, lng: -122.080},
-    zoom: 6,
+    centerUnwrapped: mapStore.getCenter(),
+    zoom: mapStore.getZoom(),
     streetViewControl: false
 };
 
@@ -36,68 +38,57 @@ var createGoogleMapIn = function (domNode) {
         selectionCircleOptions.center = selectionCircleOptions.center || new gmaps.LatLng(0, 0);
         selectionCircle = new gmaps.Circle(selectionCircleOptions);
 
-        gmapsNamespace.event.addListener(map, 'click', function (e) {
-            var clickCoords = {
-                    lat: e.latLng.lat(),
-                    lng: e.latLng.lng()
-                },
-                radius = getCurrentSelectionFromCircle().radius;
-
-            if (_.isFunction(setStateFn)) {
-                setStateFn({
-                    mapSelection: {
-                        center: clickCoords,
-                        radius: radius
-                    }
-                });
-            }
+        mapStore.addSelectionChangeListener(function () {
+            var newSelection = mapStore.getSelection();
+            console.log('catch selection CHANGE event:');
+            console.log(newSelection);
+            _.defer(updateSelectionCircle, newSelection);
         });
 
-        gmapsNamespace.event.addListener(selectionCircle, 'radius_changed', function () {
-            var currentSelection = getCurrentSelectionFromCircle();
+        mapStore.addChangeListener(function () {
+            var newZoom = mapStore.getZoom(),
+                newCenter = mapStore.getCenter();
+            console.log('catch map CHANGE event');
+            _.defer(updateMapCenterAndZoom, newCenter, newZoom);
+        });
 
-            if (_.isFunction(setStateFn)) {
-                setStateFn({
-                    mapSelection: {
-                        center: currentSelection.center,
-                        radius: currentSelection.radius
-                    }
-                });
-            }
+        gmaps.event.addListener(map, 'click', function (e) {
+            var clickCoords = {
+                lat: e.latLng.lat(),
+                lng: e.latLng.lng()
+            };
+            console.log('call actions.map.click');
+            actions.map.click(clickCoords);
+        });
+
+        gmaps.event.addListener(selectionCircle, 'radius_changed', function () {
+            var radius = selectionCircle.getRadius();
+            console.log('call actions.map.selectionRadiusChanged');
+            actions.map.selectionRadiusChanged(radius);
         });
 
         gmaps.event.addListener(selectionCircle, 'center_changed', function () {
-            var currentSelection = getCurrentSelectionFromCircle();
-
-            if (_.isFunction(setStateFn)) {
-                setStateFn({
-                    mapSelection: {
-                        center: currentSelection.center,
-                        radius: currentSelection.radius
-                    }
-                });
-            }
+            var selectionCircleCenterWrapped = selectionCircle.getCenter(),
+                center = {
+                    lat: selectionCircleCenterWrapped.lat(),
+                    lng: selectionCircleCenterWrapped.lng()
+                };
+            console.log('call actions.map.selectionCenterChanged');
+            actions.map.selectionCenterChanged(center);
         });
 
         gmaps.event.addListener(map, 'center_changed', function () {
-            var centerLatLng = map.getCenter();
-
-            if (_.isFunction(setStateFn)) {
-                setStateFn({
-                    mapCenter: {
-                        lat: centerLatLng.lat(),
-                        lng: centerLatLng.lng()
-                    }
-                })
-            }
+            var centerWrapped = map.getCenter();
+            console.log('call action..centerChanged');
+            actions.map.centerChanged({
+                lat: centerWrapped.lat(),
+                lng: centerWrapped.lng()
+            });
         });
 
         gmaps.event.addListener(map, 'zoom_changed', function () {
-            if (_.isFunction(setStateFn)) {
-                setStateFn({
-                    mapZoom: map.getZoom()
-                });
-            }
+            console.log('call action..zoomChanged');
+            actions.map.zoomChanged(map.getZoom());
         });
     });
 };
@@ -157,6 +148,9 @@ var updateSelectionCircle = function (newSelection) {
 };
 
 var updateMapCenterAndZoom = function (centerCoords, zoom) {
+    console.log('updateMapCenterAndZoom:');
+    console.log(centerCoords);
+    console.log(zoom);
     var currentMapCenterWrapped, currentMapCenterUnwrapped, currentMapZoom;
 
     if (map) {
@@ -194,19 +188,8 @@ var MapControl = React.createClass({
     componentDidMount: function () {
         // occurs once (not on server)
         createGoogleMapIn(this.getDOMNode());
-        updateMapCenterAndZoom(this.props.mapCenter, this.props.mapZoom);
-        updateSelectionCircle(this.props.selection);
-        setStateFn = this.props.setState;
-        if (_.isFunction(setStateFn)) {
-            setStateFn({
-                mapLoaded: true
-            });
-        }
     },
     shouldComponentUpdate: function (nextProps, nextState) {
-        updateMapCenterAndZoom(nextProps.mapCenter, nextProps.mapZoom);
-        updateSelectionCircle(nextProps.selection);
-        setStateFn = this.props.setState;
         return false;
     }
 });

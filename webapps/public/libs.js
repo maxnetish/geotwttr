@@ -6,6 +6,8 @@ var _ = require('lodash');
 var Q = require('q');
 var React = require('react');
 var gmapsLoader = require('./gmaps-lib-loader');
+var flux = require('flux');
+var fluxDispatcher = new flux.Dispatcher();
 
 module.exports = {
     $: $,
@@ -13,5 +15,6 @@ module.exports = {
     Q: Q,
     React: React,
     promiseGmaps: gmapsLoader.getPromiseGMaps(Q),
-    promiseGeocoder: gmapsLoader.getPromiseGeocoder(Q)
+    promiseGeocoder: gmapsLoader.getPromiseGeocoder(Q),
+    dispatcher: fluxDispatcher
 };
