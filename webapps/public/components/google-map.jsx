@@ -90,6 +90,8 @@ var createGoogleMapIn = function (domNode) {
             console.log('call action..zoomChanged');
             actions.map.zoomChanged(map.getZoom());
         });
+
+        actions.map.loaded();
     });
 };
 

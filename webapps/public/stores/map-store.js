@@ -1,7 +1,7 @@
 var libs = require('../libs'),
     actions = require('../actions'),
     dispatcher = libs.dispatcher,
-    EventEmitter = require('events').EventEmitter,
+    EventEmitter = libs.EventEmitter,
     _ = libs._,
     services = require('../services');
 

@@ -1,19 +1,22 @@
 var libs = require('./../libs'),
     services = require('../services'),
     React = libs.React,
-    _ = libs._;
+    _ = libs._,
+    rootStore = require('../stores').rootStore;
 
 var GoogleMapComponent = require('./google-map.jsx').MapControl;
 var HeaderAccountCardComponent = require('./header-account-card.jsx').Control;
 var IndicatorComponent = require('./indicator.jsx').Control;
 var AppTooltipComponent = require('./app-tooltip.jsx').Control;
+var SelectionDetailsComponent = require('./selection-details.jsx').SelectionDetailsComponent;
 
 var rootElementInstance, appConfig;
 
 var RootElement = React.createClass({
     getInitialState: function () {
         return _.assign(appConfig, {
-            mapLoaded: false
+            mapLoaded: false,
+            mapHasSelection: false
         });
     },
     render: function () {
@@ -30,7 +33,9 @@ var RootElement = React.createClass({
                 </div>
             </div>
             <div className="pane-right pane">
-                <AppTooltipComponent mapLoaded={this.state.mapLoaded} />
+                <SelectionDetailsComponent details={this.state.selectionDetails}/>
+                <AppTooltipComponent appTooltipText='Map loaded...' visible={!this.state.mapLoaded} />
+                <AppTooltipComponent appTooltipText='Click map to see tweets near...' visible={!this.state.mapHasSelection && this.state.mapLoaded} />
             </div>
             <footer>
                 <IndicatorComponent value={this.state.visibleCount} />
@@ -64,6 +69,29 @@ var setState = function (partialState, callback) {
 var getState = function () {
     return rootElementInstance.state;
 };
+
+rootStore.addMapLoadedListener(function () {
+    var loaded = rootStore.getMapLoaded();
+    setState({
+        mapLoaded: loaded
+    });
+});
+
+rootStore.addMapSelectionChangedListener(function () {
+    var hasSelection = rootStore.getMapHasSelection();
+    setState({
+        mapHasSelection: hasSelection
+    });
+});
+
+rootStore.addMapSelectionDetailsChangedListener(function(){
+    var details = rootStore.getSelectionDetails();
+    setState({
+       selectionDetails: details
+    });
+});
+
+//mapStore
 
 module.exports = {
     initInBrowser: initInBrowser,

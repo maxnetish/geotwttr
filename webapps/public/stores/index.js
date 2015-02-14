@@ -1,3 +1,4 @@
 module.exports = {
-    mapStore: require('./map-store')
+    mapStore: require('./map-store'),
+    rootStore: require('./root-store')
 };

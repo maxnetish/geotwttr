@@ -52,10 +52,19 @@ var zoomChanged = function (zoom) {
     dispatcher.dispatch(dispatcherPayload);
 };
 
+var loaded = function(){
+    var dispatcherPayload = {
+        actionType: actionTypes.MAP.LOADED,
+        actionArgs: null
+    };
+    dispatcher.dispatch(dispatcherPayload);
+};
+
 module.exports = {
     click: click,
     selectionRadiusChanged: selectionRadiusChanged,
     selectionCenterChanged: selectionCenterChanged,
     centerChanged: centerChanged,
-    zoomChanged: zoomChanged
+    zoomChanged: zoomChanged,
+    loaded: loaded
 };

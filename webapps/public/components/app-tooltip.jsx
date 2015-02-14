@@ -4,17 +4,12 @@ var libs = require('../libs'),
 var AppTooltipControl = React.createClass({
     render: function () {
         var xMarkup = null,
-            visible = !this.props.mapLoaded,
-            mapTooltipClass = 'app-tooltip',
+            visible = !!this.props.visible,
             appTooltipClass = 'app-tooltip';
-
-        if (this.props.mapLoaded) {
-            mapTooltipClass = mapTooltipClass + ' hided';
-        }
 
         if (visible) {
             xMarkup = <section>
-                <div className={mapTooltipClass}>Loading map...</div>
+                <div className={appTooltipClass}>{this.props.appTooltipText}</div>
             </section>;
         }
 
