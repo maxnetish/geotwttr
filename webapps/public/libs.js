@@ -4,7 +4,7 @@
 var $ = require('jquery'),
     _ = require('lodash'),
     Q = require('q'),
-    React = require('react'),
+    React = require('react/addons'),
     gmapsLoader = require('./gmaps-lib-loader'),
     flux = require('flux'),
     fluxDispatcher = new flux.Dispatcher(),

@@ -6,5 +6,8 @@ module.exports = {
         CENTER_CHANGED: 'action-map-center-changed',
         ZOOM_CHANGED: 'action-map-zoom-changed',
         LOADED: 'action-map-loaded'
+    },
+    SELECTION_DETAILS: {
+        EXPAND_CLICK: 'action-selection-details-expand'
     }
 };

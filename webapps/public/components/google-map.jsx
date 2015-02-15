@@ -38,14 +38,14 @@ var createGoogleMapIn = function (domNode) {
         selectionCircleOptions.center = selectionCircleOptions.center || new gmaps.LatLng(0, 0);
         selectionCircle = new gmaps.Circle(selectionCircleOptions);
 
-        mapStore.addSelectionChangeListener(function () {
+        mapStore.on(mapStore.events.SELECTION_CHANGE, function () {
             var newSelection = mapStore.getSelection();
             console.log('catch selection CHANGE event:');
             console.log(newSelection);
             _.defer(updateSelectionCircle, newSelection);
         });
 
-        mapStore.addChangeListener(function () {
+        mapStore.on(mapStore.events.CHANGE, function () {
             var newZoom = mapStore.getZoom(),
                 newCenter = mapStore.getCenter();
             console.log('catch map CHANGE event');

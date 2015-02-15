@@ -1,39 +1,103 @@
 @import "mixin.less";
 
-#selection-details{
+@widthOfLeftFloatedPlusMinusButton: 1.2rem;
 
-  .address{
-    margin: 0 1em;
+#selection-details {
+
+  .busy-wrapper {
+    position: absolute;
+    background: #808080;
+    width: 0;
+    height: 0;
+    opacity: 0;
+    top: 0;
+    bottom: 0;
+    .transition-opacity(0.2s);
+    &.active {
+      width: 100%;
+      height: 100%;
+      opacity: 0.5;
+    }
   }
 
-  .details-expand{
-    border: none;
-    background: none;
-    padding: 0;
-    cursor: pointer;
-    color: gray;
-    .transition-hover-color(gray);
-  }
-
-  .selection-details-wrapper{
+  .selection-details-wrapper {
     background: @colorBackgroundHover;
     padding: 5px;
   }
 
-  .tree-mark{
+  .selection-details-title-button-wrapper {
+    float: left;
+    width: @widthOfLeftFloatedPlusMinusButton;
+    .details-expand {
+      border: none;
+      background: none;
+      padding: 0;
+      cursor: pointer;
+      color: gray;
+      .transition-hover-color(gray);
+    }
+  }
+
+  .selection-details-title-wrapper {
+    color: #808080;
+    .transition-hover-color(gray);
+    cursor: pointer;
+  }
+
+  .selection-details-line {
+    margin-top: 0.25rem;
+  }
+
+  .selection-details-title-wrapper,
+  .selection-details-line-a-wrapper {
+    margin-left: @widthOfLeftFloatedPlusMinusButton;
+  }
+
+  .selection-details-line-icon-wrapper {
+    float: left;
+    width: @widthOfLeftFloatedPlusMinusButton;
+    color: #808080;
+    .icon {
+      position: relative;
+      top: 0.1rem;
+    }
+  }
+
+  .selection-details-transition-wrapper{
+    overflow: hidden;
+    position: relative;
+  }
+
+  .selection-details-transition-enter {
+    transition: transform 0.2s ease;
+    transform: translateY(-100px);
+    position: absolute;
+    &.selection-details-transition-enter-active {
+      transform: translateY(0);
+      position: static;
+    }
+  }
+
+  .selection-details-transition-leave {
+    transform: translateY(0);
+    position: absolute;
+    visibility: hidden;
+    transition: transform 0.1s linear;
+    &.selection-details-transition-leave-active {
+      transform: translateY(-10px);
+    }
+  }
+
+  .tree-mark {
     color: gray;
   }
 
-  .radius-block{
-    & > *{
+  .radius-block {
+    & > * {
       margin-right: 5px;
     }
-    input{
+    input {
       width: calc(~'100% - 72px');
     }
-  }
-
-  .details-text-block{
-    display: inline-block;
   }
 }

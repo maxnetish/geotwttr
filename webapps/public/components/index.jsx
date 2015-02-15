@@ -33,7 +33,7 @@ var RootElement = React.createClass({
                 </div>
             </div>
             <div className="pane-right pane">
-                <SelectionDetailsComponent details={this.state.selectionDetails}/>
+                <SelectionDetailsComponent />
                 <AppTooltipComponent appTooltipText='Map loaded...' visible={!this.state.mapLoaded} />
                 <AppTooltipComponent appTooltipText='Click map to see tweets near...' visible={!this.state.mapHasSelection && this.state.mapLoaded} />
             </div>
@@ -70,24 +70,17 @@ var getState = function () {
     return rootElementInstance.state;
 };
 
-rootStore.addMapLoadedListener(function () {
+rootStore.once(rootStore.events.EVENT_MAP_LOADED, function () {
     var loaded = rootStore.getMapLoaded();
     setState({
         mapLoaded: loaded
     });
 });
 
-rootStore.addMapSelectionChangedListener(function () {
+rootStore.on(rootStore.events.EVENT_MAP_SELECTION_CHANGED, function () {
     var hasSelection = rootStore.getMapHasSelection();
     setState({
         mapHasSelection: hasSelection
-    });
-});
-
-rootStore.addMapSelectionDetailsChangedListener(function(){
-    var details = rootStore.getSelectionDetails();
-    setState({
-       selectionDetails: details
     });
 });
 

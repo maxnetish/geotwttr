@@ -7,34 +7,29 @@ var libs = require('../libs'),
 
 var mapStore = require('./map-store');
 
-var EVENT_MAP_LOADED = 'event-map-loaded',
-    EVENT_MAP_SELECTION_CHANGED = 'event-map-selection-changed',
-    EVENT_MAP_SELECTION_DETAILS_CHANGED = 'event-map-selection-details-changed';
+var eventNames = Object.freeze({
+    EVENT_MAP_LOADED: 'event-map-loaded',
+    EVENT_MAP_SELECTION_CHANGED: 'event-map-selection-changed'
+});
 
 var internals = {
     mapLoaded: false,
     mapHasSelection: false,
-    mapSelection: null,
-    selectionDetails: null
+    mapSelection: null
 };
 
 var rootStore = _.create(EventEmitter.prototype, {
+    events: eventNames,
     emitMapLoaded: function () {
         var self = this;
         _.defer(function () {
-            return self.emit(EVENT_MAP_LOADED);
+            return self.emit(self.events.EVENT_MAP_LOADED);
         });
     },
     emitMapSelectionChanged: function () {
         var self = this;
         _.defer(function () {
-            return self.emit(EVENT_MAP_SELECTION_CHANGED);
-        });
-    },
-    emitMapSelectionDetailsChanged: function () {
-        var self = this;
-        _.defer(function () {
-            return self.emit(EVENT_MAP_SELECTION_DETAILS_CHANGED);
+            return self.emit(self.events.EVENT_MAP_SELECTION_CHANGED);
         });
     },
     getMapLoaded: function () {
@@ -45,27 +40,6 @@ var rootStore = _.create(EventEmitter.prototype, {
     },
     getMapSelection: function () {
         return internals.selection;
-    },
-    getSelectionDetails: function () {
-        return internals.selectionDetails;
-    },
-    addMapLoadedListener: function (cb) {
-        return this.on(EVENT_MAP_LOADED, cb);
-    },
-    removeMapLoadedListener: function (cb) {
-        return this.removeListener(EVENT_MAP_LOADED, cb);
-    },
-    addMapSelectionChangedListener: function (cb) {
-        return this.on(EVENT_MAP_SELECTION_CHANGED, cb);
-    },
-    removeMapSelectionChangedListener: function (cb) {
-        return this.removeListener(EVENT_MAP_SELECTION_CHANGED, cb);
-    },
-    addMapSelectionDetailsChangedListener: function(cb){
-        return this.on(EVENT_MAP_SELECTION_DETAILS_CHANGED, cb);
-    },
-    removeMapSelectionDetailsChangedListener: function(cb){
-        return this.removeListener(EVENT_MAP_SELECTION_DETAILS_CHANGED, cb);
     }
 });
 
@@ -85,23 +59,9 @@ var processMapSelectionChanges = function () {
     internals.selection = selection;
     internals.mapHasSelection = true;
     rootStore.emitMapSelectionChanged();
-
-    // update selectionDetails
-    if (selection) {
-        services.geocoder.promiseReverseGeocode({
-            lat: selection.center.lat,
-            lng: selection.center.lng
-        }).then(function(geocoderResult){
-            internals.selectionDetails = geocoderResult;
-            rootStore.emitMapSelectionDetailsChanged();
-        });
-    } else {
-        internals.selectionDetails = null;
-        rootStore.emitMapSelectionDetailsChanged();
-    }
 };
 
-var processMapSelectionZoomChanges = function () {
+var processMapSelectionRadiusChanges = function () {
     var selection;
     dispatcher.waitFor([mapStore.dispatchToken]);
     selection = mapStore.getSelection();
@@ -118,8 +78,8 @@ var actionHandler = function (payload) {
         case actions.types.MAP.SELECTION_CENTER_CHANGED:
             processMapSelectionChanges();
             break;
-        case actions.types.MAP.ZOOM_CHANGED:
-            processMapSelectionZoomChanges();
+        case actions.types.MAP.SELECTION_RADIUS_CHANGED:
+            processMapSelectionRadiusChanges();
             break;
         default:
         // nothing

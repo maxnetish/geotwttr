@@ -5,8 +5,10 @@ var libs = require('../libs'),
     _ = libs._,
     services = require('../services');
 
-var SELECTION_CHANGE = 'selection-change',
-    CHANGE = 'change';
+var eventNames = Object.freeze({
+    SELECTION_CHANGE: 'selection-change',
+    CHANGE: 'change'
+});
 
 var selection = {
     center: {
@@ -32,13 +34,14 @@ var storeZoom = _.debounce(function () {
 }, 1000);
 
 var mapStore = _.create(EventEmitter.prototype, {
+    events: eventNames,
     emitSelectionChange: function () {
         console.log('mapStore emits selection-change event');
-        return this.emit(SELECTION_CHANGE);
+        return this.emit(this.events.SELECTION_CHANGE);
     },
     emitChange: _.debounce(function () {
         console.log('mapStore emits change event');
-        return this.emit(CHANGE);
+        return this.emit(this.events.CHANGE);
     }, 500),
     getCenter: function () {
         return center;
@@ -48,18 +51,6 @@ var mapStore = _.create(EventEmitter.prototype, {
     },
     getSelection: function () {
         return selection;
-    },
-    addSelectionChangeListener: function (cb) {
-        return this.on(SELECTION_CHANGE, cb);
-    },
-    removeSelectionChangeListener: function (cb) {
-        return this.removeListener(SELECTION_CHANGE, cb);
-    },
-    addChangeListener: function (cb) {
-        return this.on(CHANGE, cb);
-    },
-    removeChangeListener: function (cb) {
-        return this.removeListener(CHANGE, cb);
     }
 });
 
