@@ -7,7 +7,8 @@ var libs = require('../libs'),
 
 var eventNames = Object.freeze({
     SELECTION_CHANGE: 'selection-change',
-    CHANGE: 'change'
+    CHANGE: 'change',
+    SELECTION_AREA_CHANGE: 'selection-area-change'
 });
 
 var selection = {
@@ -24,6 +25,10 @@ var center = services.localStorage.read(services.localStorage.keys.CENTER, {
 });
 
 var zoom = services.localStorage.read(services.localStorage.keys.ZOOM, 6);
+
+var areaSelection = {
+    geocoderResult: null
+};
 
 var storeCenter = _.debounce(function () {
     services.localStorage.write(services.localStorage.keys.CENTER, center);
@@ -43,6 +48,9 @@ var mapStore = _.create(EventEmitter.prototype, {
         console.log('mapStore emits change event');
         return this.emit(this.events.CHANGE);
     }, 500),
+    emitChangeAreaSelection: function(){
+        this.emit(this.events.SELECTION_AREA_CHANGE);
+    },
     getCenter: function () {
         return center;
     },
@@ -51,6 +59,9 @@ var mapStore = _.create(EventEmitter.prototype, {
     },
     getSelection: function () {
         return selection;
+    },
+    getAreaSelection: function(){
+        return areaSelection;
     }
 });
 
@@ -101,6 +112,12 @@ var processZoomChanged = function (newZoom) {
     mapStore.emitChange();
 };
 
+var processSelectionDetailLineClick = function(lineInfo){
+    console.log(lineInfo);
+    areaSelection.geocoderResult = lineInfo;
+    mapStore.emitChangeAreaSelection();
+};
+
 var actionHandler = function (payload) {
     console.log('selectionStore handles action');
     console.log(payload);
@@ -119,6 +136,9 @@ var actionHandler = function (payload) {
             break;
         case actions.types.MAP.ZOOM_CHANGED:
             processZoomChanged(payload.actionArgs.zoom);
+            break;
+        case actions.types.SELECTION_DETAILS.DETAIL_LINE_CLICK:
+            processSelectionDetailLineClick(payload.actionArgs.detailLineInfo);
             break;
         default:
         // nothing

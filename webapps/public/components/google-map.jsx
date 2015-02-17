@@ -4,7 +4,7 @@ var libs = require('../libs'),
     actions = require('../actions'),
     mapStore = require('../stores').mapStore;
 
-var map, selectionCircle, gmaps, setStateFn;
+var map, selectionCircle, gmaps, selectedAreaRectangle, selectedPointMarker;
 
 var selectionCircleOptionsInitial = {
     clickable: false,
@@ -25,6 +25,39 @@ var mapOptionsInitial = {
     streetViewControl: false
 };
 
+var selectedAreaRectangleOptions = {
+    clickable: false,
+    draggable: false,
+    editable: false,
+    fillColor: 'red',
+    fillOpacity: 0.1,
+    //geodesic: true,
+    strokeColor: 'red',
+    strokeOpacity: 0.2,
+    strokeWeight: 2,
+    visible: false,
+    map: null
+};
+
+var selectedPointMarkerOptions = {
+    clickable: false,
+    draggable: false,
+    icon: {
+        //path: gmaps.SymbolPath.CIRCLE,
+        path: null,
+        scale: 10,
+        fillOpacity: 0.1,
+        fillColor: 'red',
+        strokeOpacity: 0.5,
+        strokeColor: 'red',
+        strokeWeight: 4
+    },
+    map: null,
+    //position: LatLng,
+    //title: '',
+    visible: false
+};
+
 var createGoogleMapIn = function (domNode) {
     libs.promiseGmaps().then(function (gmapsNamespace) {
         gmaps = gmapsNamespace;
@@ -38,6 +71,13 @@ var createGoogleMapIn = function (domNode) {
         selectionCircleOptions.center = selectionCircleOptions.center || new gmaps.LatLng(0, 0);
         selectionCircle = new gmaps.Circle(selectionCircleOptions);
 
+        selectedAreaRectangleOptions.map = map;
+        selectedAreaRectangle = new gmaps.Rectangle(selectedAreaRectangleOptions);
+
+        selectedPointMarkerOptions.map = map;
+        selectedPointMarkerOptions.icon.path = gmaps.SymbolPath.CIRCLE;
+        selectedPointMarker = new gmaps.Marker(selectedPointMarkerOptions);
+
         mapStore.on(mapStore.events.SELECTION_CHANGE, function () {
             var newSelection = mapStore.getSelection();
             console.log('catch selection CHANGE event:');
@@ -50,6 +90,11 @@ var createGoogleMapIn = function (domNode) {
                 newCenter = mapStore.getCenter();
             console.log('catch map CHANGE event');
             _.defer(updateMapCenterAndZoom, newCenter, newZoom);
+        });
+
+        mapStore.on(mapStore.events.SELECTION_AREA_CHANGE, function () {
+            var selectedAreas = mapStore.getAreaSelection();
+            _.defer(updateSelectedGeocoderResult, selectedAreas.geocoderResult);
         });
 
         gmaps.event.addListener(map, 'click', function (e) {
@@ -178,6 +223,27 @@ var updateMapCenterAndZoom = function (centerCoords, zoom) {
         zoom = zoom || 6;
         mapOptionsInitial.centerUnwrapped = centerCoords;
         mapOptionsInitial.zoom = zoom;
+    }
+};
+
+var updateSelectedGeocoderResult = function (geocoderResult) {
+    var hasBounds = geocoderResult && geocoderResult.geometry && geocoderResult.geometry.bounds && !geocoderResult.geometry.bounds.isEmpty(),
+        hasLocation = geocoderResult && geocoderResult.geometry && geocoderResult.geometry.location;
+
+    if (hasBounds) {
+        selectedAreaRectangle.setBounds(geocoderResult.geometry.bounds);
+        selectedAreaRectangle.setVisible(true);
+    } else {
+        selectedAreaRectangle.setVisible(false);
+    }
+    if (hasLocation && !hasBounds) {
+        selectedPointMarker.setPosition(geocoderResult.geometry.location);
+        selectedPointMarker.setVisible(true);
+    } else {
+        selectedPointMarker.setVisible(false);
+    }
+    if (geocoderResult.geometry.viewport) {
+        map.fitBounds(geocoderResult.geometry.viewport);
     }
 };
 

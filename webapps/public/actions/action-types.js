@@ -8,6 +8,7 @@ module.exports = {
         LOADED: 'action-map-loaded'
     },
     SELECTION_DETAILS: {
-        EXPAND_CLICK: 'action-selection-details-expand'
+        EXPAND_CLICK: 'action-selection-details-expand',
+        DETAIL_LINE_CLICK: 'action-selection-detail-line-click'
     }
 };
