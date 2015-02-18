@@ -10,5 +10,8 @@ module.exports = {
     SELECTION_DETAILS: {
         EXPAND_CLICK: 'action-selection-details-expand',
         DETAIL_LINE_CLICK: 'action-selection-detail-line-click'
+    },
+    GEOSEARCH: {
+        TOKEN_CHANGED: 'action-search-token-changed'
     }
 };

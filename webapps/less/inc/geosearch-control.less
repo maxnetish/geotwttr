@@ -1,65 +1,92 @@
 @import "mixin.less";
 
 .geosearch-control-wrapper {
-  position: relative;
-
-  .geo-autocomplete {
-    width: 100%
-  }
-
-  .geo-autocomplete-dropdown-wrapper {
-    position: absolute;
-    z-index: 2;
-    width: 100%;
-    overflow: hidden;
-    display: none;
-
-    &.expanded {
-      display: block;
-    }
-
-    .geo-autocomplete-dropdown {
-      position: relative;
-      background: rgba(255, 255, 255, 0.8);
-      overflow-x: hidden;
-      overflow-y: auto;
-      height: 200px;
-      bottom: 200px;
-      left: 0;
-      transition: bottom 0.2s ease;
-
-      &.expanded {
-        bottom: 0;
-      }
-
-      ul {
-        li {
-          .transition-hover-background(bisque);
-          padding: 0.25em 0.5em;
-          cursor: pointer;
-
-          .place-icon {
-            float: left;
-            font-size: x-large;
-            color: rgba(64, 64, 64, 1);
-          }
-          .place-description {
-            margin: 0 0 0 2.5em;
-            .label {
-              font-size: smaller;
-              background: cornflowerblue;
-              color: white;
-              border-radius: 0.5em;
-              padding: 0 0.75em;
-              margin: 0 0.25em;
-            }
-          }
-          .place-coordinates {
-            font-size: small;
-            font-family: monospace;
-          }
+    .geosearch-control-transition-enter {
+        .transition-opacity(1s);
+        opacity: 0.01;
+        &.geosearch-control-transition-enter-active {
+            opacity: 1;
         }
-      }
     }
-  }
+
+    .geosearch-control-transition-leave {
+        .transition-opacity(1s);
+        opacity: 1;
+        &.geosearch-control-transition-leave-active {
+            opacity: 0;
+        }
+    }
+
+    .geosearch-input {
+        width: calc(~"100% - 1.8rem");
+        height: 1.5rem;
+        box-sizing: border-box;
+    }
+
+    .geosearch-submit-button {
+        width: 1.8rem;
+        border-radius: 0;
+        height: 1.5rem;
+        border-left:none;
+    }
+
+    .geo-autocomplete {
+        width: 100%
+    }
+
+    .geo-autocomplete-dropdown-wrapper {
+        position: absolute;
+        z-index: 2;
+        width: 100%;
+        overflow: hidden;
+        display: none;
+
+        &.expanded {
+            display: block;
+        }
+
+        .geo-autocomplete-dropdown {
+            position: relative;
+            background: rgba(255, 255, 255, 0.8);
+            overflow-x: hidden;
+            overflow-y: auto;
+            height: 200px;
+            bottom: 200px;
+            left: 0;
+            transition: bottom 0.2s ease;
+
+            &.expanded {
+                bottom: 0;
+            }
+
+            ul {
+                li {
+                    .transition-hover-background(bisque);
+                    padding: 0.25em 0.5em;
+                    cursor: pointer;
+
+                    .place-icon {
+                        float: left;
+                        font-size: x-large;
+                        color: rgba(64, 64, 64, 1);
+                    }
+                    .place-description {
+                        margin: 0 0 0 2.5em;
+                        .label {
+                            font-size: smaller;
+                            background: cornflowerblue;
+                            color: white;
+                            border-radius: 0.5em;
+                            padding: 0 0.75em;
+                            margin: 0 0.25em;
+                        }
+                    }
+                    .place-coordinates {
+                        font-size: small;
+                        font-family: monospace;
+                    }
+                }
+            }
+        }
+    }
 }

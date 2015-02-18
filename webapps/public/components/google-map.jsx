@@ -228,7 +228,8 @@ var updateMapCenterAndZoom = function (centerCoords, zoom) {
 
 var updateSelectedGeocoderResult = function (geocoderResult) {
     var hasBounds = geocoderResult && geocoderResult.geometry && geocoderResult.geometry.bounds && !geocoderResult.geometry.bounds.isEmpty(),
-        hasLocation = geocoderResult && geocoderResult.geometry && geocoderResult.geometry.location;
+        hasLocation = geocoderResult && geocoderResult.geometry && geocoderResult.geometry.location,
+        hasViewport = geocoderResult && geocoderResult.geometry && geocoderResult.geometry.viewport;
 
     if (hasBounds) {
         selectedAreaRectangle.setBounds(geocoderResult.geometry.bounds);
@@ -242,7 +243,7 @@ var updateSelectedGeocoderResult = function (geocoderResult) {
     } else {
         selectedPointMarker.setVisible(false);
     }
-    if (geocoderResult.geometry.viewport) {
+    if (hasViewport) {
         map.fitBounds(geocoderResult.geometry.viewport);
     }
 };

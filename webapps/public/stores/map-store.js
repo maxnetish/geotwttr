@@ -73,6 +73,9 @@ var processMapClick = function (coords) {
     selection.center.lat = coords.lat || 0;
     selection.center.lng = coords.lng || 0;
     mapStore.emitSelectionChange();
+
+    areaSelection.geocoderResult = null;
+    mapStore.emitChangeAreaSelection();
 };
 
 var processRadiusChanged = function (radius) {
@@ -90,6 +93,9 @@ var processSelectionCenterChanged = function (coords) {
     selection.center.lat = coords.lat || 0;
     selection.center.lng = coords.lng || 0;
     mapStore.emitSelectionChange();
+
+    areaSelection.geocoderResult = null;
+    mapStore.emitChangeAreaSelection();
 };
 
 var processCenterChanged = function (coords) {

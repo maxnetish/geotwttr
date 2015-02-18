@@ -9,6 +9,7 @@ var HeaderAccountCardComponent = require('./header-account-card.jsx').Control;
 var IndicatorComponent = require('./indicator.jsx').Control;
 var AppTooltipComponent = require('./app-tooltip.jsx').Control;
 var SelectionDetailsComponent = require('./selection-details.jsx').SelectionDetailsComponent;
+var GoogleMapGeosearchComponenet = require('./google-map-geosearch.jsx').GoogleMapGeosearch;
 
 var rootElementInstance, appConfig;
 
@@ -28,9 +29,8 @@ var RootElement = React.createClass({
                 <h1 className="text-center">{this.state.title}</h1>
             </header>
             <div className="pane-left pane">
-                <div className="relative full-height">
+                    <GoogleMapGeosearchComponenet visible={!this.state.mapLoaded}/>
                     <GoogleMapComponent />
-                </div>
             </div>
             <div className="pane-right pane">
                 <SelectionDetailsComponent />
