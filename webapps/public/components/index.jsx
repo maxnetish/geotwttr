@@ -29,7 +29,7 @@ var RootElement = React.createClass({
                 <h1 className="text-center">{this.state.title}</h1>
             </header>
             <div className="pane-left pane">
-                    <GoogleMapGeosearchComponenet visible={!this.state.mapLoaded}/>
+                    <GoogleMapGeosearchComponenet />
                     <GoogleMapComponent />
             </div>
             <div className="pane-right pane">

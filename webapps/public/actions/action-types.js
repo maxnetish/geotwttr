@@ -12,6 +12,7 @@ module.exports = {
         DETAIL_LINE_CLICK: 'action-selection-detail-line-click'
     },
     GEOSEARCH: {
-        TOKEN_CHANGED: 'action-search-token-changed'
+        TOKEN_CHANGED: 'action-search-token-changed',
+        FORM_SUBMIT: 'action-search-form-submit'
     }
 };

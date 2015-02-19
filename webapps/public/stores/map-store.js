@@ -5,6 +5,8 @@ var libs = require('../libs'),
     _ = libs._,
     services = require('../services');
 
+var geosearchStore = require('./geosearch-store');
+
 var eventNames = Object.freeze({
     SELECTION_CHANGE: 'selection-change',
     CHANGE: 'change',
@@ -48,7 +50,7 @@ var mapStore = _.create(EventEmitter.prototype, {
         console.log('mapStore emits change event');
         return this.emit(this.events.CHANGE);
     }, 500),
-    emitChangeAreaSelection: function(){
+    emitChangeAreaSelection: function () {
         this.emit(this.events.SELECTION_AREA_CHANGE);
     },
     getCenter: function () {
@@ -60,7 +62,7 @@ var mapStore = _.create(EventEmitter.prototype, {
     getSelection: function () {
         return selection;
     },
-    getAreaSelection: function(){
+    getAreaSelection: function () {
         return areaSelection;
     }
 });
@@ -118,10 +120,27 @@ var processZoomChanged = function (newZoom) {
     mapStore.emitChange();
 };
 
-var processSelectionDetailLineClick = function(lineInfo){
+var processSelectionDetailLineClick = function (lineInfo) {
     console.log(lineInfo);
     areaSelection.geocoderResult = lineInfo;
     mapStore.emitChangeAreaSelection();
+};
+
+var processSearchFormSubmit = function () {
+    console.log('search submit');
+    var searchToken = geosearchStore.getSearchToken();
+    if (!searchToken) {
+        return;
+    }
+
+    services.geocoder.promiseGeocode({address: searchToken}).then(function (result) {
+        if (result && result.length) {
+            center.lat = result[0].geometry.location.lat();
+            center.lng = result[0].geometry.location.lng();
+            storeCenter();
+            mapStore.emitChange();
+        }
+    });
 };
 
 var actionHandler = function (payload) {
@@ -145,6 +164,9 @@ var actionHandler = function (payload) {
             break;
         case actions.types.SELECTION_DETAILS.DETAIL_LINE_CLICK:
             processSelectionDetailLineClick(payload.actionArgs.detailLineInfo);
+            break;
+        case actions.types.GEOSEARCH.FORM_SUBMIT:
+            processSearchFormSubmit();
             break;
         default:
         // nothing
