@@ -12,14 +12,6 @@ var geosearchTokenChanged = function (newToken) {
     dispatcher.dispatch(dispatchPayload);
 };
 
-var geosearchFormSubmit = function () {
-    var dispatchPayload = {
-        actionType: actionTypes.GEOSEARCH.FORM_SUBMIT,
-        actionArgs: {}
-    };
-    dispatcher.dispatch(dispatchPayload);
-};
-
 var geosearchSelectItem = function(item){
     var  dispatchPayload = {
         actionType: actionTypes.GEOSEARCH.SELECT_ITEM,
@@ -32,6 +24,5 @@ var geosearchSelectItem = function(item){
 
 module.exports = {
     geosearchTokenChanged: geosearchTokenChanged,
-    geosearchFormSubmit: geosearchFormSubmit,
     geosearchSelectItem: geosearchSelectItem
 };

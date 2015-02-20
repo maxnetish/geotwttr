@@ -8,8 +8,7 @@ var libs = require('../libs'),
 
 var eventNames = Object.freeze({
     EVENT_TOKEN_CHANGED: 'event-token-changed',
-    EVENT_SEARCH_RESULTS_CHANGED: 'event-search-result-changed',
-    EVENT_SEARCH_RESULT_SELECTED: 'event-search-result-selected'
+    EVENT_SEARCH_RESULTS_CHANGED: 'event-search-result-changed'
 });
 
 var internals = {
@@ -25,9 +24,6 @@ var geosearchsStore = _.create(EventEmitter.prototype, {
     },
     emitSearchResultChanged: function () {
         return this.emit(this.events.EVENT_SEARCH_RESULTS_CHANGED);
-    },
-    emitSearchResultSelected: function(){
-        return this.emit(this.events.EVENT_SEARCH_RESULT_SELECTED);
     },
     getSearchToken: function () {
         return internals.searchToken;
@@ -67,34 +63,17 @@ var processTokenChanges = function (newToken) {
     geosearchsStore.emitTokenChanged();
 };
 
-var processFormSubmit = function () {
-    var searchToken = geosearchsStore.getSearchToken();
-
-    if(searchToken) {
-        services.geocoder.promiseGeocode({address: searchToken}).then(function (result) {
-            if (result && result.length) {
-                internals.selectedSearchResult = result[0];
-                geosearchsStore.emitSearchResultSelected();
-            }
-        });
-    }
-
-    internals.searchResults = [];
-    geosearchsStore.emitSearchResultChanged();
-};
-
 var processSelectItem = function(item){
     internals.searchResults = [];
     geosearchsStore.emitSearchResultChanged();
+    internals.searchToken = item && item.formatted_address;
+    geosearchsStore.emitTokenChanged();
 };
 
 var actionHandler = function (payload) {
     switch (payload.actionType) {
         case actions.types.GEOSEARCH.TOKEN_CHANGED:
             processTokenChanges(payload.actionArgs.token);
-            break;
-        case actions.types.GEOSEARCH.FORM_SUBMIT:
-            processFormSubmit();
             break;
         case actions.types.GEOSEARCH.SELECT_ITEM:
             processSelectItem(payload.actionArgs.selectedItem);

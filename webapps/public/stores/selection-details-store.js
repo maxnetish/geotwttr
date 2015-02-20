@@ -18,7 +18,7 @@ var internals = {
     detailsExpanded: false,
     details: [],
     detailsWait: false,
-    selectionRadius: null
+    selectionRadius: 1000
 };
 
 var selectionDetailsStore = _.create(EventEmitter.prototype, {
@@ -45,7 +45,7 @@ var selectionDetailsStore = _.create(EventEmitter.prototype, {
         return internals.detailsWait;
     },
     getSelectionRadius: function () {
-        return internals.selectionDetails;
+        return internals.selectionRadius;
     }
 });
 

@@ -9,7 +9,8 @@ var SelectionDetailsComponent = React.createClass({
         return {
             details: [],
             expanded: false,
-            wait: false
+            wait: false,
+            radius: 0
         };
     },
     render: function () {
@@ -17,8 +18,9 @@ var SelectionDetailsComponent = React.createClass({
             xMarkup = null,
             firstDetails = _.isEmpty(this.state.details) ? {} : this.state.details[0],
             firstFormattedAddress = firstDetails.formatted_address,
-            detailsExpandButtonClass = this.state.expanded ? 'icon icon-minus-square' : 'icon icon-plus-square';
-        detailsXList = [];
+            detailsExpandButtonClass = this.state.expanded ? 'icon icon-minus-square' : 'icon icon-plus-square',
+            detailsXList = [],
+            radiusFormatted = _.isNumber(this.state.radius) ? this.state.radius.toFixed(0) : this.state.radius;
 
         var cx = React.addons.classSet,
             ReactCSSTransitionGroup = React.addons.CSSTransitionGroup;
@@ -33,7 +35,7 @@ var SelectionDetailsComponent = React.createClass({
 
             if (this.state.expanded) {
                 detailsXList = _.map(this.state.details, function (oneLevel, ind) {
-                    if(!oneLevel.uniq){
+                    if (!oneLevel.uniq) {
                         oneLevel.uniq = _.uniqueId('details-line-');
                     }
                     return <div className="selection-details-line" key={oneLevel.uniq}>
@@ -59,9 +61,8 @@ var SelectionDetailsComponent = React.createClass({
                             </button>
                         </div>
                         <div className="selection-details-title-wrapper">
-                            <b onClick={this.onExpandButtonClick}>
-                                {firstFormattedAddress}
-                            </b>
+                            <b onClick={this.onExpandButtonClick}>{firstFormattedAddress}</b>
+                            <span> ({radiusFormatted} m)</span>
                         </div>
                     </div>
                     <ReactCSSTransitionGroup transitionName="selection-details-transition" component="div" className="selection-details-transition-wrapper">

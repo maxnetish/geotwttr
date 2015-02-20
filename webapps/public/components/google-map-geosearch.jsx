@@ -43,12 +43,7 @@ var GoogleMapGeosearch = React.createClass({
         </ReactCSSTransitionGroup>;
 
         xMarkup = <section id="geosearch-control" className="geosearch-control-wrapper">
-            <form name="geosearch-form" onSubmit={this.handleFormSubmit}>
-                <input required placeholder="Search for place" value={this.state.searchToken} onChange={this.handleSearchInput} className="geosearch-input" type="search" />
-                <button type="submit" className="geosearch-submit-button">
-                    <span className="icon icon-search"></span>
-                </button>
-            </form>
+            <input required placeholder="Search for place" value={this.state.searchToken} onChange={this.handleSearchInput} className="geosearch-input" type="search" />
             {xDropdownPart}
         </section>;
 
@@ -56,11 +51,6 @@ var GoogleMapGeosearch = React.createClass({
     },
     handleSearchInput: function (event) {
         actions.geosearch.geosearchTokenChanged(event.target.value);
-    },
-    handleFormSubmit: function (event) {
-        console.log(arguments);
-        event.preventDefault();
-        actions.geosearch.geosearchFormSubmit();
     },
     handleListItemClick: function (item) {
         console.log(item);
@@ -78,19 +68,13 @@ var GoogleMapGeosearch = React.createClass({
             searchResults: newResults
         });
     },
-    _onUpdateSelectedSearchResult: function(){
-        var newSelectedResult = geosearchStore.getSelectedSearchResult();
-
-    },
     componentDidMount: function () {
         geosearchStore.on(geosearchStore.events.EVENT_TOKEN_CHANGED, this._onUpdateSearchToken);
         geosearchStore.on(geosearchStore.events.EVENT_SEARCH_RESULTS_CHANGED, this._onUpdateSearchResults);
-        geosearchStore.on(geosearchStore.events.EVENT_SEARCH_RESULT_SELECTED, this._onUpdateSelectedSearchResult);
     },
     componentWillUnmount: function () {
         geosearchStore.removeListener(geosearchStore.events.EVENT_TOKEN_CHANGED, this._onUpdateSearchToken);
         geosearchStore.removeListener(geosearchStore.events.EVENT_SEARCH_RESULTS_CHANGED, this._onUpdateSearchResults);
-        geosearchStore.removeListener(geosearchStore.events.EVENT_SEARCH_RESULT_SELECTED, this._onUpdateSelectedSearchResult);
     }
 });
 

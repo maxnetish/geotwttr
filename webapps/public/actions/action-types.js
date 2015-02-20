@@ -13,7 +13,6 @@ module.exports = {
     },
     GEOSEARCH: {
         TOKEN_CHANGED: 'action-search-token-changed',
-        FORM_SUBMIT: 'action-search-form-submit',
         SELECT_ITEM: 'action-search-select-item'
     }
 };

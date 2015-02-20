@@ -126,22 +126,18 @@ var processSelectionDetailLineClick = function (lineInfo) {
     mapStore.emitChangeAreaSelection();
 };
 
-var processSearchResultSelected = function () {
-    dispatcher.waitFor([geosearchStore.dispatchToken]);
-
-    var selectedResult = geosearchStore.getSelectedSearchResult();
+var processSearchResultSelected = function (selectedResult) {
     if (!selectedResult) {
         return;
     }
 
-    center.lat = selectedResult.geometry.location.lat();
-    center.lng = selectedResult.geometry.location.lng();
-    storeCenter();
-    mapStore.emitChange();
-};
-
-var processSelectSearchItem = function (searchResult) {
-
+    areaSelection.geocoderResult = selectedResult;
+    mapStore.emitChangeAreaSelection();
+    //
+    //center.lat = selectedResult.geometry.location.lat();
+    //center.lng = selectedResult.geometry.location.lng();
+    //storeCenter();
+    //mapStore.emitChange();
 };
 
 var actionHandler = function (payload) {
