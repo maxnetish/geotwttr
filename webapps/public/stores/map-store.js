@@ -126,21 +126,22 @@ var processSelectionDetailLineClick = function (lineInfo) {
     mapStore.emitChangeAreaSelection();
 };
 
-var processSearchFormSubmit = function () {
-    console.log('search submit');
-    var searchToken = geosearchStore.getSearchToken();
-    if (!searchToken) {
+var processSearchResultSelected = function () {
+    dispatcher.waitFor([geosearchStore.dispatchToken]);
+
+    var selectedResult = geosearchStore.getSelectedSearchResult();
+    if (!selectedResult) {
         return;
     }
 
-    services.geocoder.promiseGeocode({address: searchToken}).then(function (result) {
-        if (result && result.length) {
-            center.lat = result[0].geometry.location.lat();
-            center.lng = result[0].geometry.location.lng();
-            storeCenter();
-            mapStore.emitChange();
-        }
-    });
+    center.lat = selectedResult.geometry.location.lat();
+    center.lng = selectedResult.geometry.location.lng();
+    storeCenter();
+    mapStore.emitChange();
+};
+
+var processSelectSearchItem = function (searchResult) {
+
 };
 
 var actionHandler = function (payload) {
@@ -165,8 +166,8 @@ var actionHandler = function (payload) {
         case actions.types.SELECTION_DETAILS.DETAIL_LINE_CLICK:
             processSelectionDetailLineClick(payload.actionArgs.detailLineInfo);
             break;
-        case actions.types.GEOSEARCH.FORM_SUBMIT:
-            processSearchFormSubmit();
+        case actions.types.GEOSEARCH.SELECT_ITEM:
+            processSearchResultSelected(payload.actionArgs.selectedItem);
             break;
         default:
         // nothing

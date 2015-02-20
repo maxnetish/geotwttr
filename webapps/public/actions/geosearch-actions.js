@@ -20,7 +20,18 @@ var geosearchFormSubmit = function () {
     dispatcher.dispatch(dispatchPayload);
 };
 
+var geosearchSelectItem = function(item){
+    var  dispatchPayload = {
+        actionType: actionTypes.GEOSEARCH.SELECT_ITEM,
+        actionArgs: {
+            selectedItem: item
+        }
+    };
+    dispatcher.dispatch(dispatchPayload);
+};
+
 module.exports = {
     geosearchTokenChanged: geosearchTokenChanged,
-    geosearchFormSubmit: geosearchFormSubmit
+    geosearchFormSubmit: geosearchFormSubmit,
+    geosearchSelectItem: geosearchSelectItem
 };

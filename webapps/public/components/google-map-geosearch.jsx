@@ -13,7 +13,8 @@ var GoogleMapGeosearch = React.createClass({
         };
     },
     render: function () {
-        var xMarkup = null, xDropdownList = null, xDropdownPart = null;
+        var xMarkup = null, xDropdownList = null, xDropdownPart = null,
+            self = this;
 
         var cx = React.addons.classSet,
             ReactCSSTransitionGroup = React.addons.CSSTransitionGroup;
@@ -24,14 +25,20 @@ var GoogleMapGeosearch = React.createClass({
         });
 
         xDropdownList = _.map(this.state.searchResults, function (r) {
-            return <li key={r.place_id}>
-                {r.formatted_address}
+            var iconClass = 'place-icon icon ' + r.knownType.icon;
+            var countryCodeClass = r.countryCode ? 'label' : 'label hidden';
+            return <li key={r.place_id} onClick={self.handleListItemClick.bind(self, r)}>
+                <span className={iconClass}></span>
+                <div className="place-description">
+                    <span className={countryCodeClass}>{r.countryCode}</span>
+                    {r.formatted_address}
+                </div>
             </li>;
         });
 
         xDropdownPart = <ReactCSSTransitionGroup transitionName="geosearch-dropdown-transition" component="div" className="geosearch-dropdown-wrapper expanded">
             {this.state.searchResults.length ? <div className="geosearch-dropdown" key="my-very-uniq-key">
-                <ul>{xDropdownList}</ul>
+                <ReactCSSTransitionGroup transitionName="geosearch-item-transition" component="ul">{xDropdownList}</ReactCSSTransitionGroup>
             </div> : null}
         </ReactCSSTransitionGroup>;
 
@@ -55,6 +62,10 @@ var GoogleMapGeosearch = React.createClass({
         event.preventDefault();
         actions.geosearch.geosearchFormSubmit();
     },
+    handleListItemClick: function (item) {
+        console.log(item);
+        actions.geosearch.geosearchSelectItem(item);
+    },
     _onUpdateSearchToken: function () {
         var token = geosearchStore.getSearchToken();
         this.setState({
@@ -67,13 +78,19 @@ var GoogleMapGeosearch = React.createClass({
             searchResults: newResults
         });
     },
+    _onUpdateSelectedSearchResult: function(){
+        var newSelectedResult = geosearchStore.getSelectedSearchResult();
+
+    },
     componentDidMount: function () {
         geosearchStore.on(geosearchStore.events.EVENT_TOKEN_CHANGED, this._onUpdateSearchToken);
         geosearchStore.on(geosearchStore.events.EVENT_SEARCH_RESULTS_CHANGED, this._onUpdateSearchResults);
+        geosearchStore.on(geosearchStore.events.EVENT_SEARCH_RESULT_SELECTED, this._onUpdateSelectedSearchResult);
     },
     componentWillUnmount: function () {
         geosearchStore.removeListener(geosearchStore.events.EVENT_TOKEN_CHANGED, this._onUpdateSearchToken);
         geosearchStore.removeListener(geosearchStore.events.EVENT_SEARCH_RESULTS_CHANGED, this._onUpdateSearchResults);
+        geosearchStore.removeListener(geosearchStore.events.EVENT_SEARCH_RESULT_SELECTED, this._onUpdateSelectedSearchResult);
     }
 });
 
