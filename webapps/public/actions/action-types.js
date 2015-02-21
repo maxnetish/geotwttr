@@ -14,5 +14,10 @@ module.exports = {
     GEOSEARCH: {
         TOKEN_CHANGED: 'action-search-token-changed',
         SELECT_ITEM: 'action-search-select-item'
+    },
+    TWEET_FEED_CONTROL: {
+        SHOW_IMMEDIATE_CHANGED: 'action-show-immediate-changed',
+        WANT_SHOW_NEW_TWEETS: 'action-want-show-new-tweets',
+        WANT_RESET_TWEETS: 'action-want-reset-tweets'
     }
 };

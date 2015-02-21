@@ -2,5 +2,7 @@ module.exports = {
     mapStore: require('./map-store'),
     rootStore: require('./root-store'),
     selectionDetailsStore: require('./selection-details-store'),
-    geosearchStore: require('./geosearch-store')
+    geosearchStore: require('./geosearch-store'),
+    tweetFeedControlStore: require('./tweet-feed-control-store'),
+    tweetFeedStore: require('./tweet-feed-store')
 };

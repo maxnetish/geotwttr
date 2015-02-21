@@ -10,6 +10,8 @@ var IndicatorComponent = require('./indicator.jsx').Control;
 var AppTooltipComponent = require('./app-tooltip.jsx').Control;
 var SelectionDetailsComponent = require('./selection-details.jsx').SelectionDetailsComponent;
 var GoogleMapGeosearchComponenet = require('./google-map-geosearch.jsx').GoogleMapGeosearch;
+var TweetFeedControlComponent = require('./tweet-feed-control.jsx').TweetFeedControl;
+var TweetFeedComponent = require('./tweet-feed.jsx').TweetFeedComponent;
 
 var rootElementInstance, appConfig;
 
@@ -36,6 +38,8 @@ var RootElement = React.createClass({
                 <SelectionDetailsComponent />
                 <AppTooltipComponent appTooltipText='Map loaded...' visible={!this.state.mapLoaded} />
                 <AppTooltipComponent appTooltipText='Click map to see tweets near...' visible={!this.state.mapHasSelection && this.state.mapLoaded} />
+                <TweetFeedControlComponent />
+                <TweetFeedComponent />
             </div>
             <footer>
                 <IndicatorComponent value={this.state.visibleCount} />
