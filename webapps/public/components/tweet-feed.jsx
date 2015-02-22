@@ -18,7 +18,7 @@ var TweetFeedComponent = React.createClass({
 
         if (this.state.visibleTweets.length) {
             xLiList = _.map(this.state.visibleTweets, function (tw) {
-                return <li>{tw.text}</li>
+                return <li key={tw.id_str}>{tw.text}</li>
             });
 
             xUl = <ul className="scroll">

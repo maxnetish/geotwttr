@@ -4,7 +4,7 @@
   "private": true,
   "dependencies": {
     "q": "~1.0.1",
-    "lodash": "~2.4.1",
+    "lodash": "~3.2.0",
     "response-time": "~2.0.1",
     "moment": "~2.8.3",
     "debug": "~2.0.0",

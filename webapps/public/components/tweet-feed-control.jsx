@@ -35,7 +35,7 @@ var TweetFeedControl = React.createClass({
             </button>;
         }
 
-        if (visibleTweets) {
+        if (allTweets) {
             xResetButton = <button type="button" onClick={this.handleResetButtonClick}>
                 <span className="icon icon-times-circle"></span>
                 <span> Clear</span>
