@@ -3,14 +3,15 @@ var libs = require('../libs'),
     React = libs.React,
     actions = require('../actions');
 
-var tweetFeedControlStore = require('../stores').tweetFeedControlStore;
+var tweetFeedControlStore = require('../stores').tweetFeedControlStore,
+    tweetFeedStore = require('../stores').tweetFeedStore;
 
 var TweetFeedControl = React.createClass({
     getInitialState: function () {
         return {
             hidedTweets: 0,
             visibleTweets: 0,
-            showImmediate: true
+            showImmediate: tweetFeedControlStore.getShowTweetsImmediate()
         };
     },
     render: function () {
@@ -24,7 +25,7 @@ var TweetFeedControl = React.createClass({
             allTweets = hidedTweets + visibleTweets;
 
         xShowTweetsImmediate = <label>
-            <input value={this.state.showImmediate} onChange={this.handleShowImmediateChange} type="checkbox" />
+            <input checked={this.state.showImmediate} onChange={this.handleShowImmediateChange} type="checkbox" />
             Show tweets immediate
         </label>;
 
@@ -68,11 +69,19 @@ var TweetFeedControl = React.createClass({
             showImmediate: newShowImmediate
         });
     },
+    _onUpdateFeed: function(){
+        this.setState({
+            visibleTweets: tweetFeedStore.getVisibleTweets().length,
+            hidedTweets: tweetFeedStore.getHidedTweets().length
+        });
+    },
     componentDidMount: function () {
         tweetFeedControlStore.on(tweetFeedControlStore.events.EVENT_SHOW_IMMEDIATE_TOGGLE, this._onUpdateShowImmediate);
+        tweetFeedStore.on(tweetFeedStore.events.EVENT_FEED_CHANGE, this._onUpdateFeed);
     },
     componentWillUnmount: function () {
         tweetFeedControlStore.removeListener(tweetFeedControlStore.events.EVENT_SHOW_IMMEDIATE_TOGGLE, this._onUpdateShowImmediate);
+        tweetFeedStore.removeListener(tweetFeedStore.events.EVENT_FEED_CHANGE, this._onUpdateFeed);
     }
 });
 

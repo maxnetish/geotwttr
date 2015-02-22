@@ -2,7 +2,8 @@ var libs = require('./../libs'),
     services = require('../services'),
     React = libs.React,
     _ = libs._,
-    rootStore = require('../stores').rootStore;
+    rootStore = require('../stores').rootStore,
+    tweetFeedStore = require('../stores').tweetFeedStore;
 
 var GoogleMapComponent = require('./google-map.jsx').MapControl;
 var HeaderAccountCardComponent = require('./header-account-card.jsx').Control;
@@ -19,7 +20,9 @@ var RootElement = React.createClass({
     getInitialState: function () {
         return _.assign(appConfig, {
             mapLoaded: false,
-            mapHasSelection: false
+            mapHasSelection: false,
+            tweetsCount: 0,
+            addingRate: 0
         });
     },
     render: function () {
@@ -31,8 +34,8 @@ var RootElement = React.createClass({
                 <h1 className="text-center">{this.state.title}</h1>
             </header>
             <div className="pane-left pane">
-                    <GoogleMapGeosearchComponenet />
-                    <GoogleMapComponent />
+                <GoogleMapGeosearchComponenet />
+                <GoogleMapComponent />
             </div>
             <div className="pane-right pane">
                 <SelectionDetailsComponent />
@@ -42,14 +45,32 @@ var RootElement = React.createClass({
                 <TweetFeedComponent />
             </div>
             <footer>
-                <IndicatorComponent value={this.state.visibleCount} />
-                <IndicatorComponent value={this.state.addingRate} unit="tw/min" />
+                <IndicatorComponent value={this.state.tweetsCount.toFixed(0)} />
+                <IndicatorComponent value={this.state.addingRate.toFixed(2)} unit="tw/min" />
                 <a href="https://twitter.com/maxnetish" className="twitter-follow-button" data-show-count="false" data-lang={this.state.langCode}>Follow me</a>
             </footer>
         </div>;
     },
+    _onUpdateFeed: function () {
+        this.setState({
+            tweetsCount: tweetFeedStore.getVisibleTweets().length + tweetFeedStore.getHidedTweets().length
+        });
+    },
+    _onUpdateAddingRate: function(){
+        this.setState({
+            addingRate: tweetFeedStore.getAddingRate()
+        })
+    },
     shouldComponentUpdate: function (nextProps, nextState) {
         return true;
+    },
+    componentDidMount: function () {
+        tweetFeedStore.on(tweetFeedStore.events.EVENT_FEED_CHANGE, this._onUpdateFeed);
+        tweetFeedStore.on(tweetFeedStore.events.EVENT_ADDING_RATE_CHANGE, this._onUpdateAddingRate);
+    },
+    componentWillUnmount: function () {
+        tweetFeedStore.removeListener(tweetFeedStore.events.EVENT_FEED_CHANGE, this._onUpdateFeed);
+        tweetFeedStore.removeListener(tweetFeedStore.events.EVENT_ADDING_RATE_CHANGE, this._onUpdateAddingRate);
     }
 });
 

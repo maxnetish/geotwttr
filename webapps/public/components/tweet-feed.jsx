@@ -5,6 +5,8 @@ var libs = require('../libs'),
 
 var tweetFeedStore = require('../stores').tweetFeedStore;
 
+var TweetComponent = require('./tweet.jsx').TweetComponent;
+
 var TweetFeedComponent = React.createClass({
     getInitialState: function () {
         return {
@@ -16,18 +18,22 @@ var TweetFeedComponent = React.createClass({
         var xUl = null,
             xLiList = null;
 
+        var cx = React.addons.classSet,
+            ReactCSSTransitionGroup = React.addons.CSSTransitionGroup;
+
         if (this.state.visibleTweets.length) {
             xLiList = _.map(this.state.visibleTweets, function (tw) {
-                return <li key={tw.id_str}>{tw.text}</li>
+                return <li key={tw.id_str} className="li-tweet">
+                    <TweetComponent tweet={tw}/>
+                </li>
             });
 
-            xUl = <ul className="scroll">
+            xUl = <ReactCSSTransitionGroup transitionName="tweet-transition" component="ul" className="scroll">
                 {xLiList}
-            </ul>
+            </ReactCSSTransitionGroup>
         }
 
         return <section>
-            Visible: {this.state.visibleTweets.length}
             {xUl}
         </section>;
     },

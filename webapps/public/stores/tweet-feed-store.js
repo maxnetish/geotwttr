@@ -9,34 +9,67 @@ var tweetFeedControlStore = require('./tweet-feed-control-store'),
     mapStore = require('./map-store');
 
 var eventNames = Object.freeze({
-    EVENT_FEED_CHANGE: 'event-feed-change'
+    EVENT_FEED_CHANGE: 'event-feed-change',
+    EVENT_ADDING_RATE_CHANGE: 'event-feed-adding-rate-change'
 });
 
 var internals = {
     visibleTweets: [],
     hidedTweets: [],
-    showImmediate: true,
-    requestId: null
+    requestId: null,
+    addingRate: 0
+};
+
+var addingRateStartTime = Date.now();
+var updateAddingRate = function () {
+    var milliseconds = Date.now() - addingRateStartTime;
+
+    if (milliseconds === 0) {
+        internals.addingRate = 0;
+    } else {
+        internals.addingRate = (60 * 1000 * (internals.visibleTweets.length + internals.hidedTweets.length)) / milliseconds;
+    }
+    tweetFeedStore.emitAddingRateChange();
 };
 
 var onTweetReceive = function (tw) {
     console.log('TweetFeedStore receive tweet ' + tw.id_str);
-    if (internals.showImmediate) {
+    var showImmediate = tweetFeedControlStore.getShowTweetsImmediate();
+    if (showImmediate) {
         internals.visibleTweets.unshift(tw);
     } else {
         internals.hidedTweets.unshift(tw);
     }
+    updateAddingRate();
+    tweetFeedStore.emitFeedChange();
+};
+
+var makeAllVisible = function () {
+    if (_.isFunction(tweetFeedStore.emitFeedChange.cancel)) {
+        console.log('cancel deferred emitFeedChange');
+        tweetFeedStore.emitFeedChange.cancel();
+    }
+    _.each(internals.hidedTweets, function (hidedItem) {
+        internals.visibleTweets.unshift(hidedItem);
+    });
+    internals.hidedTweets.length = 0;
+    tweetFeedStore.emitFeedChange();
+};
+
+var resetTweets = function () {
+    internals.visibleTweets.length = 0;
+    internals.visibleTweets.length = 0;
+    addingRateStartTime = Date.now();
     tweetFeedStore.emitFeedChange();
 };
 
 var onSelectionChanged = function (selection) {
-    if(_.isFunction(tweetFeedStore.emitFeedChange.cancel)){
+    if (_.isFunction(tweetFeedStore.emitFeedChange.cancel)) {
         console.log('cancel deferred emitFeedChange');
         tweetFeedStore.emitFeedChange.cancel();
     }
-    internals.visibleTweets.length = 0;
-    internals.visibleTweets.length = 0;
-    tweetFeedStore.emitFeedChange();
+
+    resetTweets();
 
     if (internals.requestId) {
         services.ws.getRemote().invoke('unsubscribeTwitterStream', internals.requestId).then(function (res) {
@@ -59,9 +92,7 @@ var onSelectionChanged = function (selection) {
             console.log('subscribe id:');
             console.log(resp);
             internals.requestId = resp;
-            internals.visibleTweets.length = 0;
-            internals.visibleTweets.length = 0;
-            tweetFeedStore.emitFeedChange();
+            addingRateStartTime = Date.now();
         }, function (err) {
             console.log(err);
         });
@@ -74,18 +105,28 @@ var tweetFeedStore = _.create(EventEmitter.prototype, {
     emitFeedChange: _.throttle(function () {
         console.log('TweetFeedStore emits CHANGE');
         this.emit(this.events.EVENT_FEED_CHANGE);
-    }, 3000, {leading: true}),
+    }, 1500, {leading: true}),
+    emitAddingRateChange: _.throttle(function(){
+        this.emit(this.events.EVENT_ADDING_RATE_CHANGE);
+    }, 5000, {leading: true}),
     getVisibleTweets: function () {
         return internals.visibleTweets;
     },
     getHidedTweets: function () {
         return internals.hidedTweets;
+    },
+    getAddingRate: function () {
+        return internals.addingRate;
     }
 });
 
 var processShowImmediateChanged = function () {
+    var showImmediate;
     dispatcher.waitFor([tweetFeedControlStore.dispatchToken]);
-    internals.showImmediate = tweetFeedControlStore.getShowTweetsImmediate();
+    showImmediate = tweetFeedControlStore.getShowTweetsImmediate();
+    if (showImmediate) {
+        makeAllVisible();
+    }
 };
 
 var processMapSelection = function () {
@@ -100,6 +141,14 @@ var processMapSelection = function () {
     _.defer(onSelectionChanged, newSelection);
 };
 
+var processShowHidedTweets = function () {
+    _.defer(makeAllVisible);
+};
+
+var processResetTweets = function () {
+    _.defer(resetTweets);
+};
+
 var actionHandler = function (payload) {
     switch (payload.actionType) {
         case actions.types.TWEET_FEED_CONTROL.SHOW_IMMEDIATE_CHANGED:
@@ -109,6 +158,12 @@ var actionHandler = function (payload) {
         case actions.types.MAP.SELECTION_RADIUS_CHANGED:
             console.log('TweetFeedStore catch ' + payload.actionType);
             processMapSelection();
+            break;
+        case actions.types.TWEET_FEED_CONTROL.WANT_SHOW_NEW_TWEETS:
+            processShowHidedTweets();
+            break;
+        case actions.types.TWEET_FEED_CONTROL.WANT_RESET_TWEETS:
+            processResetTweets();
             break;
         default:
         // nothing

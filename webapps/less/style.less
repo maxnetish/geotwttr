@@ -4,6 +4,7 @@
 @import "inc/filter-settings-wrapper";
 @import "inc/tweet-feed-control";
 @import "inc/toast-logger";
+@import "inc/tweet";
 @import "inc/mixin.less";
 
 body {
@@ -61,7 +62,7 @@ input[type="button"] {
   position: relative;
 }
 
-.full-height{
+.full-height {
   height: 100%;
 }
 
@@ -179,189 +180,6 @@ ul {
   width: 100%;
   height: calc(~"100% - 1.8rem");
   clear: both;
-}
-
-.li-tweet {
-  border-top: 1px solid @colorGray;
-  padding: @marginSmall;
-  min-height: 50px;
-  cursor: default;
-  .transition-hover-background();
-  .text-rtl {
-    padding-right: 5px;
-    text-align: right;
-    direction: rtl;
-    unicode-bidi: embed;
-  }
-  .tweet-right {
-    margin-left: 58px;
-    overflow: hidden;
-  }
-  .tweet-left {
-    float: left;
-  }
-  .screen-name {
-    font-size: 12px;
-    color: @colorGray;
-  }
-  .full-name {
-    font-weight: bold;
-    margin-right: @marginSmall;
-    color: black;
-  }
-  .tweet-date {
-    font-size: 12px;
-    color: @colorGray;
-    margin-right: 10px;
-  }
-  .retweet-from {
-    font-size: 12px;
-    color: @colorGray;
-    margin-right: @marginSmall;
-  }
-  .avatar {
-    border-radius: 4px;
-    border: solid 1px;
-    width: 48px;
-    height: 48px;
-    margin-right: @marginSmall;
-    vertical-align: top;
-    opacity: 1;
-    .transition-opacity();
-    &.hided {
-      opacity: 0;
-    }
-  }
-  .entity {
-    color: @colorEntity;
-    text-decoration: none;
-    &:after {
-      content: ' ';
-    }
-  }
-  .user-mention:before {
-    content: '@';
-  }
-  .hashtag:before {
-    content: '#';
-  }
-  .symbol:before {
-    content: '$';
-  }
-  .tweet-meta {
-    font-size: 12px;
-    color: @colorGray;
-  }
-  .tweet-lang {
-    border-radius: 6px;
-    background: @colorBackgroundSmallInfo;
-    color: black;
-    padding: 0 @marginSmall;
-    margin-right: 1em;
-  }
-  .coordinates-lng:before {
-    content: "Lng: ";
-  }
-  .coordinates-lat:before {
-    content: "Lat: ";
-  }
-  .tweet-near:before {
-    content: "Near: ";
-  }
-  .tweet-distance {
-    &:before {
-      content: "Distance: ";
-    }
-    &:after {
-      content: "km";
-    }
-  }
-
-  .tweet-source {
-    &:before {
-      content: "Via: ";
-    }
-    a {
-      text-decoration: none;
-    }
-  }
-  button {
-    margin-right: 1em;
-    span {
-      color: initial;
-    }
-  }
-  .details {
-    padding-top: @marginSmall * 2;
-    padding-bottom: @marginSmall;
-    p, ul {
-      margin-bottom: @marginSmall;
-    }
-
-    .tweet-checkin {
-      fieldset {
-        border: solid 1px @colorFoursquare;
-        border-radius: 4px;
-        padding: @marginSmall;
-        legend {
-          font-size: smaller;
-          color: @colorFoursquare;
-        }
-      }
-      span {
-        color: #000000;
-      }
-      .icon {
-        background: @colorFoursquare; /* foursquare color */
-        border-radius: 4px;
-        margin-right: @marginSmall;
-        margin-bottom: @marginSmall;
-      }
-      .tweet-media-thumb {
-        margin-right: @marginSmall;
-        margin-bottom: @marginSmall;
-      }
-      .full-name {
-        font-weight: bold;
-      }
-    }
-
-    .tweet-video-list {
-      width: 100%;
-      li {
-
-        .yt-iframe {
-
-        }
-      }
-    }
-  }
-
-  .tweet-media-thumb {
-    /*width: 3em;
-    height: 3em;*/
-    max-width: 100%;
-    min-width: 3em;
-    opacity: 1;
-    .transition-opacity();
-    &.hided {
-      opacity: 0;
-    }
-  }
-
-  .tweet-media-element {
-    display: inline-block;
-    position: relative;
-  }
-
-  .thumb-zoom {
-    position: absolute;
-    top: 0.5em;
-    right: 0.5em;
-    margin: 0;
-    width: 1.5em;
-    height: 1.5em;
-  }
 }
 
 .account-card {

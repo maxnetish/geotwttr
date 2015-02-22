@@ -13,7 +13,7 @@ var showImmediateChanged = function (newValue) {
 };
 
 var wantShowNewTweets = function () {
-    var dispatcherPayload = {
+    var dispatchPayload = {
         actionType: actionTypes.TWEET_FEED_CONTROL.WANT_SHOW_NEW_TWEETS,
         actionArgs: {}
     };
@@ -21,7 +21,7 @@ var wantShowNewTweets = function () {
 };
 
 var wantResetTweets = function () {
-    var dispatcherPayload = {
+    var dispatchPayload = {
         actionType: actionTypes.TWEET_FEED_CONTROL.WANT_RESET_TWEETS,
         actionArgs: {}
     };
