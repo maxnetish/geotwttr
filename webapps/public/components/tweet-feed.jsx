@@ -11,7 +11,7 @@ var TweetFeedComponent = React.createClass({
     getInitialState: function () {
         return {
             visibleTweets: [],
-            hidedTweets: []
+            visibleCount: 0
         };
     },
     render: function () {
@@ -44,10 +44,14 @@ var TweetFeedComponent = React.createClass({
         tweetFeedStore.removeListener(tweetFeedStore.events.EVENT_FEED_CHANGE, this._onUpdateFeed);
     },
     _onUpdateFeed: function () {
+        var visible = tweetFeedStore.getVisibleTweets();
         this.setState({
-            visibleTweets: tweetFeedStore.getVisibleTweets(),
-            hidedTweets: tweetFeedStore.getHidedTweets()
+            visibleTweets: visible,
+            visibleCount: visible.length
         });
+    },
+    shouldComponentUpdate: function (nextProps, nextState) {
+        return nextState.visibleCount !== this.state.visibleCount;
     }
 });
 

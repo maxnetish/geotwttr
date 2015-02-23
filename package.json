@@ -23,7 +23,8 @@
     "clean-css": "~2.2.19",
     "react": "~0.12.2",
     "node-jsx": "~0.12.4",
-    "flux": "~2.0.1"
+    "flux": "~2.0.1",
+    "node-uuid": "~1.4.2"
   },
   "devDependencies": {
     "grunt": "~0.4.5",

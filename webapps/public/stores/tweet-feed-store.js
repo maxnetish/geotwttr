@@ -35,10 +35,11 @@ var updateAddingRate = function () {
 var onTweetReceive = function (tw) {
     console.log('TweetFeedStore receive tweet ' + tw.id_str);
     var showImmediate = tweetFeedControlStore.getShowTweetsImmediate();
+    var tweetViewModelInstance = services.tweetViewModel.create(tw);
     if (showImmediate) {
-        internals.visibleTweets.unshift(tw);
+        internals.visibleTweets.unshift(tweetViewModelInstance);
     } else {
-        internals.hidedTweets.unshift(tw);
+        internals.hidedTweets.unshift(tweetViewModelInstance);
     }
     updateAddingRate();
     tweetFeedStore.emitFeedChange();
@@ -58,7 +59,7 @@ var makeAllVisible = function () {
 
 var resetTweets = function () {
     internals.visibleTweets.length = 0;
-    internals.visibleTweets.length = 0;
+    internals.hidedTweets.length = 0;
     addingRateStartTime = Date.now();
     tweetFeedStore.emitFeedChange();
 };
@@ -75,6 +76,7 @@ var onSelectionChanged = function (selection) {
         services.ws.getRemote().invoke('unsubscribeTwitterStream', internals.requestId).then(function (res) {
             console.log('unsubscribe response: ' + res);
         });
+        internals.requestId = null; // from this moment we won't receive from closing stream -> wait new stream
     }
 
     libs.promiseGmaps().then(function (gmaps) {
@@ -105,7 +107,7 @@ var tweetFeedStore = _.create(EventEmitter.prototype, {
     emitFeedChange: _.throttle(function () {
         console.log('TweetFeedStore emits CHANGE');
         this.emit(this.events.EVENT_FEED_CHANGE);
-    }, 1500, {leading: true}),
+    }, 3000, {leading: true}),
     emitAddingRateChange: _.throttle(function(){
         this.emit(this.events.EVENT_ADDING_RATE_CHANGE);
     }, 5000, {leading: true}),
@@ -171,7 +173,8 @@ var actionHandler = function (payload) {
 };
 
 services.ws.localApi.streamResp = function (resp) {
-    if (resp.tweet && resp.tweet.id) {
+    if (resp.tweet && resp.tweet.id && resp.id === internals.requestId) {
+        // supress 'not our' response and
         // tweet really
         onTweetReceive(resp.tweet);
     } else if (resp.tweet && resp.tweet.message) {

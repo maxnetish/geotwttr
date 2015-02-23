@@ -7,7 +7,7 @@ var onStreamResolve = function (socket, remote, stream, notify) {
     return function (e) {
         console.log('resolve stream, socket state: '+socket.readyState);
         if (socket && socket.readyState === socket.OPEN) {
-            remote.invoke(notify, {closed: 1});
+            remote.invoke(notify, {closed: 1, id: stream.id});
         }
         stream.dispose();
         _.remove(streams, function (item) {
@@ -20,7 +20,7 @@ var onStreamError = function (socket, remote, stream, notify) {
     return function (err) {
         console.log('error, socket state: '+socket.readyState);
         if (socket && socket.readyState === socket.OPEN) {
-            remote.invoke(notify, {error: err.message});
+            remote.invoke(notify, {error: err.message, id: stream.id});
         } else {
             stream.dispose();
             _.remove(streams, function (item) {
@@ -33,7 +33,7 @@ var onStreamError = function (socket, remote, stream, notify) {
 var onStreamProgress = function (socket, remote, stream, notify) {
     return function (tweet) {
         if (socket && socket.readyState === socket.OPEN) {
-            remote.invoke(notify, {tweet: tweet});
+            remote.invoke(notify, {tweet: tweet, id: stream.id});
         } else {
             console.log('progress, socket state: '+socket.readyState);
             stream.dispose();

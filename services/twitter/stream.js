@@ -4,7 +4,8 @@ var store = require('../../helpers/store').store,
     //tokens = require('../../config/tokens'),
     url = require('url'),
     _ = require('lodash'),
-    Q = require('q');
+    Q = require('q'),
+    uuid = require('node-uuid').v4;
 
 var streamDelimiter = '\r\n';
 
@@ -35,7 +36,7 @@ var StreamRequest = function (opts) {
     this._buffer = '';
     this._deferred = Q.defer();
     this.promise = this._deferred.promise;
-    this.id = _.uniqueId();
+    this.id = uuid();
     this.request = null;
     this.response = null;
     this.dispose = function () {

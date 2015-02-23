@@ -1,4 +1,3 @@
-
 var centerRadiusToBounds = function(lat, lng, radius, gmaps){
 
     var centerLatLng = new gmaps.LatLng(lat, lng);

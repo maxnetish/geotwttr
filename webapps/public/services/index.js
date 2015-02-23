@@ -7,5 +7,6 @@ module.exports = {
     ws: require('./ws'),
     utils: require('./utils'),
     localStorage: require('./local-storage'),
-    geosearchResultItem: require('./geosearch-result-item')
+    geosearchResultItem: require('./geosearch-result-item'),
+    tweetViewModel: require('./tweet-view-model')
 };
