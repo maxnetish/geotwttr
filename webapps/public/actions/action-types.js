@@ -19,5 +19,9 @@ module.exports = {
         SHOW_IMMEDIATE_CHANGED: 'action-show-immediate-changed',
         WANT_SHOW_NEW_TWEETS: 'action-want-show-new-tweets',
         WANT_RESET_TWEETS: 'action-want-reset-tweets'
+    },
+    TWEET: {
+        PLACE_CLICK: 'action-tweet-place-click',
+        COORDS_CLICK: 'action-tweet-coords-click'
     }
 };

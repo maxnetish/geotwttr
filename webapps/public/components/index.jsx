@@ -26,8 +26,7 @@ var RootElement = React.createClass({
         });
     },
     render: function () {
-        console.log('render root element');
-        console.log(this.state);
+        console.log('render RootElement');
         return <div>
             <header>
                 <HeaderAccountCardComponent userInfo={this.state.userInfo}/>
@@ -56,19 +55,34 @@ var RootElement = React.createClass({
             tweetsCount: tweetFeedStore.getVisibleTweets().length + tweetFeedStore.getHidedTweets().length
         });
     },
-    _onUpdateAddingRate: function(){
+    _onUpdateAddingRate: function () {
         this.setState({
             addingRate: tweetFeedStore.getAddingRate()
         })
     },
+    _onMapLoaded: function () {
+        var loaded = rootStore.getMapLoaded();
+        this.setState({
+            mapLoaded: loaded
+        });
+    },
+    _onMapSelectionChanged: function () {
+        var hasSelection = rootStore.getMapHasSelection();
+        this.setState({
+            mapHasSelection: hasSelection
+        });
+    },
     shouldComponentUpdate: function (nextProps, nextState) {
-        return true;
+        return !_.isEqual(nextState, this.state);
     },
     componentDidMount: function () {
+        rootStore.once(rootStore.events.EVENT_MAP_LOADED, this._onMapLoaded);
+        rootStore.on(rootStore.events.EVENT_MAP_SELECTION_CHANGED, this._onMapSelectionChanged);
         tweetFeedStore.on(tweetFeedStore.events.EVENT_FEED_CHANGE, this._onUpdateFeed);
         tweetFeedStore.on(tweetFeedStore.events.EVENT_ADDING_RATE_CHANGE, this._onUpdateAddingRate);
     },
     componentWillUnmount: function () {
+        rootStore.removeListener(rootStore.events.EVENT_MAP_SELECTION_CHANGED, this._onMapSelectionChanged);
         tweetFeedStore.removeListener(tweetFeedStore.events.EVENT_FEED_CHANGE, this._onUpdateFeed);
         tweetFeedStore.removeListener(tweetFeedStore.events.EVENT_ADDING_RATE_CHANGE, this._onUpdateAddingRate);
     }
@@ -84,36 +98,9 @@ var renderInNode = function (config) {
     return React.renderToString(<RootElement />);
 };
 
-var setState = function (partialState, callback) {
-    if (rootElementInstance && _.isFunction(rootElementInstance.setState)) {
-        return rootElementInstance.setState(partialState, callback);
-    }
-    return false;
-};
-
-var getState = function () {
-    return rootElementInstance.state;
-};
-
-rootStore.once(rootStore.events.EVENT_MAP_LOADED, function () {
-    var loaded = rootStore.getMapLoaded();
-    setState({
-        mapLoaded: loaded
-    });
-});
-
-rootStore.on(rootStore.events.EVENT_MAP_SELECTION_CHANGED, function () {
-    var hasSelection = rootStore.getMapHasSelection();
-    setState({
-        mapHasSelection: hasSelection
-    });
-});
-
 //mapStore
 
 module.exports = {
     initInBrowser: initInBrowser,
-    setState: setState,
-    renderInNode: renderInNode,
-    getState: getState
+    renderInNode: renderInNode
 };

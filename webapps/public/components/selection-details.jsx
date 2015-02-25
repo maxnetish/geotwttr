@@ -8,10 +8,19 @@ var SelectionDetailsComponent = React.createClass({
     getInitialState: function () {
         return {
             details: [],
+            detailsIds: [],
             expanded: false,
             wait: false,
             radius: 0
         };
+    },
+    shouldComponentUpdate: function (nextProps, nextState) {
+        var state = this.state;
+        var should = nextState.expanded !== state.expanded || nextState.wait !== state.wait || nextState.radius !== state.radius;
+        if (should) {
+            return should;
+        }
+        return !_.isEqual(nextState.detailsIds, state.detailsIds);
     },
     render: function () {
         var self = this,
@@ -30,15 +39,12 @@ var SelectionDetailsComponent = React.createClass({
             'active': this.state.wait
         });
 
-        if (firstFormattedAddress) {
-            console.log(this.state.details);
+        console.log('render SelectionDetails component');
 
+        if (firstFormattedAddress) {
             if (this.state.expanded) {
                 detailsXList = _.map(this.state.details, function (oneLevel, ind) {
-                    if (!oneLevel.uniq) {
-                        oneLevel.uniq = _.uniqueId('details-line-');
-                    }
-                    return <div className="selection-details-line" key={oneLevel.uniq}>
+                    return <div className="selection-details-line" key={oneLevel.place_id}>
                         <div className="selection-details-line-icon-wrapper">
                             <i className="icon icon-map-marker"></i>
                         </div>
@@ -82,10 +88,14 @@ var SelectionDetailsComponent = React.createClass({
         actions.selectionDetails.detailLineClick(data);
     },
     _onUpdateStore: _.debounce(function () {
+        var details = selectionDetailsStore.getDetails();
         this.setState({
             expanded: selectionDetailsStore.getDetailsExpanded(),
             wait: selectionDetailsStore.getDetailsWait(),
-            details: selectionDetailsStore.getDetails(),
+            details: details,
+            detailsIds: _.map(details, function (r) {
+                return r.place_id;
+            }),
             radius: selectionDetailsStore.getSelectionRadius()
         });
     }, 500, {leading: true}),

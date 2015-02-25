@@ -3,6 +3,7 @@ var libs = require('../libs'),
 
 var AppTooltipControl = React.createClass({
     render: function () {
+        console.log('render AppTooltipControl');
         var xMarkup = null,
             visible = !!this.props.visible,
             appTooltipClass = 'app-tooltip';
@@ -14,6 +15,9 @@ var AppTooltipControl = React.createClass({
         }
 
         return xMarkup;
+    },
+    shouldComponentUpdate: function (nextProps, nextState) {
+        return nextProps.visible !== this.props.visible;
     }
 });
 

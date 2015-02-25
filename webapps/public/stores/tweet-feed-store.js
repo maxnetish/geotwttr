@@ -33,7 +33,6 @@ var updateAddingRate = function () {
 };
 
 var onTweetReceive = function (tw) {
-    console.log('TweetFeedStore receive tweet ' + tw.id_str);
     var showImmediate = tweetFeedControlStore.getShowTweetsImmediate();
     var tweetViewModelInstance = services.tweetViewModel.create(tw);
     if (showImmediate) {
@@ -47,7 +46,6 @@ var onTweetReceive = function (tw) {
 
 var makeAllVisible = function () {
     if (_.isFunction(tweetFeedStore.emitFeedChange.cancel)) {
-        console.log('cancel deferred emitFeedChange');
         tweetFeedStore.emitFeedChange.cancel();
     }
     _.each(internals.hidedTweets, function (hidedItem) {
@@ -66,7 +64,6 @@ var resetTweets = function () {
 
 var onSelectionChanged = function (selection) {
     if (_.isFunction(tweetFeedStore.emitFeedChange.cancel)) {
-        console.log('cancel deferred emitFeedChange');
         tweetFeedStore.emitFeedChange.cancel();
     }
 
@@ -105,7 +102,6 @@ var tweetFeedStore = _.create(EventEmitter.prototype, {
     events: eventNames,
     // эмитим не чаще 1 раза в 3 сек
     emitFeedChange: _.throttle(function () {
-        console.log('TweetFeedStore emits CHANGE');
         this.emit(this.events.EVENT_FEED_CHANGE);
     }, 3000, {leading: true}),
     emitAddingRateChange: _.throttle(function(){
@@ -158,7 +154,6 @@ var actionHandler = function (payload) {
             break;
         case actions.types.MAP.SELECTION_CENTER_CHANGED:
         case actions.types.MAP.SELECTION_RADIUS_CHANGED:
-            console.log('TweetFeedStore catch ' + payload.actionType);
             processMapSelection();
             break;
         case actions.types.TWEET_FEED_CONTROL.WANT_SHOW_NEW_TWEETS:

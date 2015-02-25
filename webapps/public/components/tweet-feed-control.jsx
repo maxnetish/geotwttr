@@ -14,7 +14,12 @@ var TweetFeedControl = React.createClass({
             showImmediate: tweetFeedControlStore.getShowTweetsImmediate()
         };
     },
+    shouldComponentUpdate: function (nextProps, nextState) {
+        var state = this.state;
+        return nextState.hidedTweets !== state.hidedTweets || nextState.visibleTweets !== state.visibleTweets || nextState.showImmediate !== state.showImmediate;
+    },
     render: function () {
+        console.log('render TweetFeedControl');
         var xResult = null,
             xShowTweetsImmediate = null,
             xShowNewTweetsButton = null,
@@ -57,10 +62,10 @@ var TweetFeedControl = React.createClass({
         console.log(event.target);
         actions.tweetFeedControl.showImmediateChanged(event.target.checked);
     },
-    handleShowNewTweetsButtonClick: function(){
+    handleShowNewTweetsButtonClick: function () {
         actions.tweetFeedControl.wantShowNewTweets();
     },
-    handleResetButtonClick: function(){
+    handleResetButtonClick: function () {
         actions.tweetFeedControl.wantResetTweets();
     },
     _onUpdateShowImmediate: function () {
@@ -69,7 +74,7 @@ var TweetFeedControl = React.createClass({
             showImmediate: newShowImmediate
         });
     },
-    _onUpdateFeed: function(){
+    _onUpdateFeed: function () {
         this.setState({
             visibleTweets: tweetFeedStore.getVisibleTweets().length,
             hidedTweets: tweetFeedStore.getHidedTweets().length

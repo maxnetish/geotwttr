@@ -19,7 +19,17 @@ var boundsToTwitterString = function(bounds){
     return result;
 };
 
+var polygon2Bounds = function (polygon, gmaps) {
+    var bounds = new gmaps.LatLngBounds(),
+        path = polygon.getPath();
+    path.forEach(function (el) {
+        bounds.extend(el);
+    });
+    return bounds;
+};
+
 module.exports = {
     centerRadiusToBounds: centerRadiusToBounds,
-    boundsToTwitterString: boundsToTwitterString
+    boundsToTwitterString: boundsToTwitterString,
+    polygon2Bounds: polygon2Bounds
 };

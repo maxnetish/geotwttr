@@ -1,53 +1,60 @@
 var libs = require('../libs'),
     React = libs.React,
-    _ = libs._;
+    _ = libs._,
+    actions = require('../actions');
 
 var renderTweetTextEntity = {
-    'simple': function (originalTweetText, entity) {
-        return <span className="plain">
+    'simple': function (originalTweetText, entity, id) {
+        return <span className="plain" key={id}>
             {originalTweetText.substring(entity.indices[0], entity.indices[1] + 1)}
         </span>;
     },
-    'urls': function (originalTweetText, entity) {
-        return <a className="entity url" target="_blank" href={entity.expanded_url}>
+    'urls': function (originalTweetText, entity, id) {
+        return <a className="entity url" target="_blank" href={entity.expanded_url} key={id}>
             {entity.display_url}
         </a>;
     },
-    'user_mentions': function (originalTweetText, entity) {
-        return <a className="entity user-mention" target="_blank" href={'https://twitter.com/' + entity.screen_name}>
+    'user_mentions': function (originalTweetText, entity, id) {
+        return <a className="entity user-mention" target="_blank" href={'https://twitter.com/' + entity.screen_name} key={id}>
             {entity.screen_name}
         </a>;
     },
-    'hashtags': function (originalTweetText, entity) {
-        return <span className="entity hashtag">
+    'hashtags': function (originalTweetText, entity, id) {
+        return <span className="entity hashtag" key={id}>
             {entity.text}
         </span>;
     },
-    'photo': function (originalTweetText, entity) {
-        return <a className="entity url photo" target="_blank" href={entity.expanded_url}>
+    'photo': function (originalTweetText, entity, id) {
+        return <a className="entity url photo" target="_blank" href={entity.expanded_url} key={id}>
             {entity.display_url}
         </a>;
     },
-    'media': function (originalTweetText, entity) {
-        return <a className="entity url" target="_blank" href={entity.expanded_url}>
+    'media': function (originalTweetText, entity, id) {
+        return <a className="entity url" target="_blank" href={entity.expanded_url} key={id}>
             {entity.display_url}
         </a>;
     },
-    'symbols': function (originalTweetText, entity) {
-        return <span className="entity symbol">
+    'symbols': function (originalTweetText, entity, id) {
+        return <span className="entity symbol" key={id}>
             {entity.text}
         </span>;
     },
-    'default': function (originalTweetText, entity) {
+    'default': function (originalTweetText, entity, id) {
         console.log(entity);
-        return <span className="entity">
+        return <span className="entity" key={id}>
             {originalTweetText.substring(entity.indices[0], entity.indices[1] + 1)}
         </span>;
     }
 };
 
 var TweetComponent = React.createClass({
+    shouldComponentUpdate: function (nextProps, nextState) {
+        var nextId = nextProps.tweet && nextProps.tweet.id_str,
+            id = this.props.tweet && this.props.tweet.id_str;
+        return nextId !== id;
+    },
     render: function () {
+        console.log('render TweetComponent');
         var tw = this.props.tweet,
             xLeftPart,
             xRightPart,
@@ -62,9 +69,9 @@ var TweetComponent = React.createClass({
         });
 
         if (tw.textOriginal && tw.textOriginal.length) {
-            xTextPart = _.map(tw.entitiesOriginal, function (oneEntity) {
+            xTextPart = _.map(tw.entitiesOriginal, function (oneEntity, idx) {
                 var actualEntityType = renderTweetTextEntity.hasOwnProperty(oneEntity.type) ? oneEntity.type : 'default';
-                return renderTweetTextEntity[actualEntityType](tw.textOriginal, oneEntity);
+                return renderTweetTextEntity[actualEntityType](tw.textOriginal, oneEntity, idx);
             });
         }
 
@@ -94,10 +101,10 @@ var TweetComponent = React.createClass({
                 </span> : null}
             </p>
             {tw.place ? <p className="tweet-meta">
-                <a className="no-decoration" href="javascript:void 0">Near {tw.place.full_name}</a>
+                <a className="no-decoration" href="javascript:void 0" onClick={this.handlePlaceClick}>Near {tw.place.full_name}</a>
             </p> : null}
             {tw.coordinates ? <p className="tweet-meta">
-                <a className="no-decoration" href="javascript:void 0">
+                <a className="no-decoration" href="javascript:void 0" onClick={this.handleCoordsClick}>
                     <span className="icon icon-map-marker"></span>
                     <span> {tw.coordinatesH}</span>
                 </a>
@@ -108,6 +115,12 @@ var TweetComponent = React.createClass({
             {xLeftPart}
             {xRightPart}
         </article>;
+    },
+    handlePlaceClick: function () {
+        actions.tweet.placeClick(this.props.tweet.place);
+    },
+    handleCoordsClick: function () {
+        actions.tweet.coordsClick(this.props.tweet.coordinates && this.props.tweet.coordinates.coordinates);
     }
 });
 

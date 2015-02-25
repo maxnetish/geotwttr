@@ -2,9 +2,10 @@ var libs = require('../libs'),
     React = libs.React,
     _ = libs._,
     actions = require('../actions'),
-    mapStore = require('../stores').mapStore;
+    mapStore = require('../stores').mapStore
+    services = require('../services');
 
-var map, selectionCircle, gmaps, selectedAreaRectangle, selectedPointMarker;
+var map, selectionCircle, gmaps, selectedAreaRectangle, selectedPointMarker, tweetPlacePolygon, tweetCoordsMarker;
 
 var selectionCircleOptionsInitial = {
     clickable: false,
@@ -39,6 +40,20 @@ var selectedAreaRectangleOptions = {
     map: null
 };
 
+var tweetPlacePolygonOptions = {
+    clickable: false,
+    draggable: false,
+    editable: false,
+    fillColor: 'red',
+    fillOpacity: 0.1,
+    geodesic: true,
+    map: null,
+    strokeColor: 'blue',
+    strokeOpacity: 0.2,
+    strokeWeight: 2,
+    visible: false
+};
+
 var selectedPointMarkerOptions = {
     clickable: false,
     draggable: false,
@@ -55,6 +70,23 @@ var selectedPointMarkerOptions = {
     map: null,
     //position: LatLng,
     //title: '',
+    visible: false
+};
+
+var tweetCoordsMarkerOptions = {
+    clickable: false,
+    draggable: false,
+    icon: {
+        //path: gmaps.SymbolPath.CIRCLE,
+        path: null,
+        scale: 10,
+        fillOpacity: 0.1,
+        fillColor: 'blue',
+        strokeOpacity: 0.5,
+        strokeColor: 'blue',
+        strokeWeight: 4
+    },
+    map: null,
     visible: false
 };
 
@@ -78,6 +110,13 @@ var createGoogleMapIn = function (domNode) {
         selectedPointMarkerOptions.icon.path = gmaps.SymbolPath.CIRCLE;
         selectedPointMarker = new gmaps.Marker(selectedPointMarkerOptions);
 
+        tweetPlacePolygonOptions.map = map;
+        tweetPlacePolygon = new gmaps.Polygon(tweetPlacePolygonOptions);
+
+        tweetCoordsMarkerOptions.map = map;
+        tweetCoordsMarkerOptions.icon.path = gmaps.SymbolPath.CIRCLE;
+        tweetCoordsMarker = new gmaps.Marker(tweetCoordsMarkerOptions);
+
         mapStore.on(mapStore.events.SELECTION_CHANGE, function () {
             var newSelection = mapStore.getSelection();
             console.log('catch selection CHANGE event:');
@@ -95,6 +134,8 @@ var createGoogleMapIn = function (domNode) {
         mapStore.on(mapStore.events.SELECTION_AREA_CHANGE, function () {
             var selectedAreas = mapStore.getAreaSelection();
             _.defer(updateSelectedGeocoderResult, selectedAreas.geocoderResult);
+            _.defer(updateTweetPlacePolygon, selectedAreas.twitterPlace);
+            _.defer(updateTweetCoordsMarker, selectedAreas.twitterCoords);
         });
 
         gmaps.event.addListener(map, 'click', function (e) {
@@ -246,6 +287,40 @@ var updateSelectedGeocoderResult = function (geocoderResult) {
     if (hasViewport) {
         map.fitBounds(geocoderResult.geometry.viewport);
     }
+};
+
+var updateTweetPlacePolygon = function (twitterPlace) {
+    var hasBoundingBox = twitterPlace && twitterPlace.bounding_box.coordinates && twitterPlace.bounding_box.coordinates.length,
+        path;
+
+    if(!hasBoundingBox){
+        tweetPlacePolygon.setVisible(false);
+        return;
+    }
+
+    path = _.map(twitterPlace.bounding_box.coordinates[0], function (twCoords) {
+        return new gmaps.LatLng(twCoords[1], twCoords[0]);
+    });
+
+    tweetPlacePolygon.setPath(path);
+    tweetPlacePolygon.setVisible(true);
+    map.fitBounds(services.utils.polygon2Bounds(tweetPlacePolygon, gmaps));
+};
+
+var updateTweetCoordsMarker = function(twitterCoords){
+    var has = twitterCoords && twitterCoords.length,
+        position;
+
+    if(!has){
+        tweetCoordsMarker.setVisible(false);
+        return;
+    }
+
+    position = new gmaps.LatLng(twitterCoords[1], twitterCoords[0]);
+    tweetCoordsMarker.setPosition(position);
+    tweetCoordsMarker.setVisible(true);
+    map.panTo(position);
+    tweetCoordsMarker.setAnimation(gmaps.Animation.DROP);
 };
 
 var MapControl = React.createClass({

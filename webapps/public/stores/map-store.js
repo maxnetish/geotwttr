@@ -29,7 +29,9 @@ var center = services.localStorage.read(services.localStorage.keys.CENTER, {
 var zoom = services.localStorage.read(services.localStorage.keys.ZOOM, 6);
 
 var areaSelection = {
-    geocoderResult: null
+    geocoderResult: null,
+    twitterPlace: null,
+    twitterCoords: null
 };
 
 var storeCenter = _.debounce(function () {
@@ -43,11 +45,9 @@ var storeZoom = _.debounce(function () {
 var mapStore = _.create(EventEmitter.prototype, {
     events: eventNames,
     emitSelectionChange: function () {
-        console.log('mapStore emits selection-change event');
         return this.emit(this.events.SELECTION_CHANGE);
     },
     emitChange: _.debounce(function () {
-        console.log('mapStore emits change event');
         return this.emit(this.events.CHANGE);
     }, 500),
     emitChangeAreaSelection: function () {
@@ -77,6 +77,8 @@ var processMapClick = function (coords) {
     mapStore.emitSelectionChange();
 
     areaSelection.geocoderResult = null;
+    areaSelection.twitterCoords = null;
+    areaSelection.twitterPlace = null;
     mapStore.emitChangeAreaSelection();
 };
 
@@ -97,6 +99,8 @@ var processSelectionCenterChanged = function (coords) {
     mapStore.emitSelectionChange();
 
     areaSelection.geocoderResult = null;
+    areaSelection.twitterCoords = null;
+    areaSelection.twitterPlace = null;
     mapStore.emitChangeAreaSelection();
 };
 
@@ -111,7 +115,6 @@ var processCenterChanged = function (coords) {
 };
 
 var processZoomChanged = function (newZoom) {
-    console.log('process zoom changed: ' + newZoom);
     if (newZoom === zoom) {
         return;
     }
@@ -121,8 +124,9 @@ var processZoomChanged = function (newZoom) {
 };
 
 var processSelectionDetailLineClick = function (lineInfo) {
-    console.log(lineInfo);
     areaSelection.geocoderResult = lineInfo;
+    areaSelection.twitterCoords = null;
+    areaSelection.twitterPlace = null;
     mapStore.emitChangeAreaSelection();
 };
 
@@ -132,6 +136,8 @@ var processSearchResultSelected = function (selectedResult) {
     }
 
     areaSelection.geocoderResult = selectedResult;
+    areaSelection.twitterCoords = null;
+    areaSelection.twitterPlace = null;
     mapStore.emitChangeAreaSelection();
     //
     //center.lat = selectedResult.geometry.location.lat();
@@ -140,9 +146,30 @@ var processSearchResultSelected = function (selectedResult) {
     //mapStore.emitChange();
 };
 
+var processTweetPlaceClick = function (twitterPlace) {
+    twitterPlace = twitterPlace || {};
+    if (areaSelection.twitterPlace && areaSelection.twitterPlace.id === twitterPlace.id) {
+        return;
+    }
+
+    areaSelection.twitterPlace = twitterPlace;
+    areaSelection.geocoderResult = null;
+    areaSelection.twitterCoords = null;
+    mapStore.emitChangeAreaSelection();
+};
+
+var processTweetCoordsClick = function (twitterCoords) {
+    if(areaSelection.twitterCoords && areaSelection.twitterCoords[0]===twitterCoords[0] && areaSelection.twitterCoords[1] === twitterCoords[1]){
+        return;
+    }
+
+    areaSelection.twitterCoords = twitterCoords;
+    areaSelection.twitterPlace = null;
+    areaSelection.geocoderResult = null;
+    mapStore.emitChangeAreaSelection();
+};
+
 var actionHandler = function (payload) {
-    console.log('selectionStore handles action');
-    console.log(payload);
     switch (payload.actionType) {
         case actions.types.MAP.CLICK:
             processMapClick(payload.actionArgs.coords);
@@ -164,6 +191,12 @@ var actionHandler = function (payload) {
             break;
         case actions.types.GEOSEARCH.SELECT_ITEM:
             processSearchResultSelected(payload.actionArgs.selectedItem);
+            break;
+        case actions.types.TWEET.PLACE_CLICK:
+            processTweetPlaceClick(payload.actionArgs.twitterPlace);
+            break;
+        case actions.types.TWEET.COORDS_CLICK:
+            processTweetCoordsClick(payload.actionArgs.coords);
             break;
         default:
         // nothing

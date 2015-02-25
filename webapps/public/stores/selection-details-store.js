@@ -24,15 +24,19 @@ var internals = {
 var selectionDetailsStore = _.create(EventEmitter.prototype, {
     events: eventNames,
     emitDetailsExpanded: function () {
+        console.log('emit EVENT_EXPAND_TOGGLE');
         return this.emit(this.events.EVENT_EXPAND_TOGGLE);
     },
     emitWait: function () {
+        console.log('emit EVENT_DETAILS_WAIT_TOGGLE');
         return this.emit(this.events.EVENT_DETAILS_WAIT_TOGGLE);
     },
     emitDetailsReady: function () {
+        console.log('emit EVENT_DETAILS_READY');
         return this.emit(this.events.EVENT_DETAILS_READY);
     },
     emitSelectionRadiusChanged: function () {
+        console.log('emit EVENT_RADIUS_CHANGED');
         return this.emit(this.events.EVENT_RADIUS_CHANGED);
     },
     getDetailsExpanded: function () {

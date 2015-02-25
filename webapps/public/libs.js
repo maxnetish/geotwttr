@@ -1,7 +1,8 @@
 /**
  * Created by Gordeev on 07.09.2014.
  */
-var $ = require('jquery'),
+var
+    //$ = require('jquery'),
     _ = require('lodash'),
     Q = require('q'),
     React = require('react/addons'),
@@ -11,7 +12,7 @@ var $ = require('jquery'),
     EventEmitter = require('events').EventEmitter;
 
 module.exports = {
-    $: $,
+    //$: $,
     _: _,
     Q: Q,
     React: React,

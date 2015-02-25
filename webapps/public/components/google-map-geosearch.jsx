@@ -9,10 +9,19 @@ var GoogleMapGeosearch = React.createClass({
     getInitialState: function () {
         return {
             searchToken: null,
-            searchResults: []
+            searchResults: [],
+            searchResultsIds: []
         };
     },
+    shouldComponentUpdate: function (nextProps, nextState) {
+        var should =  nextState.searchToken!==this.state.searchToken;
+        if(should){
+            return should;
+        }
+        return !_.isEqual(nextState.searchResultsIds, this.state.searchResultsIds);
+    },
     render: function () {
+        console.log('render GoogleMapGeosearchComponent');
         var xMarkup = null, xDropdownList = null, xDropdownPart = null,
             self = this;
 
@@ -65,7 +74,10 @@ var GoogleMapGeosearch = React.createClass({
     _onUpdateSearchResults: function () {
         var newResults = geosearchStore.getSearchResults();
         this.setState({
-            searchResults: newResults
+            searchResults: newResults,
+            searchResultsIds: _.map(newResults, function(r){
+                return r.place_id;
+            })
         });
     },
     componentDidMount: function () {
