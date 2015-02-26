@@ -1,9 +1,10 @@
-var libs = require('../libs'),
-    _ = libs._,
-    EventEmitter = libs.EventEmitter,
-    dispatcher = libs.dispatcher,
+var
+    _ = require('lodash'),
+    EventEmitter = require('events').EventEmitter,
+    dispatcher = require('../dispatcher'),
     actions = require('../actions'),
-    services = require('../services');
+    services = require('../services'),
+    gmapsLibsLoader=require('../gmaps-lib-loader');
 
 var tweetFeedControlStore = require('./tweet-feed-control-store'),
     mapStore = require('./map-store');
@@ -76,7 +77,7 @@ var onSelectionChanged = function (selection) {
         internals.requestId = null; // from this moment we won't receive from closing stream -> wait new stream
     }
 
-    libs.promiseGmaps().then(function (gmaps) {
+    gmapsLibsLoader.getPromiseGMaps().then(function (gmaps) {
         var gmapBounds = services.utils.centerRadiusToBounds(selection.center.lat, selection.center.lng, selection.radius, gmaps),
             twitterBounds = services.utils.boundsToTwitterString(gmapBounds);
         services.ws.getRemote().invoke('subscribeTwitterStream', {

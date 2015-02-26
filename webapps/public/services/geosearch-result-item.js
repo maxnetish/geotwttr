@@ -1,5 +1,5 @@
-var libs = require('../libs'),
-    _ = libs._;
+var
+    _ = require('lodash');
 
 var geocoderResultTypesMap = {
     'route': {

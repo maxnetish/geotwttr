@@ -1,9 +1,10 @@
-var libs = require('../libs'),
-    React = libs.React,
-    _ = libs._,
+var
+    React = require('react/addons'),
+    _ = require('lodash'),
     actions = require('../actions'),
     mapStore = require('../stores').mapStore
-    services = require('../services');
+    services = require('../services'),
+    gmapLibsLoader = require('../gmaps-lib-loader');
 
 var map, selectionCircle, gmaps, selectedAreaRectangle, selectedPointMarker, tweetPlacePolygon, tweetCoordsMarker;
 
@@ -91,7 +92,7 @@ var tweetCoordsMarkerOptions = {
 };
 
 var createGoogleMapIn = function (domNode) {
-    libs.promiseGmaps().then(function (gmapsNamespace) {
+    gmapLibsLoader.getPromiseGMaps().then(function (gmapsNamespace) {
         gmaps = gmapsNamespace;
         var mapOptions = mapOptionsInitial,
             selectionCircleOptions = selectionCircleOptionsInitial;

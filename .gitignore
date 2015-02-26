@@ -5,3 +5,4 @@
 /public/js
 dep.txt
 projectFilesBackup/.idea/workspace.xml
+*.log

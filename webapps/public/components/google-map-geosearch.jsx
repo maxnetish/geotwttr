@@ -1,6 +1,6 @@
-var libs = require('../libs'),
-    React = libs.React,
-    _ = libs._,
+var
+    React = require('react/addons'),
+    _ = require('lodash'),
     actions = require('../actions'),
     stores = require('../stores'),
     geosearchStore = stores.geosearchStore;

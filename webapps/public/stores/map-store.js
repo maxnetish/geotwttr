@@ -1,8 +1,8 @@
-var libs = require('../libs'),
+var
     actions = require('../actions'),
-    dispatcher = libs.dispatcher,
-    EventEmitter = libs.EventEmitter,
-    _ = libs._,
+    dispatcher = require('../dispatcher'),
+    EventEmitter = require('events').EventEmitter,
+    _ = require('lodash'),
     services = require('../services');
 
 var geosearchStore = require('./geosearch-store');

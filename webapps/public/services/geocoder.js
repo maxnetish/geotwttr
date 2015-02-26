@@ -1,10 +1,11 @@
-var libs = require('../libs'),
-    Q = libs.Q;
+var
+    Q = require('q'),
+    gmapsLibsLoader = require('../gmaps-lib-loader');
 
 var promiseGeocode = function (request) {
     var dfr = Q.defer();
 
-    libs.promiseGeocoder().then(function (geocoder) {
+    gmapsLibsLoader.getPromiseGeocoder().then(function (geocoder) {
         geocoder.geocode(request, function (results, status) {
             dfr.resolve(results || []);
         });
@@ -16,7 +17,7 @@ var promiseGeocode = function (request) {
 var promiseReverseGeocode = function (plainLatLng) {
     var dfr = Q.defer();
 
-    Q.all([libs.promiseGmaps(), libs.promiseGeocoder()]).then(function (promiseResults) {
+    Q.all([gmapsLibsLoader.getPromiseGMaps(), gmapsLibsLoader.getPromiseGeocoder()]).then(function (promiseResults) {
         var gmaps = promiseResults[0],
             geocoder = promiseResults[1];
         geocoder.geocode({

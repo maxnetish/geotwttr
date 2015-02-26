@@ -1,7 +1,7 @@
-var libs = require('./../libs'),
+var
     services = require('../services'),
-    React = libs.React,
-    _ = libs._,
+    React = require('react/addons'),
+    _ = require('lodash'),
     rootStore = require('../stores').rootStore,
     tweetFeedStore = require('../stores').tweetFeedStore;
 

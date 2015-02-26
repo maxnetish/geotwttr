@@ -1,7 +1,7 @@
-var libs = require('../libs'),
-    _ = libs._,
-    EventEmitter = libs.EventEmitter,
-    dispatcher = libs.dispatcher,
+var
+    _ = require('lodash'),
+    EventEmitter = require('events').EventEmitter,
+    dispatcher = require('../dispatcher'),
     actions = require('../actions'),
     services = require('../services');
 

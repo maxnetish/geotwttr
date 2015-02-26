@@ -3,7 +3,9 @@
  */
 
 // depends
-var googleConfig = require('../../config/google.json');
+var
+    googleConfig = require('../../config/google.json'),
+    Q = require('q');
 //var googleConfig = {};
 
 var gMapsDefer,
@@ -14,8 +16,8 @@ var callbackName = 'gmaps_initialize',
 
     beginLoadGoogleLibs = function () {
         var script,
-            //langCode =  window.gt_config && window.gt_config.langCode
-            langCode =  'ru'
+        //langCode =  window.gt_config && window.gt_config.langCode
+            langCode = 'ru'
             ;
 
         window[callbackName] = function () {
@@ -25,39 +27,35 @@ var callbackName = 'gmaps_initialize',
 
         script = document.createElement('script');
         script.type = 'text/javascript';
-        script.src = 'https://maps.googleapis.com/maps/api/js?callback=' + callbackName + '&key=' + googleConfig.apiKey+'&language='+langCode;
+        script.src = 'https://maps.googleapis.com/maps/api/js?callback=' + callbackName + '&key=' + googleConfig.apiKey + '&language=' + langCode;
 
         document.body.appendChild(script);
     },
 
-    getGoogleMaps = function (Q) {
-        return function() {
-            if(!gMapsDefer){
-                gMapsDefer = Q.defer();
-            }
+    getGoogleMaps = function () {
+        if (!gMapsDefer) {
+            gMapsDefer = Q.defer();
+        }
 
-            if (!(window.google && window.google.maps) && !window[callbackName]) {
-                beginLoadGoogleLibs();
-            }
+        if (!(window.google && window.google.maps) && !window[callbackName]) {
+            beginLoadGoogleLibs();
+        }
 
-            return gMapsDefer.promise;
-        };
+        return gMapsDefer.promise;
     },
-    getGoogleGeocoder = function(Q){
-        return function(){
-            if(!geocoderDefer){
-                geocoderDefer = Q.defer();
-            }
+    getGoogleGeocoder = function () {
+        if (!geocoderDefer) {
+            geocoderDefer = Q.defer();
+        }
 
-            if(!geocoderInstance) {
-                getGoogleMaps(Q)().then(function (gmaps) {
-                    geocoderInstance = new gmaps.Geocoder();
-                    geocoderDefer.resolve(geocoderInstance);
-                });
-            }
+        if (!geocoderInstance) {
+            getGoogleMaps().then(function (gmaps) {
+                geocoderInstance = new gmaps.Geocoder();
+                geocoderDefer.resolve(geocoderInstance);
+            });
+        }
 
-            return geocoderDefer.promise;
-        };
+        return geocoderDefer.promise;
     };
 
 module.exports = {

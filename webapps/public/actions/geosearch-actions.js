@@ -1,5 +1,5 @@
-var libs = require('../libs'),
-    dispatcher = libs.dispatcher,
+var
+    dispatcher = require('../dispatcher'),
     actionTypes = require('./action-types');
 
 var geosearchTokenChanged = function (newToken) {

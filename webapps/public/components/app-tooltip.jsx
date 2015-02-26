@@ -1,5 +1,5 @@
-var libs = require('../libs'),
-    React = libs.React;
+var
+    React = require('react/addons');
 
 var AppTooltipControl = React.createClass({
     render: function () {
