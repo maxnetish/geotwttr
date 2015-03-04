@@ -45,7 +45,10 @@ var getCountryAddressComponent = function (searchResult) {
 };
 
 var GeocoderResultViewModel = function (geocoderResult) {
+    console.log('GeocoderResultViewModel ctor execs');
+    console.log(geocoderResult);
     _.extend(this, geocoderResult);
+    console.log(this);
 
     this.knownType = getKnownResultType(this);
     this.countryCode = getCountryAddressComponent(this).short_name;

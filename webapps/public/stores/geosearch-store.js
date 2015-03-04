@@ -31,16 +31,42 @@ var geosearchsStore = _.create(EventEmitter.prototype, {
     getSearchResults: function () {
         return internals.searchResults;
     },
-    getSelectedSearchResult: function(){
+    getSelectedSearchResult: function () {
         return internals.selectedSearchResult;
     }
 });
 
+//var refreshSearchResultsDebounce = function () {
+//    console.log('exec refreshSearchResults not Debounce: ' + internals.searchToken);
+//    if (internals.searchToken) {
+//        services.geocoder.promiseGeocode({address: internals.searchToken}).then(function (result) {
+//            console.log('got results: ' + result.length);
+//            if (result && result.length) {
+//                internals.searchResults = _.map(result, function (oneResult) {
+//                    console.log(oneResult);
+//                    console.log(new services.geosearchResultItem.GeocoderResultViewModel(oneResult));
+//                    return new services.geosearchResultItem.GeocoderResultViewModel(oneResult);
+//                });
+//            } else {
+//                internals.searchResults = [];
+//            }
+//            geosearchsStore.emitSearchResultChanged();
+//        });
+//    } else {
+//        internals.searchResults = [];
+//        geosearchsStore.emitSearchResultChanged();
+//    }
+//};
+
 var refreshSearchResultsDebounce = _.debounce(function () {
+    console.log('exec refreshSearchResultsDebounce: '+ internals.searchToken);
     if (internals.searchToken) {
         services.geocoder.promiseGeocode({address: internals.searchToken}).then(function (result) {
             if (result && result.length) {
                 internals.searchResults = _.map(result, function (oneResult) {
+                    console.log(oneResult);
+                    console.log(new services.geosearchResultItem.GeocoderResultViewModel(oneResult));
+                    console.log(services.geosearchResultItem.GeocoderResultViewModel);
                     return new services.geosearchResultItem.GeocoderResultViewModel(oneResult);
                 });
             } else {
@@ -58,12 +84,13 @@ var processTokenChanges = function (newToken) {
     if (newToken === internals.searchToken) {
         return;
     }
+    console.log('processTokenChanges: ' + newToken);
     internals.searchToken = newToken;
     refreshSearchResultsDebounce();
     geosearchsStore.emitTokenChanged();
 };
 
-var processSelectItem = function(item){
+var processSelectItem = function (item) {
     internals.searchResults = [];
     geosearchsStore.emitSearchResultChanged();
     internals.searchToken = item && item.formatted_address;

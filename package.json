@@ -5,6 +5,11 @@
   "scripts": {
     "test": "jest"
   },
+  "jest": {
+    "unmockedModulePathPatterns": [
+      "./node_modules/lodash"
+    ]
+  },
   "dependencies": {
     "q": "~1.0.1",
     "lodash": "~3.2.0",
