@@ -3,8 +3,9 @@ var
     EventEmitter = require('events').EventEmitter,
     dispatcher = require('../dispatcher'),
     actions = require('../actions'),
-//searchMockData = require('../services/geocoder-results-mock-data'),
-    services = require('../services');
+    servicesGeocoder = require('../services/geocoder'),
+    servicesGeosearchResult = require('../services/geosearch-result-item')
+    ;
 
 var eventNames = Object.freeze({
     EVENT_TOKEN_CHANGED: 'event-token-changed',
@@ -36,38 +37,13 @@ var geosearchsStore = _.create(EventEmitter.prototype, {
     }
 });
 
-//var refreshSearchResultsDebounce = function () {
-//    console.log('exec refreshSearchResults not Debounce: ' + internals.searchToken);
-//    if (internals.searchToken) {
-//        services.geocoder.promiseGeocode({address: internals.searchToken}).then(function (result) {
-//            console.log('got results: ' + result.length);
-//            if (result && result.length) {
-//                internals.searchResults = _.map(result, function (oneResult) {
-//                    console.log(oneResult);
-//                    console.log(new services.geosearchResultItem.GeocoderResultViewModel(oneResult));
-//                    return new services.geosearchResultItem.GeocoderResultViewModel(oneResult);
-//                });
-//            } else {
-//                internals.searchResults = [];
-//            }
-//            geosearchsStore.emitSearchResultChanged();
-//        });
-//    } else {
-//        internals.searchResults = [];
-//        geosearchsStore.emitSearchResultChanged();
-//    }
-//};
-
 var refreshSearchResultsDebounce = _.debounce(function () {
-    console.log('exec refreshSearchResultsDebounce: '+ internals.searchToken);
     if (internals.searchToken) {
-        services.geocoder.promiseGeocode({address: internals.searchToken}).then(function (result) {
+        servicesGeocoder.promiseGeocode({address: internals.searchToken}).then(function (result) {
             if (result && result.length) {
                 internals.searchResults = _.map(result, function (oneResult) {
-                    console.log(oneResult);
-                    console.log(new services.geosearchResultItem.GeocoderResultViewModel(oneResult));
-                    console.log(services.geosearchResultItem.GeocoderResultViewModel);
-                    return new services.geosearchResultItem.GeocoderResultViewModel(oneResult);
+                    var viewModel = servicesGeosearchResult.createViewModel(oneResult);
+                    return viewModel;
                 });
             } else {
                 internals.searchResults = [];
@@ -84,7 +60,6 @@ var processTokenChanges = function (newToken) {
     if (newToken === internals.searchToken) {
         return;
     }
-    console.log('processTokenChanges: ' + newToken);
     internals.searchToken = newToken;
     refreshSearchResultsDebounce();
     geosearchsStore.emitTokenChanged();

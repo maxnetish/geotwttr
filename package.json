@@ -7,7 +7,7 @@
   },
   "jest": {
     "unmockedModulePathPatterns": [
-      "./node_modules/lodash"
+      "lodash"
     ]
   },
   "dependencies": {

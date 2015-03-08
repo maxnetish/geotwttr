@@ -1,5 +1,6 @@
 var
-    _ = require('lodash');
+    _ = require('lodash'),
+    geocoderResultViewModelProto = {};
 
 var geocoderResultTypesMap = {
     'route': {
@@ -45,15 +46,20 @@ var getCountryAddressComponent = function (searchResult) {
 };
 
 var GeocoderResultViewModel = function (geocoderResult) {
-    console.log('GeocoderResultViewModel ctor execs');
-    console.log(geocoderResult);
     _.extend(this, geocoderResult);
-    console.log(this);
 
     this.knownType = getKnownResultType(this);
     this.countryCode = getCountryAddressComponent(this).short_name;
 };
 
+var createViewModel = function(geocoderResult){
+    var res = _.create(geocoderResultViewModelProto, geocoderResult);
+    res.knownType = getKnownResultType(this);
+    res.countryCode = getCountryAddressComponent(this).short_name;
+    return res;
+};
+
 module.exports = {
-    GeocoderResultViewModel: GeocoderResultViewModel
+    GeocoderResultViewModel: GeocoderResultViewModel,
+    createViewModel: createViewModel
 };

@@ -1,37 +1,46 @@
 jest.dontMock('lodash');
-//jest.dontMock('flux');
 jest.dontMock('../geosearch-store');
+jest.dontMock('../../services/geosearch-result-item');
 
 describe('geosearch-store', function () {
-    var _, dispatcher, actions, store, dispatcherCallback, eventCallback, services, geocoder;
+    var _, dispatcher, actions, store, dispatcherCallback, eventCallback, geocoder;
+
+    var mockGeocodeSearchResult =
+        [
+            {
+                value: 'first'
+            },
+            {
+                value: 'second'
+            }
+        ];
 
     beforeEach(function () {
         _ = require('lodash');
+
+        // mock debounce calls
         spyOn(_, 'debounce').andCallFake(function (func) {
-            console.log('creating fake function');
             return function () {
-                console.log('exec fake debounced func');
                 func.apply(this, arguments);
             };
         });
-        services = require('../../services');
+
+        geocoder = require('../../services/geocoder');
         dispatcher = require('../../dispatcher');
         actions = require('../../actions');
         store = require('../geosearch-store');
+
+        // mock dispatcher callback
         dispatcherCallback = dispatcher.register.mock.calls[0][0];
         eventCallback = jest.genMockFunction();
-        geocoder = services.geocoder;
+
+        // mock async geocoding - do sync
         geocoder.promiseGeocode.mockReturnValue({
             then: function (cb) {
-                cb([{
-                    foo: 'bar'
-                }]);
+                cb(mockGeocodeSearchResult);
             }
         });
-        //services.geosearchResultItem.GeocoderResultViewModel.mockImplementation(function (inp) {
-        //    console.log('exec fake GeocoderResultViewModel ctor');
-        //    this.foo2 = 'bar2';
-        //});
+
     });
 
     afterEach(function () {
@@ -39,13 +48,14 @@ describe('geosearch-store', function () {
     });
 
     it('Should receive GEOSEARCH.TOKEN_CHANGED action and store new token', function () {
+        var expectedToken = 'token 1';
         dispatcherCallback({
             actionType: actions.types.GEOSEARCH.TOKEN_CHANGED,
             actionArgs: {
-                token: 'token 1'
+                token: expectedToken
             }
         });
-        expect(store.getSearchToken()).toEqual('token 1');
+        expect(store.getSearchToken()).toEqual(expectedToken);
     });
 
     it('Should emit EVENT_TOKEN_CHANGED after GEOSEARCH.TOKEN_CHANGED action', function () {
@@ -53,51 +63,73 @@ describe('geosearch-store', function () {
         dispatcherCallback({
             actionType: actions.types.GEOSEARCH.TOKEN_CHANGED,
             actionArgs: {
-                token: 'token 2'
+                token: 'bar'
             }
         });
         expect(eventCallback.mock.calls.length).toBe(1);
     });
 
     it('Should not emit EVENT_TOKEN_CHANGED if token not changed', function () {
+        var myToken = 'token 3';
         dispatcherCallback({
             actionType: actions.types.GEOSEARCH.TOKEN_CHANGED,
             actionArgs: {
-                token: 'token 3'
+                token: myToken
             }
         });
         store.on(store.events.EVENT_TOKEN_CHANGED, eventCallback);
         dispatcherCallback({
             actionType: actions.types.GEOSEARCH.TOKEN_CHANGED,
             actionArgs: {
-                token: 'token 3'
+                token: myToken
             }
         });
         expect(eventCallback.mock.calls.length).toBe(0);
     });
 
     it('Should perform geocode search after update search token', function () {
-        var flag;
-
-        console.log('it calls');
-
-        (_.debounce(function () {
-            console.log('debounced spying call');
-        }, 100))();
-
+        var result,
+            myToken = 'token 4';
 
         dispatcherCallback({
             actionType: actions.types.GEOSEARCH.TOKEN_CHANGED,
             actionArgs: {
-                token: 'token 4'
+                token: myToken
+            }
+        });
+        result = store.getSearchResults();
+        expect(result.length).toBe(mockGeocodeSearchResult.length);
+    });
+
+    it('Should emit EVENT_SEARCH_RESULTS_CHANGED event after geocode search', function () {
+        var myToken = 'token 5';
+        store.on(store.events.EVENT_SEARCH_RESULTS_CHANGED, eventCallback);
+        dispatcherCallback({
+            actionType: actions.types.GEOSEARCH.TOKEN_CHANGED,
+            actionArgs: {
+                token: myToken
+            }
+        });
+        expect(eventCallback.mock.calls.length).toBe(1);
+    });
+
+    it('Should clear search result and set token after GEOSEARCH.SELECT_ITEM (after select one of search results)', function () {
+        var myFormattedAddress = 'My formatted address',
+            resultList, resultToken;
+
+        dispatcherCallback({
+            actionType: actions.types.GEOSEARCH.SELECT_ITEM,
+            actionArgs: {
+                selectedItem: {
+                    formatted_address: myFormattedAddress
+                }
             }
         });
 
-        console.log(geocoder.promiseGeocode.mock.calls.length);
-        console.log(store.getSearchResults());
-        expect(store.getSearchResults()).toEqual([{
-            foo: 'bar'
-        }]);
+        resultList = store.getSearchResults();
+        resultToken = store.getSearchToken();
 
+        expect(resultList.length).toBe(0);
+        expect(resultToken).toBe(myFormattedAddress);
     });
 });

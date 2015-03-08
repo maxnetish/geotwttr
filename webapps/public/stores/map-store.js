@@ -3,7 +3,7 @@ var
     dispatcher = require('../dispatcher'),
     EventEmitter = require('events').EventEmitter,
     _ = require('lodash'),
-    services = require('../services');
+    localStorage = require('../services/local-storage');
 
 var geosearchStore = require('./geosearch-store');
 
@@ -21,12 +21,12 @@ var selection = {
     radius: 1000
 };
 
-var center = services.localStorage.read(services.localStorage.keys.CENTER, {
+var center = localStorage.read(localStorage.keys.CENTER, {
     lat: 37.419,
     lng: -122.080
 });
 
-var zoom = services.localStorage.read(services.localStorage.keys.ZOOM, 6);
+var zoom = localStorage.read(localStorage.keys.ZOOM, 6);
 
 var areaSelection = {
     geocoderResult: null,
@@ -35,11 +35,11 @@ var areaSelection = {
 };
 
 var storeCenter = _.debounce(function () {
-    services.localStorage.write(services.localStorage.keys.CENTER, center);
+    localStorage.write(localStorage.keys.CENTER, center);
 }, 1000);
 
 var storeZoom = _.debounce(function () {
-    services.localStorage.write(services.localStorage.keys.ZOOM, zoom);
+    localStorage.write(localStorage.keys.ZOOM, zoom);
 }, 1000);
 
 var mapStore = _.create(EventEmitter.prototype, {
