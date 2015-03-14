@@ -325,6 +325,14 @@ describe('map-store', function () {
             mockInfo: 'bar'
         }, newGeocoderResult, newSelectionArea;
 
+        dispatcherCallback({
+            actionType: actions.types.GEOSEARCH.SELECT_ITEM,
+            actionArgs: {
+                selectedItem: {
+                    foo: 'bar'
+                }
+            }
+        });
         store.on(store.events.SELECTION_AREA_CHANGE, eventCallback);
         dispatcherCallback({
             actionType: actions.types.SELECTION_DETAILS.DETAIL_LINE_CLICK,
@@ -343,5 +351,155 @@ describe('map-store', function () {
                 expect(propValue).toBeFalsy();
             }
         });
+    });
+
+    it('After GEOSEARCH.SELECT_ITEM should emit SELECTION_AREA_CHANGE, set areaSelection.geocoderResult and clear another props of areaSelection', function () {
+        var myItemInfo = {
+            mockInfo: 'foo'
+        };
+        var newItemInfo;
+        var newAreaSelection;
+
+        dispatcherCallback({
+            actionType: actions.types.SELECTION_DETAILS.DETAIL_LINE_CLICK,
+            actionArgs: {
+                detailLineInfo: {
+                    foo: 'bar'
+                }
+            }
+        });
+        store.on(store.events.SELECTION_AREA_CHANGE, eventCallback);
+        dispatcherCallback({
+            actionType: actions.types.GEOSEARCH.SELECT_ITEM,
+            actionArgs: {
+                selectedItem: myItemInfo
+            }
+        });
+        newAreaSelection = store.getAreaSelection();
+        newItemInfo = newAreaSelection.geocoderResult;
+
+        expect(eventCallback.mock.calls.length).toBe(1);
+        _.forOwn(newAreaSelection, function (propValue, propName) {
+            if (propName === 'geocoderResult') {
+                expect(newItemInfo).toEqual(myItemInfo);
+            } else {
+                expect(propValue).toBeFalsy();
+            }
+        });
+    });
+
+    it('After TWEET.PLACE_CLICK should emit SELECTION_AREA_CHANGE, set areaSelection.twitterPlace, clear another props of areaSelection', function () {
+        var myTweetPlaceInfo = {
+            id: 'my-very-uniq-id'
+        };
+        var newAreaSelection;
+
+        dispatcherCallback({
+            actionType: actions.types.SELECTION_DETAILS.DETAIL_LINE_CLICK,
+            actionArgs: {
+                detailLineInfo: {
+                    foo: 'bar'
+                }
+            }
+        });
+        store.on(store.events.SELECTION_AREA_CHANGE, eventCallback);
+        dispatcherCallback({
+            actionType: actions.types.TWEET.PLACE_CLICK,
+            actionArgs: {
+                twitterPlace: myTweetPlaceInfo
+            }
+        });
+        newAreaSelection = store.getAreaSelection();
+
+        expect(eventCallback.mock.calls.length).toBe(1);
+        _.forOwn(newAreaSelection, function (propValue, propName) {
+            if (propName === 'twitterPlace') {
+                expect(propValue).toEqual(myTweetPlaceInfo);
+            } else {
+                expect(propValue).toBeFalsy();
+            }
+        });
+    });
+
+    it('after TWEET.PLACE_CLICK should not emit SELECTION_AREA_CHANGE: if twitterPlace.id same as areaSelection.twitterPlace.id', function () {
+        var myTweetPlaceInfo = {
+            id: '1234-qwerty'
+        };
+
+        dispatcherCallback({
+            actionType: actions.types.TWEET.PLACE_CLICK,
+            actionArgs: {
+                twitterPlace: myTweetPlaceInfo
+            }
+        });
+        store.on(store.events.SELECTION_AREA_CHANGE, eventCallback);
+        dispatcherCallback({
+            actionType: actions.types.TWEET.PLACE_CLICK,
+            actionArgs: {
+                twitterPlace: myTweetPlaceInfo
+            }
+        });
+
+        expect(eventCallback.mock.calls.length).toBe(0);
+    });
+
+    it('after TWEET.COORDS_CLICK should emit SELECTION_AREA_CHANGE, set areaSelection.twitterCoords and clear ather props of areaSelection', function () {
+        var myTweetCoords = [1.234, -5.6789];
+        var newAreaSelection;
+
+        dispatcherCallback({
+            actionType: actions.types.SELECTION_DETAILS.DETAIL_LINE_CLICK,
+            actionArgs: {
+                detailLineInfo: {
+                    foo: 'bar'
+                }
+            }
+        });
+        dispatcherCallback({
+            actionType: actions.types.TWEET.PLACE_CLICK,
+            actionArgs: {
+                twitterPlace: {
+                    bar: 'foo'
+                }
+            }
+        });
+        store.on(store.events.SELECTION_AREA_CHANGE, eventCallback);
+        dispatcherCallback({
+            actionType: actions.types.TWEET.COORDS_CLICK,
+            actionArgs: {
+                coords: myTweetCoords
+            }
+        });
+        newAreaSelection = store.getAreaSelection();
+
+        expect(eventCallback.mock.calls.length).toBe(1);
+        _.forOwn(newAreaSelection, function (propValue, propName) {
+            if (propName === 'twitterCoords') {
+                expect(propValue).toEqual(myTweetCoords);
+            } else {
+                expect(propValue).toBeFalsy();
+            }
+        });
+    });
+
+    it('after TWEET.COORDS_CLICK should not emit SELECTION_AREA_CHANGE if coords of areaSelection.twitterCoords are same as in eventArgs', function () {
+        var myTweetCoords = [1.234, -5.6789];
+        var newAreaSelection;
+
+        dispatcherCallback({
+            actionType: actions.types.TWEET.PLACE_CLICK,
+            actionArgs: {
+                coords: myTweetCoords
+            }
+        });
+        store.on(store.events.SELECTION_AREA_CHANGE, eventCallback);
+        dispatcherCallback({
+            actionType: actions.types.TWEET.PLACE_CLICK,
+            actionArgs: {
+                coords: myTweetCoords
+            }
+        });
+
+        expect(eventCallback.mock.calls.length).toBe(0);
     });
 });
