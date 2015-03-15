@@ -4,7 +4,7 @@
 jest.dontMock('lodash');
 jest.dontMock('../root-store');
 
-describe('map-store', function () {
+describe('root-store', function () {
     var _, dispatcher, actions, store, dispatcherCallback, eventCallback, mapStore, selectionMockValue;
 
     beforeEach(function () {
