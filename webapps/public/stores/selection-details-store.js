@@ -63,17 +63,35 @@ var processSelectionChanges = function () {
     dispatcher.waitFor([mapStore.dispatchToken]);
     selection = mapStore.getSelection();
 
+    console.log('map store selection:');
+    console.log(selection);
+
     // update selectionDetails
     if (selection) {
         internals.detailsWait = true;
         selectionDetailsStore.emitWait();
+
+        //var prom = services.geocoder.promiseReverseGeocode({
+        //        lat: selection.center.lat,
+        //        lng: selection.center.lng
+        //    });
+        //
+        //console.log('call promise.then:');
+        //console.log(prom.then);
+        //
+        //prom.then(function(){
+        //     console.log('prom.then execs');
+        //});
+
         services.geocoder.promiseReverseGeocode({
             lat: selection.center.lat,
             lng: selection.center.lng
         }).then(function (geocoderResult) {
+            console.log('promise.then execs');
             internals.details = geocoderResult;
             selectionDetailsStore.emitDetailsReady();
         })['finally'](function () {
+            console.log('promise.finally execs');
             internals.detailsWait = false;
             selectionDetailsStore.emitWait();
         });
