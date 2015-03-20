@@ -25,6 +25,7 @@ describe('selection-details-store', function () {
             }
         });
 
+        // mock geocoder service
         Q = require('q');
         promiseResolveFunctionMock = function (opts) {
             opts = opts || {
@@ -33,21 +34,15 @@ describe('selection-details-store', function () {
                 deferAction: '',
                 deferArg: null
             };
-
             opts.target[opts.fnName].mockImplementation(function () {
                 var dfr = Q.defer(), result;
                 dfr[opts.deferAction](opts.deferArg);
                 result = dfr.promise;
-                console.log('return mock promise.then:');
-                console.log(result.then);
-                // FIXME несмотря на то что возвращается резолвленный promise, коллбэки выполняются асинхронно!
                 return result;
             });
-
-            console.log('promise mock created:');
-            console.log(opts.target[opts.fnName]);
         };
 
+        // mock mapStore
         mapStore = require('../map-store');
         mockSelection = {
             center: {
@@ -57,50 +52,6 @@ describe('selection-details-store', function () {
             radius: 1000
         };
         mapStore.getSelection.mockReturnValue(mockSelection);
-        //promiseResolveFunctionMock = function (opts) {
-        //    opts = opts || {
-        //        target: null,
-        //        fnName: '',
-        //        deferAction: '',
-        //        deferArg: null
-        //    };
-        //
-        //    spyOn(opts.target, opts.fnName).andCallFake(function () {
-        //        var dfr = Q.defer();
-        //        dfr[opts.deferAction](opts.deferArg);
-        //        return dfr.promise;
-        //    });
-        //};
-
-        //spyOn(services.geocoder, 'promiseReverseGeocode').andCallFake(function(){
-        //    var deferred = Q.defer();
-        //    deferred.resolve('Result for resolve');
-        //    return deferred.promise;
-        //});
-
-        //promiseResolveFunctionMock = function(promiseFn, resolveValue){
-        //    var getResultValue = function(val) {
-        //        return {
-        //            then: function (cb) {
-        //                var newVal;
-        //                if (_.isFunction(cb)) {
-        //                    newVal = cb(val);
-        //                }
-        //                return getResultValue(newVal);
-        //            },
-        //            'finally': function (cb) {
-        //                if(_.isFunction(cb)){
-        //                    cb();
-        //                }
-        //                return getResultValue(val);
-        //            }
-        //        };
-        //    };
-        //
-        //    promiseFn.mockReturnValue(getResultValue(resolveValue));
-        //};
-        //services = require('../../services');
-        //promiseResolveFunctionMock(services.geocoder.promiseReverseGeocode, {foo: 'bar'});
 
         services = require('../../services');
         dispatcher = require('../../dispatcher');
@@ -110,9 +61,6 @@ describe('selection-details-store', function () {
         // mock dispatcher callback
         dispatcherCallback = dispatcher.register.mock.calls[0][0];
         eventCallback = jest.genMockFunction();
-        eventCallback.mockImplementation(function(){
-            console.log('event callback execs');
-        });
     });
 
     afterEach(function () {
@@ -123,7 +71,6 @@ describe('selection-details-store', function () {
         var myGeocode = {
             foo: 'geocode object'
         };
-        var myCoords = [1.234, -5.678];
 
         promiseResolveFunctionMock({
             target: services.geocoder,
@@ -132,26 +79,28 @@ describe('selection-details-store', function () {
             deferArg: myGeocode
         });
 
-        console.log('add listener');
-        store.on(store.events.EVENT_DETAILS_WAIT_TOGGLE, eventCallback);
-        console.log('call dispatcher callback');
-        dispatcherCallback({
-            actionType: actions.types.MAP.CLICK,
-            actionArgs: {
-                coords: myCoords
-            }
+        runs(function () {
+            store.on(store.events.EVENT_DETAILS_WAIT_TOGGLE, eventCallback);
+            dispatcherCallback({
+                actionType: actions.types.MAP.CLICK,
+                actionArgs: null
+            });
         });
-        console.log('now check expectations');
 
-        expect(eventCallback.mock.calls.length).toBe(2);
-        expect(store.getDetailsWait()).toBeFalsy();
+        waitsFor(function () {
+            return eventCallback.mock.calls.length === 2;
+        }, 'Event callback not called twice during 200ms', 200);
+
+        runs(function () {
+            expect(eventCallback.mock.calls.length).toBe(2);
+            expect(store.getDetailsWait()).toBeFalsy();
+        });
     });
 
-    xit('After MAP.CLICK should resolve geocode and emit EVENT_DETAILS_READY', function(){
+    it('After MAP.CLICK should resolve geocode and emit EVENT_DETAILS_READY', function () {
         var myGeocode = {
             foo: 'geocode object'
         };
-        var myCoords = [1.234, -5.678];
 
         promiseResolveFunctionMock({
             target: services.geocoder,
@@ -160,14 +109,84 @@ describe('selection-details-store', function () {
             deferArg: myGeocode
         });
 
-        store.on(store.events.EVENT_DETAILS_READY, eventCallback);
+        runs(function () {
+            store.on(store.events.EVENT_DETAILS_READY, eventCallback);
+            dispatcherCallback({
+                actionType: actions.types.MAP.CLICK,
+                actionArgs: null
+            });
+        });
+
+        waitsFor(function () {
+            return eventCallback.mock.calls.length > 0;
+        }, 'Event callback not called during 200 ms', 200);
+
+        runs(function () {
+            expect(eventCallback).toBeCalled();
+            expect(store.getDetails()).toEqual(myGeocode);
+        });
+    });
+
+    it('After MAP.CLICK should not emit EVENT_DETAILS_READY (and emit EVENT_DETAILS_WAIT_TOGGLE twice) if geocoding not success', function () {
+        var detailsWaitCallbak = jest.genMockFunction();
+
+        promiseResolveFunctionMock({
+            target: services.geocoder,
+            fnName: 'promiseReverseGeocode',
+            deferAction: 'reject',
+            deferArg: 'mock error'
+        });
+
+        runs(function () {
+            store.on(store.events.EVENT_DETAILS_WAIT_TOGGLE, detailsWaitCallbak);
+            store.on(store.events.EVENT_DETAILS_READY, eventCallback);
+            dispatcherCallback({
+                actionType: actions.types.MAP.CLICK,
+                actionArgs: null
+            });
+        });
+
+        waitsFor(function () {
+            return detailsWaitCallbak.mock.calls.length === 2;
+        }, 'detailsWaitCallbak not called twice', 200);
+
+        runs(function () {
+            expect(detailsWaitCallbak.mock.calls.length).toBe(2);
+            expect(eventCallback.mock.calls.length).toBeFalsy();
+        });
+    });
+
+    it('After MAP.SELECTION_RADIUS_CHANGED emit EVENT_RADIUS_CHANGED and set new radius', function () {
+
+        store.on(store.events.EVENT_RADIUS_CHANGED, eventCallback);
         dispatcherCallback({
-            actionType: actions.types.MAP.CLICK,
-            actionArgs: {
-                coords: myCoords
-            }
+            actionType: actions.types.MAP.SELECTION_RADIUS_CHANGED,
+            actionArgs: null
         });
 
         expect(eventCallback).toBeCalled();
+        expect(store.getSelectionRadius()).toEqual(mockSelection.radius);
     });
+
+    it('After SELECTION_DETAILS.EXPAND_CLICK emit EVENT_EXPAND_TOGGLE and toggle getDetailsExpanded()', function(){
+        var initialVal = !!store.getDetailsExpanded();
+
+        store.on(store.events.EVENT_EXPAND_TOGGLE, eventCallback);
+        dispatcherCallback({
+            actionType: actions.types.SELECTION_DETAILS.EXPAND_CLICK,
+            actionArgs: null
+        });
+
+        expect(eventCallback).toBeCalled();
+        expect(store.getDetailsExpanded()).toBe(!initialVal);
+
+        eventCallback.mockClear();
+        dispatcherCallback({
+            actionType: actions.types.SELECTION_DETAILS.EXPAND_CLICK,
+            actionArgs: null
+        });
+
+        expect(eventCallback).toBeCalled();
+        expect(store.getDetailsExpanded()).toBe(initialVal);
+    })
 });

@@ -24,19 +24,19 @@ var internals = {
 var selectionDetailsStore = _.create(EventEmitter.prototype, {
     events: eventNames,
     emitDetailsExpanded: function () {
-        console.log('emit EVENT_EXPAND_TOGGLE');
+        //console.log('emit EVENT_EXPAND_TOGGLE');
         return this.emit(this.events.EVENT_EXPAND_TOGGLE);
     },
     emitWait: function () {
-        console.log('emit EVENT_DETAILS_WAIT_TOGGLE');
+        //console.log('emit EVENT_DETAILS_WAIT_TOGGLE');
         return this.emit(this.events.EVENT_DETAILS_WAIT_TOGGLE);
     },
     emitDetailsReady: function () {
-        console.log('emit EVENT_DETAILS_READY');
+        //console.log('emit EVENT_DETAILS_READY');
         return this.emit(this.events.EVENT_DETAILS_READY);
     },
     emitSelectionRadiusChanged: function () {
-        console.log('emit EVENT_RADIUS_CHANGED');
+        //console.log('emit EVENT_RADIUS_CHANGED');
         return this.emit(this.events.EVENT_RADIUS_CHANGED);
     },
     getDetailsExpanded: function () {
@@ -63,35 +63,16 @@ var processSelectionChanges = function () {
     dispatcher.waitFor([mapStore.dispatchToken]);
     selection = mapStore.getSelection();
 
-    console.log('map store selection:');
-    console.log(selection);
-
-    // update selectionDetails
     if (selection) {
         internals.detailsWait = true;
         selectionDetailsStore.emitWait();
-
-        //var prom = services.geocoder.promiseReverseGeocode({
-        //        lat: selection.center.lat,
-        //        lng: selection.center.lng
-        //    });
-        //
-        //console.log('call promise.then:');
-        //console.log(prom.then);
-        //
-        //prom.then(function(){
-        //     console.log('prom.then execs');
-        //});
-
         services.geocoder.promiseReverseGeocode({
             lat: selection.center.lat,
             lng: selection.center.lng
         }).then(function (geocoderResult) {
-            console.log('promise.then execs');
             internals.details = geocoderResult;
             selectionDetailsStore.emitDetailsReady();
         })['finally'](function () {
-            console.log('promise.finally execs');
             internals.detailsWait = false;
             selectionDetailsStore.emitWait();
         });
