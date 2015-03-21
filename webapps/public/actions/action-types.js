@@ -23,5 +23,10 @@ module.exports = {
     TWEET: {
         PLACE_CLICK: 'action-tweet-place-click',
         COORDS_CLICK: 'action-tweet-coords-click'
+    },
+    TWEET_PROVIDER: {
+        RECEIVE_TWEET: 'action-receive-tweet',
+        RECEIVE_MESSAGE: 'action-receive-twitter-message',
+        RECEIVE_ERROR: 'action-receive-twitter-error'
     }
 };

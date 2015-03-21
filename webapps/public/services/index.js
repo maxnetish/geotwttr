@@ -8,5 +8,6 @@ module.exports = {
     utils: require('./utils'),
     localStorage: require('./local-storage'),
     geosearchResultItem: require('./geosearch-result-item'),
-    tweetViewModel: require('./tweet-view-model')
+    tweetViewModel: require('./tweet-view-model'),
+    wsTweetProvider: require('./ws-tweet-provider')
 };
