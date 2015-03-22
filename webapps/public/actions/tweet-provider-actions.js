@@ -32,8 +32,30 @@ function receiveError(err) {
     dispatcher.dispatch(dispatchPayload);
 }
 
+function unsubscribe(serverMessage){
+    var dispatchPayload = {
+        actionType: actionTypes.TWEET_PROVIDER.UNSUBSCRIBED,
+        actionArgs: {
+            message: serverMessage
+        }
+    };
+    dispatcher.dispatch(dispatchPayload);
+}
+
+function subscribe(serverMessage){
+    var dispatchPayload = {
+        actionType: actionTypes.TWEET_PROVIDER.SUBSCRIBED,
+        actionArgs: {
+            message: serverMessage
+        }
+    };
+    dispatcher.dispatch(dispatchPayload);
+}
+
 module.exports = {
     receiveTweet: receiveTweet,
     receiveMessage: receiveMessage,
-    receiveError: receiveError
+    receiveError: receiveError,
+    unsubscribe: unsubscribe,
+    subscribe: subscribe
 };

@@ -24,7 +24,19 @@ var getRemote = function () {
     return remote;
 };
 
+function localApiSetListener(entryPointName, cb){
+    localApi[entryPointName] = cb;
+}
+
+function localApiRemoveListener(entryPointName){
+    delete localApi[entryPointName];
+}
+
 module.exports = {
     getRemote: getRemote,
-    localApi: localApi
+    api:{
+        add: localApiSetListener,
+        remove: localApiRemoveListener,
+        local: localApi
+    }
 };

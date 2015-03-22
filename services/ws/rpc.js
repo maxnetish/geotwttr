@@ -4,12 +4,13 @@ var Connection = require('q-connection');
 var serverStateService = require('./server-state');
 var twitterStreamService = require('./twttr-stream');
 
-var localServices = {
-    subscribeState: serverStateService.subscribe,
-    unsubscribeState: serverStateService.unsubscribe,
-    subscribeTwitterStream: twitterStreamService.subscribe,
-    unsubscribeTwitterStream: twitterStreamService.unsubscribe
-};
+var rpcInterface = require('./rpc-server-interface');
+
+var localServices = {};
+localServices[rpcInterface.STATE.SUBSCRIBE] = serverStateService.subscribe;
+localServices[rpcInterface.STATE.UNSUBSCRIBE] = serverStateService.unsubscribe;
+localServices[rpcInterface.TWITTER_STREAM.SUBSCRIBE] = twitterStreamService.subscribe;
+localServices[rpcInterface.TWITTER_STREAM.UNSUBSCRIBE] = twitterStreamService.unsubscribe;
 
 var LocalApi = function (socket) {
     var self = this,

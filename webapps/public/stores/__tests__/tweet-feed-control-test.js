@@ -1,26 +1,28 @@
 jest.dontMock('lodash');
 jest.dontMock('../tweet-feed-control-store');
 
-describe('selection-details-store', function () {
+describe('tweet-feed-control-store', function () {
     var _, dispatcher, actions, store, dispatcherCallback, eventCallback;
 
     beforeEach(function () {
         _ = require('lodash');
 
         // mock debounce calls
+        // mock debounce calls
         spyOn(_, 'debounce').andCallFake(function (func) {
             return function () {
                 func.apply(this, arguments);
             };
         });
-        spyOn(_, 'defer').andCallFake(function () {
-            var argsArray = Array.prototype.slice.call(arguments);
-            var func = argsArray.length ? argsArray[0] : undefined;
-            var funcArgs = argsArray.length > 1 ? argsArray.slice(1) : [];
-
+        spyOn(_, 'defer').andCallFake(function (func, args) {
             if (func) {
-                return func.apply(this, funcArgs);
+                return func.apply(this, args);
             }
+        });
+        spyOn(_, 'throttle').andCallFake(function(){
+            return function () {
+                func.apply(this, arguments);
+            };
         });
 
         dispatcher = require('../../dispatcher');

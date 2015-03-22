@@ -9,7 +9,18 @@ describe('map-store', function () {
         _ = require('lodash');
 
         // mock debounce calls
+        // mock debounce calls
         spyOn(_, 'debounce').andCallFake(function (func) {
+            return function () {
+                func.apply(this, arguments);
+            };
+        });
+        spyOn(_, 'defer').andCallFake(function (func, args) {
+            if (func) {
+                return func.apply(this, args);
+            }
+        });
+        spyOn(_, 'throttle').andCallFake(function(){
             return function () {
                 func.apply(this, arguments);
             };

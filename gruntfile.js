@@ -54,8 +54,8 @@ module.exports = function (grunt) {
             // не надо
             includeSelect2Css: {
                 src: [
-                        publicCss + '/app.css',
-                        nodeModulesSelect2 + '/select2.css'
+                    publicCss + '/app.css',
+                    nodeModulesSelect2 + '/select2.css'
                 ],
                 dest: publicCss + '/app.css'
             }
@@ -84,9 +84,17 @@ module.exports = function (grunt) {
                     }
                 ]
             }
+        },
+        jest: {
+            options: {
+                unmockedModulePathPatterns: [
+                    "lodash"
+                ]
+            }
         }
     });
 
     require('load-grunt-tasks')(grunt);
     grunt.registerTask('default', ['clean', 'browserify', 'uglify', 'less', 'copy']);
+    grunt.registerTask('test', ['jest']);
 };
