@@ -18,12 +18,12 @@ var internals = {
     hidedTweets: [],
     requestId: null,
     addingRate: 0,
-    tweetProvider: new services.wsTweetProvider.Provider()
+    tweetProvider: new services.wsTweetProvider.Provider(),
+    startTime: Date.now()
 };
 
-var addingRateStartTime = Date.now();
 var updateAddingRate = function () {
-    var milliseconds = Date.now() - addingRateStartTime;
+    var milliseconds = Date.now() - internals.startTime;
 
     if (milliseconds === 0) {
         internals.addingRate = 0;
@@ -49,7 +49,7 @@ var makeAllVisible = function () {
     if (_.isFunction(tweetFeedStore.emitFeedChange.cancel)) {
         tweetFeedStore.emitFeedChange.cancel();
     }
-    _.each(internals.hidedTweets, function (hidedItem) {
+    _.eachRight(internals.hidedTweets, function (hidedItem) {
         internals.visibleTweets.unshift(hidedItem);
     });
     internals.hidedTweets.length = 0;
@@ -59,7 +59,7 @@ var makeAllVisible = function () {
 var resetTweets = function () {
     internals.visibleTweets.length = 0;
     internals.hidedTweets.length = 0;
-    addingRateStartTime = Date.now();
+    internals.startTime = Date.now();
     tweetFeedStore.emitFeedChange();
 };
 
@@ -80,6 +80,9 @@ var tweetFeedStore = _.create(EventEmitter.prototype, {
     },
     getAddingRate: function () {
         return internals.addingRate;
+    },
+    getStartTime: function(){
+        return internals.startTime;
     }
 });
 

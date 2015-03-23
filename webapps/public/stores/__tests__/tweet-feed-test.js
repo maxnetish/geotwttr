@@ -30,7 +30,8 @@ describe('tweet-feed-store', function () {
         tweetViewModelService = require('../../services').tweetViewModel;
         tweetViewModelService.create.mockImplementation(function (tw) {
             return _.create(tw, {
-                mockViewModel: true
+                mockViewModel: true,
+                id: _.uniqueId()
             });
         });
 
@@ -97,8 +98,8 @@ describe('tweet-feed-store', function () {
             actionArgs: {tweet: mockTweet}
         });
 
-        expect(store.getVisibleTweets().length).toBe(initialVisibleLen + 1)
-        expect(store.getVisibleTweets().shift().id).toEqual(mockTweet.id);
+        expect(store.getVisibleTweets().length).toBe(initialVisibleLen + 1);
+        expect(store.getVisibleTweets().shift().mockViewModel).toBeTruthy();
         expect(store.getHidedTweets().length).toBe(inititalHidedLen);
     });
 
@@ -120,7 +121,7 @@ describe('tweet-feed-store', function () {
         });
 
         expect(store.getHidedTweets().length).toBe(inititalHidedLen + 1);
-        expect(store.getHidedTweets().shift().id).toEqual(mockTweet.id);
+        expect(store.getHidedTweets().shift().mockViewModel).toBeTruthy();
         expect(store.getVisibleTweets().length).toBe(initialVisibleLen);
     });
 
@@ -188,10 +189,12 @@ describe('tweet-feed-store', function () {
         expect(mockProvider.subscribe.mock.calls[0][0].geoSelection).toEqual(mockSelection);
     });
 
-    it('After MAP.SELECTION_CENTER_CHANGED should emit EVENT_FEED_CHANGE and reset visible and hided', function () {
+    it('After MAP.SELECTION_CENTER_CHANGED should emit EVENT_FEED_CHANGE and reset visible and hided and startTime', function () {
+        var myTime;
+
         // fill store
         tweetFeedControlStore.getShowTweetsImmediate.mockReturnValue(true);
-        _.each([1, 2, 3], function(){
+        _.each([1, 2, 3], function () {
             dispatcherCallback({
                 actionType: actions.types.TWEET_PROVIDER.RECEIVE_TWEET,
                 actionArgs: {
@@ -202,7 +205,7 @@ describe('tweet-feed-store', function () {
             });
         });
         tweetFeedControlStore.getShowTweetsImmediate.mockReturnValue(false);
-        _.each([1, 2], function(){
+        _.each([1, 2], function () {
             dispatcherCallback({
                 actionType: actions.types.TWEET_PROVIDER.RECEIVE_TWEET,
                 actionArgs: {
@@ -214,6 +217,7 @@ describe('tweet-feed-store', function () {
         });
 
         store.on(store.events.EVENT_FEED_CHANGE, eventCallback);
+        myTime = Date.now();
         dispatcherCallback({
             actionType: actions.types.MAP.SELECTION_CENTER_CHANGED,
             actionArgs: {foo: 'bar'}
@@ -222,5 +226,153 @@ describe('tweet-feed-store', function () {
         expect(eventCallback).toBeCalled();
         expect(store.getVisibleTweets().length).toBe(0);
         expect(store.getHidedTweets().length).toBe(0);
+        expect(store.getStartTime()).toBeCloseTo(myTime, 1);
+    });
+
+    it('After MAP.SELECTION_RADIUS_CHANGED should call tweetProvider.subscribe', function () {
+        var mockProvider;
+
+        dispatcherCallback({
+            actionType: actions.types.MAP.SELECTION_RADIUS_CHANGED,
+            actionArgs: {foo: 'bar'}
+        });
+        mockProvider = tweetProviderService.Provider.mock.instances[0];
+
+        expect(mockProvider.subscribe).toBeCalled();
+        expect(mockProvider.subscribe.mock.calls[0][0].geoSelection).toEqual(mockSelection);
+    });
+
+    it('After MAP.SELECTION_RADIUS_CHANGED should emit EVENT_FEED_CHANGE and reset visible and hided and startTime', function () {
+        var myTime;
+
+        // fill store
+        tweetFeedControlStore.getShowTweetsImmediate.mockReturnValue(true);
+        _.each([1, 2, 3], function () {
+            dispatcherCallback({
+                actionType: actions.types.TWEET_PROVIDER.RECEIVE_TWEET,
+                actionArgs: {
+                    tweet: {
+                        id: _.uniqueId()
+                    }
+                }
+            });
+        });
+        tweetFeedControlStore.getShowTweetsImmediate.mockReturnValue(false);
+        _.each([1, 2], function () {
+            dispatcherCallback({
+                actionType: actions.types.TWEET_PROVIDER.RECEIVE_TWEET,
+                actionArgs: {
+                    tweet: {
+                        id: _.uniqueId()
+                    }
+                }
+            });
+        });
+
+        store.on(store.events.EVENT_FEED_CHANGE, eventCallback);
+        myTime = Date.now();
+        dispatcherCallback({
+            actionType: actions.types.MAP.SELECTION_RADIUS_CHANGED,
+            actionArgs: {foo: 'bar'}
+        });
+
+        expect(eventCallback).toBeCalled();
+        expect(store.getVisibleTweets().length).toBe(0);
+        expect(store.getHidedTweets().length).toBe(0);
+        expect(store.getStartTime()).toBeCloseTo(myTime, 1);
+    });
+
+    it('After TWEET_FEED_CONTROL.WANT_SHOW_NEW_TWEETS should emit EVENT_FEED_CHANGE', function () {
+        store.on(store.events.EVENT_FEED_CHANGE, eventCallback);
+        dispatcherCallback({
+            actionType: actions.types.TWEET_FEED_CONTROL.WANT_SHOW_NEW_TWEETS,
+            actionArgs: null
+        });
+
+        expect(eventCallback).toBeCalled();
+    });
+
+    it('After  TWEET_FEED_CONTROL.WANT_SHOW_NEW_TWEETS: all hided tweets become visible', function () {
+        var lastAdded;
+        // fill store with 3 visible and 2 hided tweets
+        tweetFeedControlStore.getShowTweetsImmediate.mockReturnValue(true);
+        _.each([1, 2, 3], function () {
+            dispatcherCallback({
+                actionType: actions.types.TWEET_PROVIDER.RECEIVE_TWEET,
+                actionArgs: {
+                    tweet: {
+                        id: _.uniqueId()
+                    }
+                }
+            });
+        });
+        tweetFeedControlStore.getShowTweetsImmediate.mockReturnValue(false);
+        _.each([1, 2], function () {
+            dispatcherCallback({
+                actionType: actions.types.TWEET_PROVIDER.RECEIVE_TWEET,
+                actionArgs: {
+                    tweet: {
+                        id: _.uniqueId()
+                    }
+                }
+            });
+        });
+
+        lastAdded = store.getHidedTweets()[0];
+        dispatcherCallback({
+            actionType: actions.types.TWEET_FEED_CONTROL.WANT_SHOW_NEW_TWEETS,
+            actionArgs: null
+        });
+
+        expect(store.getHidedTweets().length).toBe(0);
+        expect(store.getVisibleTweets().length).toBe(5);
+        expect(store.getVisibleTweets()[0].id).toBe(lastAdded.id);
+    });
+
+    it('After TWEET_FEED_CONTROL.WANT_RESET_TWEETS should emit EVENT_FEED_CHANGE', function () {
+        store.on(store.events.EVENT_FEED_CHANGE, eventCallback);
+        dispatcherCallback({
+            actionType: actions.types.TWEET_FEED_CONTROL.WANT_RESET_TWEETS,
+            actionArgs: null
+        });
+        expect(eventCallback).toBeCalled();
+    });
+
+    it('After TWEET_FEED_CONTROL.WANT_RESET_TWEETS should reset visible, hided and startTime', function () {
+        var myTime;
+
+        // fill store with 3 visible and 2 hided tweets
+        tweetFeedControlStore.getShowTweetsImmediate.mockReturnValue(true);
+        _.each([1, 2, 3], function () {
+            dispatcherCallback({
+                actionType: actions.types.TWEET_PROVIDER.RECEIVE_TWEET,
+                actionArgs: {
+                    tweet: {
+                        id: _.uniqueId()
+                    }
+                }
+            });
+        });
+        tweetFeedControlStore.getShowTweetsImmediate.mockReturnValue(false);
+        _.each([1, 2], function () {
+            dispatcherCallback({
+                actionType: actions.types.TWEET_PROVIDER.RECEIVE_TWEET,
+                actionArgs: {
+                    tweet: {
+                        id: _.uniqueId()
+                    }
+                }
+            });
+        });
+
+        myTime = Date.now();
+        dispatcherCallback({
+            actionType: actions.types.TWEET_FEED_CONTROL.WANT_RESET_TWEETS,
+            actionArgs: null
+        });
+
+        expect(store.getVisibleTweets().length).toBe(0);
+        expect(store.getHidedTweets().length).toBe(0);
+        expect(store.getStartTime()).toBeCloseTo(myTime, 1);
     });
 });
