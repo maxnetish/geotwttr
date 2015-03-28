@@ -53,7 +53,7 @@ Provider.prototype.subscribe = function (opts) {
 
     this.unsubscribe();
 
-    ws.api.add(newNotifyFnName, this._streamResponse);
+    ws.api.add(newNotifyFnName, _.bind(self._streamResponse, self));
     this._notifyFn = newNotifyFnName;
 
     return gmapUtils.centerRadiusToBoundsPromise(selection.center.lat, selection.center.lng, selection.radius)
@@ -72,7 +72,7 @@ Provider.prototype.subscribe = function (opts) {
         .then(function (resp) {
             console.log('subscribe id:');
             console.log(resp);
-            this._requestId = resp;
+            self._requestId = resp;
             actions.tweetProvider.subscribe(resp);
             return resp;
         }, function (err) {

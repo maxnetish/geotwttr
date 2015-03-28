@@ -68,7 +68,7 @@ var tweetFeedStore = _.create(EventEmitter.prototype, {
     // эмитим не чаще 1 раза в 3 сек
     emitFeedChange: _.throttle(function () {
         this.emit(this.events.EVENT_FEED_CHANGE);
-    }, 3000, {leading: true}),
+    }, 1000, {leading: true}),
     emitAddingRateChange: _.throttle(function(){
         this.emit(this.events.EVENT_ADDING_RATE_CHANGE);
     }, 5000, {leading: true}),
@@ -113,9 +113,13 @@ var processMapSelection = function () {
     // reset visible, hided, start time
     resetTweets();
 
-    _.defer(internals.tweetProvider.subscribe, {
+    _.defer(_.bind(internals.tweetProvider.subscribe, internals.tweetProvider, {
         geoSelection: newSelection
-    });
+    }));
+    //
+    //_.defer(internals.tweetProvider.subscribe, {
+    //    geoSelection: newSelection
+    //});
 };
 
 var processShowHidedTweets = function () {

@@ -226,7 +226,7 @@ describe('tweet-feed-store', function () {
         expect(eventCallback).toBeCalled();
         expect(store.getVisibleTweets().length).toBe(0);
         expect(store.getHidedTweets().length).toBe(0);
-        expect(store.getStartTime()).toBeCloseTo(myTime, 1);
+        expect(store.getStartTime()).toBeGreaterThan(myTime - 1);
     });
 
     it('After MAP.SELECTION_RADIUS_CHANGED should call tweetProvider.subscribe', function () {

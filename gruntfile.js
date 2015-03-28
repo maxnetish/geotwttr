@@ -97,4 +97,5 @@ module.exports = function (grunt) {
     require('load-grunt-tasks')(grunt);
     grunt.registerTask('default', ['clean', 'browserify', 'uglify', 'less', 'copy']);
     grunt.registerTask('test', ['jest']);
+    grunt.registerTask('testAndBuild', ['jest', 'clean', 'browserify', 'uglify', 'less', 'copy']);
 };

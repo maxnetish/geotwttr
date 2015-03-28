@@ -45,21 +45,21 @@ var getCountryAddressComponent = function (searchResult) {
         }) || {};
 };
 
-var GeocoderResultViewModel = function (geocoderResult) {
-    _.extend(this, geocoderResult);
-
-    this.knownType = getKnownResultType(this);
-    this.countryCode = getCountryAddressComponent(this).short_name;
-};
+//var GeocoderResultViewModel = function (geocoderResult) {
+//    _.extend(this, geocoderResult);
+//
+//    this.knownType = getKnownResultType(this);
+//    this.countryCode = getCountryAddressComponent(this).short_name;
+//};
 
 var createViewModel = function(geocoderResult){
     var res = _.create(geocoderResultViewModelProto, geocoderResult);
-    res.knownType = getKnownResultType(this);
-    res.countryCode = getCountryAddressComponent(this).short_name;
+    res.knownType = getKnownResultType(geocoderResult);
+    res.countryCode = getCountryAddressComponent(geocoderResult).short_name;
     return res;
 };
 
 module.exports = {
-    GeocoderResultViewModel: GeocoderResultViewModel,
+    //GeocoderResultViewModel: GeocoderResultViewModel,
     createViewModel: createViewModel
 };

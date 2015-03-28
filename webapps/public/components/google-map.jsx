@@ -3,7 +3,7 @@ var
     _ = require('lodash'),
     actions = require('../actions'),
     mapStore = require('../stores').mapStore
-    services = require('../services'),
+services = require('../services'),
     gmapLibsLoader = require('../gmaps-lib-loader');
 
 var map, selectionCircle, gmaps, selectedAreaRectangle, selectedPointMarker, tweetPlacePolygon, tweetCoordsMarker;
@@ -294,7 +294,7 @@ var updateTweetPlacePolygon = function (twitterPlace) {
     var hasBoundingBox = twitterPlace && twitterPlace.bounding_box.coordinates && twitterPlace.bounding_box.coordinates.length,
         path;
 
-    if(!hasBoundingBox){
+    if (!hasBoundingBox) {
         tweetPlacePolygon.setVisible(false);
         return;
     }
@@ -305,14 +305,17 @@ var updateTweetPlacePolygon = function (twitterPlace) {
 
     tweetPlacePolygon.setPath(path);
     tweetPlacePolygon.setVisible(true);
-    map.fitBounds(services.utils.polygon2Bounds(tweetPlacePolygon, gmaps));
+    services.utils.polygon2BoundsPromise(tweetPlacePolygon)
+        .then(function (bounds) {
+            map.fitBounds(bounds);
+        });
 };
 
-var updateTweetCoordsMarker = function(twitterCoords){
+var updateTweetCoordsMarker = function (twitterCoords) {
     var has = twitterCoords && twitterCoords.length,
         position;
 
-    if(!has){
+    if (!has) {
         tweetCoordsMarker.setVisible(false);
         return;
     }
