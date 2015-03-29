@@ -1,7 +1,8 @@
 var
     React = require('react/addons'),
     _ = require('lodash'),
-    actions = require('../actions');
+    actions = require('../actions'),
+    LazyImageControl = require('./lazy-image.jsx').Control;
 
 var renderTweetTextEntity = {
     'simple': function (originalTweetText, entity, id) {
@@ -68,6 +69,10 @@ var TweetComponent = React.createClass({
             'tweet-text': true
         });
 
+        var hasMediaEntity = _.any(tw.entitiesOriginal, function(oneEntity){
+            return oneEntity.type === 'media' || oneEntity.type === 'photo';
+        });
+
         if (tw.textOriginal && tw.textOriginal.length) {
             xTextPart = _.map(tw.entitiesOriginal, function (oneEntity, idx) {
                 var actualEntityType = renderTweetTextEntity.hasOwnProperty(oneEntity.type) ? oneEntity.type : 'default';
@@ -75,9 +80,14 @@ var TweetComponent = React.createClass({
             });
         }
 
+        //xLeftPart = <section className="tweet-left">
+        //    <a className="no-decoration" target="_blank" href={tw.profileOriginalUrl}>
+        //        <img className="avatar" src={tw.avatarUrl}/>
+        //    </a>
+        //</section>;
         xLeftPart = <section className="tweet-left">
             <a className="no-decoration" target="_blank" href={tw.profileOriginalUrl}>
-                <img className="avatar" src={tw.avatarUrl}/>
+                <LazyImageControl imageUrl={tw.avatarUrl} className="avatar"/>
             </a>
         </section>;
 
@@ -108,6 +118,9 @@ var TweetComponent = React.createClass({
                     <span className="icon icon-map-marker"></span>
                     <span> {tw.coordinatesH}</span>
                 </a>
+            </p> : null}
+            {hasMediaEntity ? <p className="tweet-meta">
+                <a className="no-decoration" href="javascript:void 0">Media preview</a>
             </p> : null}
         </section>;
 

@@ -32,7 +32,8 @@
     "react": "~0.12.2",
     "node-jsx": "~0.12.4",
     "flux": "~2.0.1",
-    "node-uuid": "~1.4.2"
+    "node-uuid": "~1.4.2",
+    "classlist-polyfill": "~1.0.0"
   },
   "devDependencies": {
     "grunt": "~0.4.5",

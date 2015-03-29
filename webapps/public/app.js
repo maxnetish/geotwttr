@@ -3,6 +3,9 @@
  * run up
  */
 
+// add polyfills:
+require('classlist-polyfill');
+
 var reactRoot = require('./components/index.jsx');
 var appConfig = window.gt_config;
 

@@ -40,7 +40,7 @@ var humanizeCoordinates = function (coordinates) {
     return result;
 };
 
-var parseTweetDate = function(dateString){
+var parseTweetDate = function (dateString) {
     // Sun Nov 02 21:05:43 +0000 2014
     // to ecma script format (http://www.ecma-international.org/ecma-262/5.1/#sec-15.9.1.15)
     // YYYY-MM-DDTHH:mm:ss.sssZ
@@ -115,7 +115,7 @@ var normalizeEntities = function (tweetText, tweetEntities) {
     return entities;
 };
 
-var normalize = function(tw){
+var normalize = function (tw) {
     var isRetweet = !!tw.retweeted_status;
     var originalTweet = isRetweet ? tw.retweeted_status : tw;
 
@@ -127,6 +127,7 @@ var normalize = function(tw){
         userOriginalScreenName: originalTweet.user.screen_name,
         textOriginal: originalTweet.text,
         entitiesOriginal: normalizeEntities(originalTweet.text, originalTweet.entities),
+        extendedEntities: tw.extended_entities,
         tweetUrl: 'https://twitter.com/' + tw.user.screen_name + '/status/' + tw.id_str,
         createdAtOriginal: parseTweetDate(originalTweet.created_at).toLocaleString(),
         place: tw.place,
@@ -139,7 +140,7 @@ var normalize = function(tw){
     };
 };
 
-var createViewModel = function(tw){
+var createViewModel = function (tw) {
     return _.create(tw, normalize(tw));
 };
 
