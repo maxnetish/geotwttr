@@ -115,9 +115,27 @@ var normalizeEntities = function (tweetText, tweetEntities) {
     return entities;
 };
 
+function buildMediaInfo(tw) {
+    var result = {
+        hasMedia: false
+    };
+
+    if (tw.extended_entities && tw.extended_entities.media && tw.extended_entities.media.length) {
+        result.twitterMedia = tw.extended_entities.media;
+        result.hasMedia = true;
+    }
+
+    return result;
+}
+
 var normalize = function (tw) {
     var isRetweet = !!tw.retweeted_status;
     var originalTweet = isRetweet ? tw.retweeted_status : tw;
+
+    if (tw.extended_entities) {
+        console.log('EXTENDED');
+        console.log(tw.extended_entities);
+    }
 
     return {
         isRetweet: isRetweet,
@@ -136,7 +154,8 @@ var normalize = function (tw) {
         useRtl: detectRtl(tw),
         shouldVisible: true,
         coordinates: tw.coordinates,
-        coordinatesH: humanizeCoordinates(tw.coordinates)
+        coordinatesH: humanizeCoordinates(tw.coordinates),
+        mediaInfo: buildMediaInfo(tw)
     };
 };
 

@@ -8,23 +8,23 @@ var beforeClass = 'lazy-image-before',
     baseClass = 'lazy-image';
 
 var Control = React.createClass({
-        displayName: DISPLAY_NAME,
-        shouldComponentUpdate: function (nextProps, nextState) {
-            return this.props.imageUrl !== nextProps.imageUrl;
-        },
-        render: function () {
-            console.log('render ' + DISPLAY_NAME);
-            var localClass = [this.props.className, baseClass, beforeClass].join(' ');
-            var xMarkup = <img className={localClass} src={this.props.imageUrl} onLoad={this.onImageLoad}/>;
-            return xMarkup;
-        },
-        onImageLoad: function () {
-            var node = this.getDOMNode();
-            DOMTokenList.prototype.remove.call(node.classList, beforeClass);
-            DOMTokenList.prototype.add.call(node.classList, afterClass);
-        }
-    })
-    ;
+    displayName: DISPLAY_NAME,
+    shouldComponentUpdate: function (nextProps, nextState) {
+        return this.props.imageUrl !== nextProps.imageUrl;
+    },
+    render: function () {
+        console.log('render ' + DISPLAY_NAME);
+        var localClass = [this.props.className, baseClass, beforeClass].join(' ');
+        var localStyle = this.props.style;
+        var xMarkup = <img className={localClass} src={this.props.imageUrl} onLoad={this.onImageLoad} style={localStyle}/>;
+        return xMarkup;
+    },
+    onImageLoad: function () {
+        var node = this.getDOMNode();
+        DOMTokenList.prototype.remove.call(node.classList, beforeClass);
+        DOMTokenList.prototype.add.call(node.classList, afterClass);
+    }
+});
 
 module.exports = {
     Control: Control

@@ -2,7 +2,8 @@ var
     React = require('react/addons'),
     _ = require('lodash'),
     actions = require('../actions'),
-    LazyImageControl = require('./lazy-image.jsx').Control;
+    LazyImageControl = require('./lazy-image.jsx').Control,
+    TweetMediaPreview = require('./tweet-media-preview.jsx').Control;
 
 var renderTweetTextEntity = {
     'simple': function (originalTweetText, entity, id) {
@@ -49,10 +50,17 @@ var renderTweetTextEntity = {
 };
 
 var TweetComponent = React.createClass({
+    getInitialState: function () {
+        return {
+            mediaPreviewShow: false
+        };
+    },
     shouldComponentUpdate: function (nextProps, nextState) {
         var nextId = nextProps.tweet && nextProps.tweet.id_str,
-            id = this.props.tweet && this.props.tweet.id_str;
-        return nextId !== id;
+            id = this.props.tweet && this.props.tweet.id_str,
+            media = this.state.mediaPreviewShow,
+            nextMedia = nextState.mediaPreviewShow;
+        return nextId !== id || media !== nextMedia;
     },
     render: function () {
         console.log('render TweetComponent');
@@ -69,9 +77,7 @@ var TweetComponent = React.createClass({
             'tweet-text': true
         });
 
-        var hasMediaEntity = _.any(tw.entitiesOriginal, function(oneEntity){
-            return oneEntity.type === 'media' || oneEntity.type === 'photo';
-        });
+        var hasMediaEntity = tw.mediaInfo.hasMedia;
 
         if (tw.textOriginal && tw.textOriginal.length) {
             xTextPart = _.map(tw.entitiesOriginal, function (oneEntity, idx) {
@@ -120,7 +126,8 @@ var TweetComponent = React.createClass({
                 </a>
             </p> : null}
             {hasMediaEntity ? <p className="tweet-meta">
-                <a className="no-decoration" href="javascript:void 0">Media preview</a>
+                <a onClick={this.handleMediaPreviewClick} className="no-decoration" href="javascript:void 0">{this.state.mediaPreviewShow ? 'Hide preview' : 'Media preview'}</a>
+                {this.state.mediaPreviewShow ? <TweetMediaPreview mediaInfo={tw.mediaInfo}/> : null}
             </p> : null}
         </section>;
 
@@ -134,6 +141,11 @@ var TweetComponent = React.createClass({
     },
     handleCoordsClick: function () {
         actions.tweet.coordsClick(this.props.tweet.coordinates && this.props.tweet.coordinates.coordinates);
+    },
+    handleMediaPreviewClick: function () {
+        this.setState({
+            mediaPreviewShow: !this.state.mediaPreviewShow
+        });
     }
 });
 
