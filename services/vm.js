@@ -41,24 +41,28 @@ Vm.prototype.promiseSetIpGeocode = function (ip) {
     var self = this,
         dfr = Q.defer();
 
-    if (ip) {
-        getMmdbReaderInstance(function (err1, instance) {
-            if (err1) {
-                dfr.reject(err1);
-                return;
-            }
-            instance.getGeoData(ip, function (err2, result) {
-                if (err2) {
-                    dfr.reject(err2);
-                    return;
-                }
-                self.ipGeocode = JSON.stringify(result);
-                dfr.resolve(self);
-            });
-        });
-    } else {
-        dfr.resolve(self);
-    }
+    // switch off
+    //if (ip) {
+    //    getMmdbReaderInstance(function (err1, instance) {
+    //        if (err1) {
+    //            dfr.reject(err1);
+    //            return;
+    //        }
+    //        instance.getGeoData(ip, function (err2, result) {
+    //            if (err2) {
+    //                dfr.reject(err2);
+    //                return;
+    //            }
+    //            self.ipGeocode = JSON.stringify(result);
+    //            dfr.resolve(self);
+    //        });
+    //    });
+    //} else {
+    //    dfr.resolve(self);
+    //}
+
+    self.ipGeocode = '{}';
+    dfr.resolve(self);
     return dfr.promise;
 };
 Vm.prototype.setLangCode = function (langCode) {

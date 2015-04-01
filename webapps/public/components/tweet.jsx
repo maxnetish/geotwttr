@@ -4,6 +4,7 @@ var
     actions = require('../actions'),
     LazyImageControl = require('./lazy-image.jsx').Control,
     TweetMediaPreview = require('./tweet-media-preview.jsx').Control;
+    ExpandedBlock = require('./expanded-block.jsx').Control;
 
 var renderTweetTextEntity = {
     'simple': function (originalTweetText, entity, id) {
@@ -64,6 +65,7 @@ var TweetComponent = React.createClass({
     },
     render: function () {
         console.log('render TweetComponent');
+        var self = this;
         var tw = this.props.tweet,
             xLeftPart,
             xRightPart,
@@ -127,7 +129,9 @@ var TweetComponent = React.createClass({
             </p> : null}
             {hasMediaEntity ? <p className="tweet-meta">
                 <a onClick={this.handleMediaPreviewClick} className="no-decoration" href="javascript:void 0">{this.state.mediaPreviewShow ? 'Hide preview' : 'Media preview'}</a>
-                {this.state.mediaPreviewShow ? <TweetMediaPreview mediaInfo={tw.mediaInfo}/> : null}
+                <ExpandedBlock>
+                    {self.state.mediaPreviewShow ? <TweetMediaPreview mediaInfo={tw.mediaInfo}/> : null}
+                </ExpandedBlock>
             </p> : null}
         </section>;
 
