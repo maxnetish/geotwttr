@@ -52,8 +52,9 @@ var GoogleMapGeosearch = React.createClass({
         </ReactCSSTransitionGroup>;
 
         xMarkup = <section id="geosearch-control" className="geosearch-control-wrapper">
-            <input required placeholder="Search for place" value={this.state.searchToken} onChange={this.handleSearchInput} className="geosearch-input" type="search" />
+            <input required placeholder="Search for place" value={this.state.searchToken} onChange={this.handleSearchInput} className="geosearch-input" type="text" />
             {xDropdownPart}
+            <span className="icon icon-search geosearch-control-search-icon"></span>
         </section>;
 
         return xMarkup;

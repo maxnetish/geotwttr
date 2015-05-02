@@ -122,17 +122,23 @@ var TweetComponent = React.createClass({
             </p>
             {tw.place ? <p className="tweet-meta">
                 <a className="no-decoration" href="javascript:void 0"
-                   onClick={this.handlePlaceClick}>Near {tw.place.full_name}</a>
+                   onClick={this.handlePlaceClick}>
+                    <span className="icon icon-compass tweet-meta-icon"></span>
+                    <span>Near {tw.place.full_name}</span>
+                </a>
             </p> : null}
             {tw.coordinates ? <p className="tweet-meta">
                 <a className="no-decoration" href="javascript:void 0" onClick={this.handleCoordsClick}>
-                    <span className="icon icon-map-marker"></span>
-                    <span> {tw.coordinatesH}</span>
+                    <span className="icon icon-map-marker tweet-meta-icon"></span>
+                    <span>{tw.coordinatesH}</span>
                 </a>
             </p> : null}
             {hasMediaEntity ? <div className="tweet-meta">
                 <a onClick={this.handleMediaPreviewClick} className="no-decoration"
-                   href="javascript:void 0">{this.state.mediaPreviewShow ? 'Hide preview' : 'Media preview'}</a>
+                   href="javascript:void 0">
+                    <span className="icon icon-camera tweet-meta-icon"></span>
+                    <span>{self.state.mediaPreviewShow ? 'Hide preview' : 'Media preview'}</span>
+                </a>
                 <div className="tweet-media-preview-wrapper">
                     {self.state.mediaPreviewShow ? <TweetMediaPreview key={'media-of-'+tw.id_str} mediaInfo={tw.mediaInfo} /> : null}
                 </div>
