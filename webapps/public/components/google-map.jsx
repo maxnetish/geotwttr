@@ -120,15 +120,15 @@ var createGoogleMapIn = function (domNode) {
 
         mapStore.on(mapStore.events.SELECTION_CHANGE, function () {
             var newSelection = mapStore.getSelection();
-            console.log('catch selection CHANGE event:');
-            console.log(newSelection);
+            //console.log('catch selection CHANGE event:');
+            //console.log(newSelection);
             _.defer(updateSelectionCircle, newSelection);
         });
 
         mapStore.on(mapStore.events.CHANGE, function () {
             var newZoom = mapStore.getZoom(),
                 newCenter = mapStore.getCenter();
-            console.log('catch map CHANGE event');
+            //console.log('catch map CHANGE event');
             _.defer(updateMapCenterAndZoom, newCenter, newZoom);
         });
 
@@ -144,13 +144,13 @@ var createGoogleMapIn = function (domNode) {
                 lat: e.latLng.lat(),
                 lng: e.latLng.lng()
             };
-            console.log('call actions.map.click');
+            //console.log('call actions.map.click');
             actions.map.click(clickCoords);
         });
 
         gmaps.event.addListener(selectionCircle, 'radius_changed', function () {
             var radius = selectionCircle.getRadius();
-            console.log('call actions.map.selectionRadiusChanged');
+            //console.log('call actions.map.selectionRadiusChanged');
             actions.map.selectionRadiusChanged(radius);
         });
 
@@ -160,13 +160,13 @@ var createGoogleMapIn = function (domNode) {
                     lat: selectionCircleCenterWrapped.lat(),
                     lng: selectionCircleCenterWrapped.lng()
                 };
-            console.log('call actions.map.selectionCenterChanged');
+            //console.log('call actions.map.selectionCenterChanged');
             actions.map.selectionCenterChanged(center);
         });
 
         gmaps.event.addListener(map, 'center_changed', function () {
             var centerWrapped = map.getCenter();
-            console.log('call action..centerChanged');
+            //console.log('call action..centerChanged');
             actions.map.centerChanged({
                 lat: centerWrapped.lat(),
                 lng: centerWrapped.lng()
@@ -174,7 +174,7 @@ var createGoogleMapIn = function (domNode) {
         });
 
         gmaps.event.addListener(map, 'zoom_changed', function () {
-            console.log('call action..zoomChanged');
+            //console.log('call action..zoomChanged');
             actions.map.zoomChanged(map.getZoom());
         });
 
@@ -237,9 +237,9 @@ var updateSelectionCircle = function (newSelection) {
 };
 
 var updateMapCenterAndZoom = function (centerCoords, zoom) {
-    console.log('updateMapCenterAndZoom:');
-    console.log(centerCoords);
-    console.log(zoom);
+    //console.log('updateMapCenterAndZoom:');
+    //console.log(centerCoords);
+    //console.log(zoom);
     var currentMapCenterWrapped, currentMapCenterUnwrapped, currentMapZoom;
 
     if (map) {
@@ -329,7 +329,7 @@ var updateTweetCoordsMarker = function (twitterCoords) {
 
 var MapControl = React.createClass({
     render: function () {
-        console.log('render map control');
+        //console.log('render map control');
         return <div id="gmap" className="gmap">
         </div>;
     },

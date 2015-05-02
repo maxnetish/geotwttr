@@ -15,7 +15,7 @@ var TweetFeedComponent = React.createClass({
         };
     },
     render: function () {
-        console.log('render TweetFeedComponent');
+        //console.log('render TweetFeedComponent');
         var xUl = null,
             xLiList = null;
 

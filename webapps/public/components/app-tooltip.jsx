@@ -3,7 +3,7 @@ var
 
 var AppTooltipControl = React.createClass({
     render: function () {
-        console.log('render AppTooltipControl');
+        //console.log('render AppTooltipControl');
         var xMarkup = null,
             visible = !!this.props.visible,
             appTooltipClass = 'app-tooltip';

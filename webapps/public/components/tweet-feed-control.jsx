@@ -19,7 +19,7 @@ var TweetFeedControl = React.createClass({
         return nextState.hidedTweets !== state.hidedTweets || nextState.visibleTweets !== state.visibleTweets || nextState.showImmediate !== state.showImmediate;
     },
     render: function () {
-        console.log('render TweetFeedControl');
+        //console.log('render TweetFeedControl');
         var xResult = null,
             xShowTweetsImmediate = null,
             xShowNewTweetsButton = null,

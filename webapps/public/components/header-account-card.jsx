@@ -7,7 +7,7 @@ var Control = React.createClass({
         return false;
     },
     render: function () {
-        console.log('render HeaderControl');
+        //console.log('render HeaderControl');
         var twitterHref = 'https://twitter.com/' + this.props.userInfo.screen_name,
             twitterScreenName = this.props.userInfo.screen_name;
 

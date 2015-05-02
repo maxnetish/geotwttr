@@ -21,7 +21,7 @@ var GoogleMapGeosearch = React.createClass({
         return !_.isEqual(nextState.searchResultsIds, this.state.searchResultsIds);
     },
     render: function () {
-        console.log('render GoogleMapGeosearchComponent');
+        //console.log('render GoogleMapGeosearchComponent');
         var xMarkup = null, xDropdownList = null, xDropdownPart = null,
             self = this;
 

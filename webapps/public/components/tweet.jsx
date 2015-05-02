@@ -4,7 +4,6 @@ var
     actions = require('../actions'),
     LazyImageControl = require('./lazy-image.jsx').Control,
     TweetMediaPreview = require('./tweet-media-preview.jsx').Control;
-    ExpandedBlock = require('./expanded-block.jsx').Control;
 
 var renderTweetTextEntity = {
     'simple': function (originalTweetText, entity, id) {
@@ -18,7 +17,8 @@ var renderTweetTextEntity = {
         </a>;
     },
     'user_mentions': function (originalTweetText, entity, id) {
-        return <a className="entity user-mention" target="_blank" href={'https://twitter.com/' + entity.screen_name} key={id}>
+        return <a className="entity user-mention" target="_blank" href={'https://twitter.com/' + entity.screen_name}
+                  key={id}>
             {entity.screen_name}
         </a>;
     },
@@ -64,7 +64,7 @@ var TweetComponent = React.createClass({
         return nextId !== id || media !== nextMedia;
     },
     render: function () {
-        console.log('render TweetComponent');
+        //console.log('render TweetComponent');
         var self = this;
         var tw = this.props.tweet,
             xLeftPart,
@@ -106,7 +106,9 @@ var TweetComponent = React.createClass({
                     <span className="screen-name">{tw.userOriginalScreenName}</span>
                 </a>
             </p>
+
             <p className={tweetTextClass}>{xTextPart}</p>
+
             <p className="tweet-meta">
                 <a className="no-decoration" href={tw.tweetUrl} target="_blank">
                     <time className="tweet-date">{tw.createdAtOriginal}</time>
@@ -119,7 +121,8 @@ var TweetComponent = React.createClass({
                 </span> : null}
             </p>
             {tw.place ? <p className="tweet-meta">
-                <a className="no-decoration" href="javascript:void 0" onClick={this.handlePlaceClick}>Near {tw.place.full_name}</a>
+                <a className="no-decoration" href="javascript:void 0"
+                   onClick={this.handlePlaceClick}>Near {tw.place.full_name}</a>
             </p> : null}
             {tw.coordinates ? <p className="tweet-meta">
                 <a className="no-decoration" href="javascript:void 0" onClick={this.handleCoordsClick}>
@@ -127,12 +130,13 @@ var TweetComponent = React.createClass({
                     <span> {tw.coordinatesH}</span>
                 </a>
             </p> : null}
-            {hasMediaEntity ? <p className="tweet-meta">
-                <a onClick={this.handleMediaPreviewClick} className="no-decoration" href="javascript:void 0">{this.state.mediaPreviewShow ? 'Hide preview' : 'Media preview'}</a>
-                <ExpandedBlock>
-                    {self.state.mediaPreviewShow ? <TweetMediaPreview mediaInfo={tw.mediaInfo}/> : null}
-                </ExpandedBlock>
-            </p> : null}
+            {hasMediaEntity ? <div className="tweet-meta">
+                <a onClick={this.handleMediaPreviewClick} className="no-decoration"
+                   href="javascript:void 0">{this.state.mediaPreviewShow ? 'Hide preview' : 'Media preview'}</a>
+                <div className="tweet-media-preview-wrapper">
+                    {self.state.mediaPreviewShow ? <TweetMediaPreview key={'media-of-'+tw.id_str} mediaInfo={tw.mediaInfo} /> : null}
+                </div>
+            </div> : null}
         </section>;
 
         return <article>

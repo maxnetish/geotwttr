@@ -13,7 +13,7 @@ var Control = React.createClass({
         return this.props.imageUrl !== nextProps.imageUrl;
     },
     render: function () {
-        console.log('render ' + DISPLAY_NAME);
+        //console.log('render ' + DISPLAY_NAME);
         var localClass = [this.props.className, baseClass, beforeClass].join(' ');
         var localStyle = this.props.style;
         var xMarkup = <img className={localClass} src={this.props.imageUrl} onLoad={this.onImageLoad} style={localStyle}/>;

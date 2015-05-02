@@ -39,7 +39,7 @@ var SelectionDetailsComponent = React.createClass({
             'active': this.state.wait
         });
 
-        console.log('render SelectionDetails component');
+        //console.log('render SelectionDetails component');
 
         if (firstFormattedAddress) {
             if (this.state.expanded) {

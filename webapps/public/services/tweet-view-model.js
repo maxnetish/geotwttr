@@ -132,10 +132,15 @@ var normalize = function (tw) {
     var isRetweet = !!tw.retweeted_status;
     var originalTweet = isRetweet ? tw.retweeted_status : tw;
 
-    if (tw.extended_entities) {
-        console.log('EXTENDED');
-        console.log(tw.extended_entities);
-    }
+    //if (tw.extended_entities) {
+    //    console.log('EXTENDED');
+    //    if(_.some(tw.extended_entities.media, function(ent){
+    //            return ent.type!='photo'
+    //        })){
+    //        console.log('NO PHOTO!');
+    //    }
+    //    console.log(tw.extended_entities);
+    //}
 
     return {
         isRetweet: isRetweet,

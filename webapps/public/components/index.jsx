@@ -26,7 +26,7 @@ var RootElement = React.createClass({
         });
     },
     render: function () {
-        console.log('render RootElement');
+        //console.log('render RootElement');
         return <div>
             <header>
                 <HeaderAccountCardComponent userInfo={this.state.userInfo}/>
