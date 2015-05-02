@@ -26,9 +26,13 @@ module.exports = {
     },
     TWEET_PROVIDER: {
         RECEIVE_TWEET: 'action-receive-tweet',
-        RECEIVE_MESSAGE: 'action-receive-twitter-message',
-        RECEIVE_ERROR: 'action-receive-twitter-error',
+        //RECEIVE_MESSAGE: 'action-receive-twitter-message',
+        //RECEIVE_ERROR: 'action-receive-twitter-error',
         UNSUBSCRIBED: 'action-tweet-provider-unsubscribed',
         SUBSCRIBED: 'action-tweet-provider-subscribed'
+    },
+    ALERT: {
+        WARNING: 'action-warning',
+        MESSAGE: 'action-message'
     }
 };

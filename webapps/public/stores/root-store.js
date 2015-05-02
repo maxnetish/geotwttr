@@ -9,13 +9,17 @@ var mapStore = require('./map-store');
 
 var eventNames = Object.freeze({
     EVENT_MAP_LOADED: 'event-map-loaded',
-    EVENT_MAP_SELECTION_CHANGED: 'event-map-selection-changed'
+    EVENT_MAP_SELECTION_CHANGED: 'event-map-selection-changed',
+    EVENT_WARNING: 'event-warning',
+    EVENT_MESSAGE: 'event-message'
 });
 
 var internals = {
     mapLoaded: false,
     mapHasSelection: false,
-    mapSelection: null
+    mapSelection: null,
+    warning: null,
+    message: null
 };
 
 var rootStore = _.create(EventEmitter.prototype, {
@@ -32,6 +36,12 @@ var rootStore = _.create(EventEmitter.prototype, {
             return self.emit(self.events.EVENT_MAP_SELECTION_CHANGED);
         });
     },
+    emitWarning: function(){
+      return this.emit(this.events.EVENT_WARNING);
+    },
+    emitMessage: function(){
+      return this.emit(this.events.EVENT_MESSAGE);
+    },
     getMapLoaded: function () {
         return internals.mapLoaded;
     },
@@ -40,6 +50,12 @@ var rootStore = _.create(EventEmitter.prototype, {
     },
     getMapSelection: function () {
         return internals.selection;
+    },
+    getWarning: function(){
+        return internals.warning;
+    },
+    getMessage: function(){
+        return internals.message;
     }
 });
 
@@ -69,6 +85,16 @@ var processMapSelectionRadiusChanges = function () {
     rootStore.emitMapSelectionChanged();
 };
 
+function processAlertWarning(err){
+    internals.warning = err;
+    rootStore.emitWarning();
+}
+
+function processAlertMessage(message){
+    internals.message = message;
+    rootStore.emitMessage();
+}
+
 var actionHandler = function (payload) {
     switch (payload.actionType) {
         case actions.types.MAP.LOADED:
@@ -81,6 +107,11 @@ var actionHandler = function (payload) {
         case actions.types.MAP.SELECTION_RADIUS_CHANGED:
             processMapSelectionRadiusChanges();
             break;
+        case actions.types.ALERT.WARNING:
+            processAlertWarning(payload.actionArgs.error);
+            break;
+        case actions.types.ALERT.MESSAGE:
+            processAlertMessage(payload.actionArgs.message);
         default:
         // nothing
     }

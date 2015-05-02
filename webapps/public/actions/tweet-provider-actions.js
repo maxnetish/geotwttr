@@ -14,7 +14,7 @@ function receiveTweet(tweet) {
 
 function receiveMessage(message) {
     var dispatchPayload = {
-        actionType: actionTypes.TWEET_PROVIDER.RECEIVE_MESSAGE,
+        actionType: actionTypes.ALERT.MESSAGE,
         actionArgs: {
             message: message
         }
@@ -24,7 +24,7 @@ function receiveMessage(message) {
 
 function receiveError(err) {
     var dispatchPayload = {
-        actionType: actionTypes.TWEET_PROVIDER.RECEIVE_ERROR,
+        actionType: actionTypes.ALERT.WARNING,
         actionArgs: {
             error: err
         }

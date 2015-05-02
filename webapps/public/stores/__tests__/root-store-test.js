@@ -93,4 +93,34 @@ describe('root-store', function () {
         expect(eventCallback).toBeCalled();
         expect(store.getMapSelection()).toEqual(selectionMockValue);
     });
+
+    it('after ALERT.WARNING should emit EVENT_WARNING and set warning', function(){
+        var mockWarning = {
+            error: {
+                foo: 'bar'
+            }
+        };
+        store.on(store.events.EVENT_WARNING, eventCallback);
+        dispatcherCallback({
+            actionType: actions.types.ALERT.WARNING,
+            actionArgs: mockWarning
+        });
+
+        expect(eventCallback).toBeCalled();
+        expect(store.getWarning()).toEqual(mockWarning.error);
+    });
+
+    it('after ALERT.MESSAGE should emit EVENT_MESSAGE and set message', function(){
+        var mockMessage = {
+            message: 'message'
+        };
+        store.on(store.events.EVENT_MESSAGE, eventCallback);
+        dispatcherCallback({
+            actionType: actions.types.ALERT.MESSAGE,
+            actionArgs: mockMessage
+        });
+
+        expect(eventCallback).toBeCalled();
+        expect(store.getMessage()).toEqual(mockMessage.message);
+    });
 });
