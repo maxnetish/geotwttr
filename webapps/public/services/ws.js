@@ -3,17 +3,26 @@ var global = (function () {
     })(),
     WebSocket = global.WebSocket || global.MozWebSocket,
     Connection = require('q-connection'),
+    actions = require('../actions'),
     localApi = {},
     remote;
 
 var createSocket = function () {
     var socketInstance = new WebSocket('ws://' + global.document.location.host.replace(/:.*/, '') + (global.document.location.port ? ':' + window.document.location.port : ''));
-    socketInstance.addEventListener('close', function () {
+
+    socketInstance.addEventListener('close', function (e) {
         console.log('websocket is down, try to reconnect in 15 sec...');
+        if (e.code > 1001) {
+            actions.alert.addMessage({
+                title: 'Websocket closed',
+                text: 'Code: ' + e.code + '. Try to reconnect in 15 sec...'
+            });
+        }
         setTimeout(function () {
             remote = Connection(createSocket(), localApi, {max: 4096});
         }, 15000);
     });
+
     return socketInstance;
 };
 
@@ -24,17 +33,17 @@ var getRemote = function () {
     return remote;
 };
 
-function localApiSetListener(entryPointName, cb){
+function localApiSetListener(entryPointName, cb) {
     localApi[entryPointName] = cb;
 }
 
-function localApiRemoveListener(entryPointName){
+function localApiRemoveListener(entryPointName) {
     delete localApi[entryPointName];
 }
 
 module.exports = {
     getRemote: getRemote,
-    api:{
+    api: {
         add: localApiSetListener,
         remove: localApiRemoveListener,
         local: localApi

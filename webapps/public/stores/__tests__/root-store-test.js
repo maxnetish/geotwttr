@@ -22,7 +22,7 @@ describe('root-store', function () {
                 return func.apply(this, args);
             }
         });
-        spyOn(_, 'throttle').andCallFake(function(){
+        spyOn(_, 'throttle').andCallFake(function () {
             return function () {
                 func.apply(this, arguments);
             };
@@ -59,7 +59,7 @@ describe('root-store', function () {
         expect(store.getMapLoaded()).toBeTruthy();
     });
 
-    it('after MAP.CLICK emit EVENT_MAP_SELECTION_CHANGED and set new selection and hasSelection', function(){
+    it('after MAP.CLICK emit EVENT_MAP_SELECTION_CHANGED and set new selection and hasSelection', function () {
         store.on(store.events.EVENT_MAP_SELECTION_CHANGED, eventCallback);
         dispatcherCallback({
             actionType: actions.types.MAP.CLICK,
@@ -71,7 +71,7 @@ describe('root-store', function () {
         expect(store.getMapHasSelection()).toBeTruthy();
     });
 
-    it('after MAP.SELECTION_CENTER_CHANGED emit EVENT_MAP_SELECTION_CHANGED and set new selection and hasSelection', function(){
+    it('after MAP.SELECTION_CENTER_CHANGED emit EVENT_MAP_SELECTION_CHANGED and set new selection and hasSelection', function () {
         store.on(store.events.EVENT_MAP_SELECTION_CHANGED, eventCallback);
         dispatcherCallback({
             actionType: actions.types.MAP.SELECTION_CENTER_CHANGED,
@@ -83,7 +83,7 @@ describe('root-store', function () {
         expect(store.getMapHasSelection()).toBeTruthy();
     });
 
-    it('after MAP.SELECTION_RADIUS_CHANGED should emit EVENT_MAP_SELECTION_CHANGED and set new selection', function(){
+    it('after MAP.SELECTION_RADIUS_CHANGED should emit EVENT_MAP_SELECTION_CHANGED and set new selection', function () {
         store.on(store.events.EVENT_MAP_SELECTION_CHANGED, eventCallback);
         dispatcherCallback({
             actionType: actions.types.MAP.SELECTION_RADIUS_CHANGED,
@@ -94,33 +94,70 @@ describe('root-store', function () {
         expect(store.getMapSelection()).toEqual(selectionMockValue);
     });
 
-    it('after ALERT.WARNING should emit EVENT_WARNING and set warning', function(){
+    it('after ALERT.WARNING should emit EVENT_ALERT_CHANGED and set as first element in alerts with uniq id property and severity', function () {
         var mockWarning = {
             error: {
                 foo: 'bar'
             }
         };
-        store.on(store.events.EVENT_WARNING, eventCallback);
+        store.on(store.events.EVENT_ALERTS_CHANGED, eventCallback);
         dispatcherCallback({
             actionType: actions.types.ALERT.WARNING,
             actionArgs: mockWarning
         });
 
         expect(eventCallback).toBeCalled();
-        expect(store.getWarning()).toEqual(mockWarning.error);
+        expect(store.getAlerts()[0].foo).toBe(mockWarning.error.foo);
+        expect(store.getAlerts()[0].id).toBeDefined();
+        expect(store.getAlerts()[0].severity).toBe('warning');
     });
 
-    it('after ALERT.MESSAGE should emit EVENT_MESSAGE and set message', function(){
+    it('after ALERT.MESSAGE should emit EVENT_ALERT_CHANGED and set as first element in alerts with uniq id property message and severity', function () {
         var mockMessage = {
-            message: 'message'
+            message: {
+                title: 'mock title',
+                text: 'mock text'
+            }
         };
-        store.on(store.events.EVENT_MESSAGE, eventCallback);
+        store.on(store.events.EVENT_ALERTS_CHANGED, eventCallback);
         dispatcherCallback({
             actionType: actions.types.ALERT.MESSAGE,
             actionArgs: mockMessage
         });
 
         expect(eventCallback).toBeCalled();
-        expect(store.getMessage()).toEqual(mockMessage.message);
+        expect(store.getAlerts()[0].text).toBe(mockMessage.message.text);
+        expect(store.getAlerts()[0].id).toBeDefined();
+        expect(store.getAlerts()[0].severity).toBe('message');
+    });
+
+    it('after ALERT.REMOVE_ALERT should emit EVENT_ALERT_CHANGED and remove from alerts element with specified alert.id', function () {
+        var mockMessage = {
+            message: {
+                title: 'mock title',
+                text: 'mock text'
+            }
+        };
+        var alertInStore, alerts;
+        dispatcherCallback({
+            actionType: actions.types.ALERT.MESSAGE,
+            actionArgs: mockMessage
+        });
+        alertInStore = store.getAlerts()[0];
+
+
+        store.on(store.events.EVENT_ALERTS_CHANGED, eventCallback);
+        dispatcherCallback({
+            actionType: actions.types.ALERT.REMOVE_ALERT,
+            actionArgs: {
+                alert: alertInStore
+            }
+        });
+
+        expect(eventCallback).toBeCalled();
+        alerts = store.getAlerts();
+        expect(!_.any(alerts, function (oneAlert) {
+            return oneAlert.id === alertInStore.id;
+        })).toBeTruthy();
     });
 });

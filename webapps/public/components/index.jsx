@@ -3,7 +3,8 @@ var
     React = require('react/addons'),
     _ = require('lodash'),
     rootStore = require('../stores').rootStore,
-    tweetFeedStore = require('../stores').tweetFeedStore;
+    tweetFeedStore = require('../stores').tweetFeedStore,
+    actions = require('../actions');
 
 var GoogleMapComponent = require('./google-map.jsx').MapControl;
 var HeaderAccountCardComponent = require('./header-account-card.jsx').Control;
@@ -13,6 +14,7 @@ var SelectionDetailsComponent = require('./selection-details.jsx').SelectionDeta
 var GoogleMapGeosearchComponenet = require('./google-map-geosearch.jsx').GoogleMapGeosearch;
 var TweetFeedControlComponent = require('./tweet-feed-control.jsx').TweetFeedControl;
 var TweetFeedComponent = require('./tweet-feed.jsx').TweetFeedComponent;
+var Toaster = require('./toaster.jsx').Control;
 
 var rootElementInstance, appConfig;
 
@@ -22,7 +24,8 @@ var RootElement = React.createClass({
             mapLoaded: false,
             mapHasSelection: false,
             tweetsCount: 0,
-            addingRate: 0
+            addingRate: 0,
+            alerts: []
         });
     },
     render: function () {
@@ -30,6 +33,7 @@ var RootElement = React.createClass({
         return <div>
             <header>
                 <HeaderAccountCardComponent userInfo={this.state.userInfo}/>
+
                 <h1 className="text-center">{this.state.title}</h1>
             </header>
             <div className="pane-left pane">
@@ -38,17 +42,20 @@ var RootElement = React.createClass({
             </div>
             <div className="pane-right pane">
                 <SelectionDetailsComponent />
-                <AppTooltipComponent appTooltipText='Map loaded...' visible={!this.state.mapLoaded} />
-                <AppTooltipComponent appTooltipText='Click map to see tweets near...' visible={!this.state.mapHasSelection && this.state.mapLoaded} />
+                <AppTooltipComponent appTooltipText='Map loaded...' visible={!this.state.mapLoaded}/>
+                <AppTooltipComponent appTooltipText='Click map to see tweets near...'
+                                     visible={!this.state.mapHasSelection && this.state.mapLoaded}/>
                 <TweetFeedControlComponent />
                 <TweetFeedComponent />
             </div>
             <footer>
-                <IndicatorComponent value={this.state.tweetsCount.toFixed(0)} />
-                <IndicatorComponent value={this.state.addingRate.toFixed(2)} unit="tw/min" />
-                <a href="https://twitter.com/maxnetish" className="twitter-follow-button" data-show-count="false" data-lang={this.state.langCode}>Follow me</a>
+                <IndicatorComponent value={this.state.tweetsCount.toFixed(0)}/>
+                <IndicatorComponent value={this.state.addingRate.toFixed(2)} unit="tw/min"/>
+                <a href="https://twitter.com/maxnetish" className="twitter-follow-button" data-show-count="false"
+                   data-lang={this.state.langCode}>Follow me</a>
             </footer>
-        </div>;
+            <Toaster items={this.state.alerts} removeToast={this.handleRemoveAlert}/>
+        </div>
     },
     _onUpdateFeed: function () {
         this.setState({
@@ -72,19 +79,29 @@ var RootElement = React.createClass({
             mapHasSelection: hasSelection
         });
     },
+    _onUpdateAlerts: function () {
+        this.setState({
+            alerts: rootStore.getAlerts()
+        });
+    },
+    handleRemoveAlert: function (toastItem) {
+        actions.alert.removeAlert(toastItem);
+    },
     shouldComponentUpdate: function (nextProps, nextState) {
-        return !_.isEqual(nextState, this.state);
+        return true;
     },
     componentDidMount: function () {
         rootStore.once(rootStore.events.EVENT_MAP_LOADED, this._onMapLoaded);
         rootStore.on(rootStore.events.EVENT_MAP_SELECTION_CHANGED, this._onMapSelectionChanged);
         tweetFeedStore.on(tweetFeedStore.events.EVENT_FEED_CHANGE, this._onUpdateFeed);
         tweetFeedStore.on(tweetFeedStore.events.EVENT_ADDING_RATE_CHANGE, this._onUpdateAddingRate);
+        rootStore.on(rootStore.events.EVENT_ALERTS_CHANGED, this._onUpdateAlerts);
     },
     componentWillUnmount: function () {
         rootStore.removeListener(rootStore.events.EVENT_MAP_SELECTION_CHANGED, this._onMapSelectionChanged);
         tweetFeedStore.removeListener(tweetFeedStore.events.EVENT_FEED_CHANGE, this._onUpdateFeed);
         tweetFeedStore.removeListener(tweetFeedStore.events.EVENT_ADDING_RATE_CHANGE, this._onUpdateAddingRate);
+        rootStore.removeListener(rootStore.events.EVENT_ALERTS_CHANGED, this._onUpdateAlerts);
     }
 });
 

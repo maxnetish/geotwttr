@@ -12,19 +12,22 @@ function Provider() {
     this._notifyFn = null;
 }
 
-Provider.prototype._streamResponse = function(resp){
-    if (resp.tweet && resp.tweet.id && resp.id === this._requestId) {
-        // supress 'not our' response and
+Provider.prototype._streamResponse = function (resp) {
+    if (resp.id !== this._requestId) {
+        // supress 'not our' response
+        return 'OK';
+    }
+    if (resp.tweet && resp.tweet.id) {
         // tweet really
         actions.tweetProvider.receiveTweet(resp.tweet);
     } else if (resp.tweet && resp.tweet.message) {
         actions.tweetProvider.receiveMessage(resp.tweet.message);
     } else {
         actions.tweetProvider.receiveMessage('Strange unknown response');
-        console.log({
-            title: 'Uknown response',
-            content: JSON.stringify(resp)
-        });
+        //console.log({
+        //    title: 'Uknown response',
+        //    content: JSON.stringify(resp)
+        //});
     }
     return 'OK';
 };
@@ -49,7 +52,7 @@ Provider.prototype.unsubscribe = function () {
 Provider.prototype.subscribe = function (opts) {
     var self = this;
     var newNotifyFnName = _.uniqueId(notifyFnBase);
-    var  selection = opts.geoSelection || {};
+    var selection = opts.geoSelection || {};
 
     this.unsubscribe();
 

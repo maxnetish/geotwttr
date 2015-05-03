@@ -2,41 +2,6 @@ extends layout
 
 block content
     div#react-wrapper !{prerendered}
-    //header
-    //    div.account-card.text-center
-    //        span Signed in as
-    //        a.no-decoration(href= "https://twitter.com/"+userInfo.screen_name, target="_blank")
-    //            span.screen-name #{userInfo.screen_name}
-    //        a.logout(href="/logout") Sign-out
-    //    h1.text-center= title
-    //div.pane-left.pane
-    //    div.pane.gmap-column.relative
-    //        div.relative
-    //            geosearch-control(params="mapInstance: mapInstance, selectedResult: selectedGeosearchResult")
-    //            button.show-hide-controls(data-bind='click: toggleFilterSettings')
-    //                span.icon.icon-wrench
-    //        div.settings-wrapper(data-bind="component: {name: 'filter-settings-panel', params: {filters: filters}}, smoothShowHide: filterSettingsVisible, hideOnAnyClick: true")
-    //        gmap-control(params="mapInstance: mapInstance, appState: appState, selectedGeosearchResult: selectedGeosearchResult, selectedTweet: selectedTweet")
-    //div.pane-right.pane.hide-initial(data-bind="css: {'hide-initial': viewModelNotReady}")
-    //    selection-details-control(params="appState: appState, mapInstance: mapInstance")
-    //    tweet-feed-control(params="showImmediate: showImmediate, hidedCount: tweetList.hidedCount, showHided: showHidedTweets, reset: tweetList.reset", data-bind="visible: appState.selection().lat")
-    //    p.loading-map(data-bind="visible: mapNotYetLoaded") Loading map...
-    //    div.app-tooltip(data-bind="visible: showAppTooltip") Click some area in map and see realtime feed of tweets.
-    //    ul#tweet-list.scroll
-    //        // ko foreach: {data: tweetList.visible, as: 'item'}
-    //        li(data-bind="component: {name: 'tweet-ui-mini', params: {tweet: item, filters: $parent.filters, selectedTweet: $parent.selectedTweet}}")
-    //        // /ko
-    //        button.button-request-previous(data-old-bind="click: needMore, visible: !restLoadingNow()", style="display: none;")
-    //            span Load more
-    //footer
-    //    section.inner-info
-    //        span(data-bind='text: tweetList.visibleCount')
-    //    section.inner-info
-    //        span(data-bind='text: tweetList.addingRate')
-    //        span &nbsp;tw/min
-    //    a(href="https://twitter.com/maxnetish", class="twitter-follow-button", data-show-count="false", data-lang="#{langCode}") Follow me
-    //div.absolute-blocks
-    //    toast-logger(params="notify: addToast")
     script.
         window.gt_config={};
         window.gt_config.langCode = "#{langCode}";

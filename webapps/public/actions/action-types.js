@@ -33,6 +33,7 @@ module.exports = {
     },
     ALERT: {
         WARNING: 'action-warning',
-        MESSAGE: 'action-message'
+        MESSAGE: 'action-message',
+        REMOVE_ALERT: 'remove-alert'
     }
 };

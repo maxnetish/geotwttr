@@ -5,5 +5,6 @@ module.exports = {
     geosearch: require('./geosearch-actions'),
     tweetFeedControl: require('./tweet-feed-control-actions'),
     tweet: require('./tweet-actions'),
-    tweetProvider: require('./tweet-provider-actions')
+    tweetProvider: require('./tweet-provider-actions'),
+    alert: require('./alert-actions')
 };

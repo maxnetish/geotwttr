@@ -59,7 +59,6 @@ var TweetFeedControl = React.createClass({
         return xResult;
     },
     handleShowImmediateChange: function (event) {
-        console.log(event.target);
         actions.tweetFeedControl.showImmediateChanged(event.target.checked);
     },
     handleShowNewTweetsButtonClick: function () {

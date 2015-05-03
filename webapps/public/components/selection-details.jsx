@@ -84,7 +84,6 @@ var SelectionDetailsComponent = React.createClass({
         actions.selectionDetails.expandToggle();
     },
     onDetailLineClick: function (data) {
-        console.log(data);
         actions.selectionDetails.detailLineClick(data);
     },
     _onUpdateStore: _.debounce(function () {

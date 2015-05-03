@@ -10,16 +10,14 @@ var mapStore = require('./map-store');
 var eventNames = Object.freeze({
     EVENT_MAP_LOADED: 'event-map-loaded',
     EVENT_MAP_SELECTION_CHANGED: 'event-map-selection-changed',
-    EVENT_WARNING: 'event-warning',
-    EVENT_MESSAGE: 'event-message'
+    EVENT_ALERTS_CHANGED: 'event-alerts-changed'
 });
 
 var internals = {
     mapLoaded: false,
     mapHasSelection: false,
     mapSelection: null,
-    warning: null,
-    message: null
+    alerts: []
 };
 
 var rootStore = _.create(EventEmitter.prototype, {
@@ -36,11 +34,8 @@ var rootStore = _.create(EventEmitter.prototype, {
             return self.emit(self.events.EVENT_MAP_SELECTION_CHANGED);
         });
     },
-    emitWarning: function(){
-      return this.emit(this.events.EVENT_WARNING);
-    },
-    emitMessage: function(){
-      return this.emit(this.events.EVENT_MESSAGE);
+    emitAlertsChanged: function () {
+        return this.emit(this.events.EVENT_ALERTS_CHANGED);
     },
     getMapLoaded: function () {
         return internals.mapLoaded;
@@ -51,11 +46,8 @@ var rootStore = _.create(EventEmitter.prototype, {
     getMapSelection: function () {
         return internals.selection;
     },
-    getWarning: function(){
-        return internals.warning;
-    },
-    getMessage: function(){
-        return internals.message;
+    getAlerts: function () {
+        return internals.alerts;
     }
 });
 
@@ -85,14 +77,37 @@ var processMapSelectionRadiusChanges = function () {
     rootStore.emitMapSelectionChanged();
 };
 
-function processAlertWarning(err){
-    internals.warning = err;
-    rootStore.emitWarning();
+function processAlertWarning(err) {
+    internals.alerts.unshift(_.assign(err || {}, {
+        id: _.uniqueId('alert-'),
+        severity: 'warning'
+    }));
+    rootStore.emitAlertsChanged();
 }
 
-function processAlertMessage(message){
-    internals.message = message;
-    rootStore.emitMessage();
+function processAlertMessage(message) {
+    var newId = _.uniqueId('alert-');
+
+    internals.alerts.unshift(_.assign(message || {}, {
+        id: newId,
+        severity: 'message'
+    }));
+    rootStore.emitAlertsChanged();
+
+    // remove after 36 sec:
+    _.delay(function () {
+        _.remove(internals.alerts, function (oneAlert) {
+            return oneAlert.id === newId;
+        });
+        rootStore.emitAlertsChanged();
+    }, 36000);
+}
+
+function processRemoveAlert(alert) {
+    _.remove(internals.alerts, function (oneAlert) {
+        return oneAlert.id === alert.id;
+    });
+    rootStore.emitAlertsChanged();
 }
 
 var actionHandler = function (payload) {
@@ -112,6 +127,10 @@ var actionHandler = function (payload) {
             break;
         case actions.types.ALERT.MESSAGE:
             processAlertMessage(payload.actionArgs.message);
+            break;
+        case actions.types.ALERT.REMOVE_ALERT:
+            processRemoveAlert(payload.actionArgs.alert);
+            break;
         default:
         // nothing
     }

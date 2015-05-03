@@ -16,19 +16,27 @@ function receiveMessage(message) {
     var dispatchPayload = {
         actionType: actionTypes.ALERT.MESSAGE,
         actionArgs: {
-            message: message
+            message: {
+                title: 'The server said:',
+                text: message
+            }
         }
     };
     dispatcher.dispatch(dispatchPayload);
 }
 
 function receiveError(err) {
+    var errText = JSON.stringify(err, null, 4);
     var dispatchPayload = {
         actionType: actionTypes.ALERT.WARNING,
         actionArgs: {
-            error: err
+            error: {
+                title: 'There is something wrong',
+                text: errText
+            }
         }
     };
+    console.log(err);
     dispatcher.dispatch(dispatchPayload);
 }
 

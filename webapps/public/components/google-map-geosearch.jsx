@@ -63,7 +63,6 @@ var GoogleMapGeosearch = React.createClass({
         actions.geosearch.geosearchTokenChanged(event.target.value);
     },
     handleListItemClick: function (item) {
-        console.log(item);
         actions.geosearch.geosearchSelectItem(item);
     },
     _onUpdateSearchToken: function () {
