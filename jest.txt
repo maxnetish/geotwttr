@@ -1,2 +1,4 @@
 To install jest-cli:
 npm install jest-cli --save-dev --msvs-version=2013
+
+mongoose also
