@@ -84,7 +84,7 @@ router.get('/auth_callback', function (req, res, next) {
                     httpOnly: true,
                     signed: true
                 });
-                store.setSecret(result.authToken, result.authTokenSecret);
+                store.setSecret(result.authToken, result.authTokenSecret, result.userInfo.user_id);
                 console.log('We receive accessToken: ' + result.authToken + ', secret: ' + result.authTokenSecret);
                 return res.redirect('/');
             }).then(null, function (err) {

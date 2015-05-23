@@ -1,5 +1,16 @@
 function createModel(mongoose) {
-    var definition = {};
+    var definition = {
+        accessToken: {
+            type: String,
+            index: { unique: true }
+        },
+        userId: {
+            type: String
+        },
+        tokenSecret: {
+            type: String
+        }
+    };
     var schema = new mongoose.Schema(definition);
 
     return mongoose.model('SessionStore', schema);

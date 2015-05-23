@@ -2,39 +2,34 @@
  * Created by max on 29.10.13.
  */
 
-var redis = require('redis'),
-    Q = require('q'),
-    client = redis.createClient(),
-    _ = require('lodash'),
+var SessionStore = require('../models').SessionStore;
 
-    getAccessTokenSecret = function (accessToken, callback, context) {
-        // console.log("We are get secret from store, accessToken=" + accessToken);
-        var dfr = Q.defer();
-
-        client.get(accessToken, function (err, reply) {
-            // reply is null when the key is missing
-            // console.log("Secret received from strore, secret=" + reply);
-            if (_.isFunction(callback)) {
-                callback.call(context, err, reply);
-            }
-            if (err) {
-                dfr.reject(err);
-            } else {
-                dfr.resolve(reply);
-            }
-        });
-
-        return dfr.promise;
-    },
-
-    setAccessTokenSecret = function (accessToken, accessTokenSecret) {
-        if (!accessToken) {
-            return;
-        }
-        client.set(accessToken, accessTokenSecret);
+function promiseSetTokens(accessToken, accessTokenSecret, userId) {
+    var criteria = {
+        userId: userId
+    };
+    var newSession = {
+        tokenSecret: accessTokenSecret,
+        accessToken: accessToken
     };
 
+    return SessionStore.findOneAndUpdate(criteria, newSession, {
+        new: true,
+        upsert: true
+    }).lean().exec();
+}
+
+function promiseAccessTokenSecret(accessToken) {
+    return SessionStore.findOne({accessToken: accessToken}).lean().exec()
+        .then(function (finded) {
+            if (finded) {
+                return finded.tokenSecret;
+            }
+            return null;
+        });
+}
+
 exports.store = {
-    getSecret: getAccessTokenSecret,
-    setSecret: setAccessTokenSecret
+    getSecret: promiseAccessTokenSecret,
+    setSecret: promiseSetTokens
 };
