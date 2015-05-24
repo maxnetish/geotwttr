@@ -2,10 +2,11 @@ function createModel(mongoose) {
     var definition = {
         accessToken: {
             type: String,
-            index: { unique: true }
+            index: {unique: true}
         },
         userId: {
-            type: String
+            type: String,
+            index: {unique: true}
         },
         tokenSecret: {
             type: String

@@ -1,3 +1,9 @@
+/**
+ * Probably not used
+ * @type {exports|module.exports}
+ * @private
+ */
+
 var _ = require('lodash');
 
 var interval;

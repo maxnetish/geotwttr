@@ -7,6 +7,8 @@ var twitterStreamService = require('./twttr-stream');
 var rpcInterface = require('./rpc-server-interface');
 
 var localServices = {};
+
+// here we define rpc interface that client could use
 localServices[rpcInterface.STATE.SUBSCRIBE] = serverStateService.subscribe;
 localServices[rpcInterface.STATE.UNSUBSCRIBE] = serverStateService.unsubscribe;
 localServices[rpcInterface.TWITTER_STREAM.SUBSCRIBE] = twitterStreamService.subscribe;

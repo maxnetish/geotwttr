@@ -4,6 +4,8 @@ geotwttr
 Single page web application based on:
 * express
 * browserify
-* knockout
+* react
+* twitter stream api
+* google maps
 
 http://do.gordeev.me

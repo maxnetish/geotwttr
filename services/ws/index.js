@@ -4,11 +4,13 @@ var cookieParser = require('cookie-parser');
 var twitterAuthService = require('./../twitter/auth');
 var _ = require('lodash');
 var LocalRpc = require('./rpc').LocalApi;
+var logger = require('../../helpers/logger');
 
 var customClientVerify,
     wsServerInstance;
 
 var verifyClientDefault = function (info, cb) {
+    // we should use callback here because function will be pass to Websocket Server ctor
     var accessToken;
 
     // parse cookie
@@ -23,13 +25,17 @@ var verifyClientDefault = function (info, cb) {
 
     // check auth
     twitterAuthService.verifyCredentials(accessToken).then(function (userInfo) {
+        // sorry, use side effect
         info.req.user = userInfo;
         if (userInfo) {
             cb(true);
         } else {
             cb(false, 401, 'Denied');
         }
+        logger.message.add.auth(userInfo.id);
+        return userInfo;
     }, function (err) {
+        logger.error(err);
         cb(false, 401, 'Denied');
     });
 };
@@ -39,6 +45,7 @@ var onMessage = function (data, flags) {
 };
 
 var onSocketError = function (err) {
+    logger.error(err);
     // context will be rpc instance
     if (this.socket && this.socket.readyState === this.OPEN) {
         // gracefully close
@@ -52,14 +59,13 @@ var onSocketError = function (err) {
 
 var onConnection = function (socket) {
     var rpc = new LocalRpc(socket);
-
     socket.on('error', _.bind(onSocketError, rpc));
     socket.on('message', _.bind(onMessage, rpc));
 };
 
 var onServerError = function (err) {
     // underlying protocol error
-    console.log(err);
+    logger.error(err);
     wsServerInstance.close();
     wsServerInstance = null;
 };

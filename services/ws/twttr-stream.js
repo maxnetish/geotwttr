@@ -1,11 +1,11 @@
 var TwitterStream = require('./../twitter/stream');
 var _ = require('lodash');
+var logger = require('../../helpers/logger');
 
 var streams = [];
 
-var onStreamResolve = function (socket, remote, stream, notify) {
+function onStreamResolve(socket, remote, stream, notify) {
     return function (e) {
-        console.log('resolve stream, socket state: '+socket.readyState);
         if (socket && socket.readyState === socket.OPEN) {
             remote.invoke(notify, {closed: 1, id: stream.id});
         }
@@ -13,12 +13,13 @@ var onStreamResolve = function (socket, remote, stream, notify) {
         _.remove(streams, function (item) {
             return item === stream;
         });
+        return e;
     };
-};
+}
 
-var onStreamError = function (socket, remote, stream, notify) {
+function onStreamError(socket, remote, stream, notify) {
     return function (err) {
-        console.log('error, socket state: '+socket.readyState);
+        logger.error(err);
         if (socket && socket.readyState === socket.OPEN) {
             remote.invoke(notify, {error: err.message, id: stream.id});
         } else {
@@ -27,22 +28,24 @@ var onStreamError = function (socket, remote, stream, notify) {
                 return item === stream;
             });
         }
+        return err;
     };
-};
+}
 
-var onStreamProgress = function (socket, remote, stream, notify) {
+function onStreamProgress(socket, remote, stream, notify) {
     return function (tweet) {
+        logger.message.response(socket.upgradeReq.user.id_str, tweet);
         if (socket && socket.readyState === socket.OPEN) {
             remote.invoke(notify, {tweet: tweet, id: stream.id});
         } else {
-            console.log('progress, socket state: '+socket.readyState);
             stream.dispose();
             _.remove(streams, function (item) {
                 return item === stream;
             });
         }
+        return tweet;
     };
-};
+}
 
 /**
  *
@@ -51,6 +54,8 @@ var onStreamProgress = function (socket, remote, stream, notify) {
  * @param opts: {notify, reqMethod, reqUrl, reqData}
  */
 var subscribe = function (socket, remote, opts) {
+    logger.message.request(socket.upgradeReq.user.id_str, opts);
+
     var stream = new TwitterStream({
         accessToken: socket.upgradeReq.signedCookies.at,
         method: opts.reqMethod,
