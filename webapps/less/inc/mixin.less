@@ -11,23 +11,23 @@
 
 /***  mixins  ***/
 .fontText(@fontSize: 14px) {
-  font: @fontSize "Lucida Grande", Helvetica, Arial, sans-serif;
+    font: @fontSize "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 
 .transition-hover-background(@hoverBackground: @colorBackgroundHover) {
-  transition: background 0.3s ease;
-  &:hover {
-    background: @hoverBackground;
-  }
+    transition: background 0.3s ease;
+    &:hover {
+        background: @hoverBackground;
+    }
 }
 
 .transition-hover-color(@hoverColor: gray) {
-  transition: background 0.3s ease;
-  &:hover{
-    color: darken(@hoverColor, 30%);
-  }
+    transition: background 0.3s ease;
+    &:hover {
+        color: darken(@hoverColor, 30%);
+    }
 }
 
 .transition-opacity(@duration: 0.3s) {
-  transition: opacity @duration ease;
+    transition: opacity @duration ease;
 }

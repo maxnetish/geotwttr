@@ -11,6 +11,7 @@ var appConfig = window.gt_config;
 
 reactRoot.initInBrowser(document.getElementById('react-wrapper'), appConfig);
 
+
 //setInterval(function(){
 //    reactRoot.setState({
 //        'now': Date.now()

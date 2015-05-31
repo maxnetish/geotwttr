@@ -91,10 +91,50 @@ module.exports = function (grunt) {
                     "lodash"
                 ]
             }
+        },
+        delta: {
+            /**
+             * By default, we want the Live Reload to work for all tasks; this is
+             * overridden in some tasks (like this file) where browser resources are
+             * unaffected. It runs by default on port 35729, which your browser
+             * plugin should auto-detect.
+             */
+            options: {
+                livereload: true
+            },
+
+            /**
+             * When our JavaScript source files change, we want to browserify
+             * but uglifying really not needed
+             */
+            js: {
+                files: ['webapps/public/**/*.js', '!webapps/public/**/__tests__/*.*'],
+                tasks: ['browserify']
+            },
+
+            /**
+             * When the LESS files change, we need to compile them.
+             */
+            less: {
+                files: ['webapps/less/**/*.less'],
+                tasks: ['less']
+            }
         }
     });
 
     require('load-grunt-tasks')(grunt);
+
+    /**
+     * In order to make it safe to just compile or copy *only* what was changed,
+     * we need to ensure we are starting from a clean, fresh build. So we rename
+     * the `watch` task to `delta` (that's why the configuration var above is
+     * `delta`) and then add a new task called `watch` that does a clean build
+     * before watching for changes.
+     */
+    grunt.renameTask('watch', 'delta');
+
+    grunt.registerTask('watch', [ 'clean', 'browserify', 'uglify', 'less', 'copy', 'delta' ]);
+
     grunt.registerTask('default', ['clean', 'browserify', 'uglify', 'less', 'copy']);
     grunt.registerTask('test', ['jest']);
     grunt.registerTask('testAndBuild', ['jest', 'clean', 'browserify', 'uglify', 'less', 'copy']);

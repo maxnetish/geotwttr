@@ -1,17 +1,17 @@
 @import "mixin.less";
 
 .tweet-feed-control-wrapper {
-  .tweet-feed-control {
-    background: @colorBackgroundHover;
-    padding: 5px;
-    button {
-      padding: 5px 10px;
+    .tweet-feed-control {
+        background: @colorBackgroundHover;
+        padding: 5px;
+        button {
+            padding: 5px 10px;
+        }
+        > * {
+            margin-right: 10px;
+        }
+        > *:last-child {
+            margin-right: 0;
+        }
     }
-    > * {
-      margin-right: 10px;
-    }
-    > *:last-child {
-      margin-right: 0;
-    }
-  }
 }
